@@ -1,4 +1,3 @@
-import FeesArt from "@/components/illustrations/FeesArt";
 import Image from "next/image";
 
 export default function Fees() {

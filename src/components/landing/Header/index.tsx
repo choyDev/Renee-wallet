@@ -22,20 +22,49 @@ const Header = () => {
       setSticky(false);
     }
   };
-  useEffect(() => {
-    window.addEventListener("scroll", handleStickyNavbar);
-  });
 
-  // submenu handler
-  const usePathName = usePathname();
+  const pathname = usePathname();
+  const [activeHash, setActiveHash] = useState<string>("");
+
+  useEffect(() => {
+    const sync = () => setActiveHash(window.location.hash || "");
+    sync(); // set on first render
+    window.addEventListener("hashchange", sync, { passive: true });
+    return () => window.removeEventListener("hashchange", sync);
+  }, []);
+
+  // When route changes to anything that's not "/", clear anchor highlight
+  useEffect(() => {
+    if (pathname !== "/") setActiveHash("");
+  }, [pathname]);
+
+  const isAnchorPath = (p?: string) => !!p && (p.startsWith("#") || p.startsWith("/#"));
+  const normHash = (p: string) => (p.startsWith("/#") ? p.slice(1) : p); // "/#features" -> "#features"
+
+  // Active rule:
+  // - Home: active when on "/" AND no anchor selected
+  // - Anchors: active when on "/" AND their hash matches activeHash
+  // - Other routes: active by pathname
+  const isActive = (p: string) => {
+    if (isAnchorPath(p)) return pathname === "/" && activeHash === normHash(p);
+    if (p === "/") return pathname === "/" && activeHash === "";
+    return pathname === p;
+  };
 
   return (
     <>
-      <header
+      {/* <header
         className={`header top-0 left-0 z-40 flex w-full items-center ${
           sticky
             ? "dark:bg-gray-dark dark:shadow-sticky-dark shadow-sticky fixed z-9999 bg-white/80 backdrop-blur-xs transition"
-            : "absolute bg-transparent"
+            : "bg-transparent"
+        }`}
+      > */}
+      <header
+        className={`sticky top-0 left-0 z-[9999] flex w-full items-center backdrop-blur ${
+          sticky
+            ? "bg-white/80 shadow-sticky transition dark:bg-gray-dark dark:shadow-sticky-dark"
+            : "bg-transparent"
         }`}
       >
         <div className="container">
@@ -48,14 +77,14 @@ const Header = () => {
                 } `}
               >
                 <Image
-                  src="/images/logo/logo-2.svg"
+                  src="/images/logo/logo-light.svg"
                   alt="logo"
                   width={140}
                   height={30}
                   className="w-full dark:hidden"
                 />
                 <Image
-                  src="/images/logo/logo.svg"
+                  src="/images/logo/logo-dark.svg"
                   alt="logo"
                   width={140}
                   height={30}
@@ -96,25 +125,41 @@ const Header = () => {
                   }`}
                 >
                   <ul className="block lg:flex lg:space-x-12">
-                    {menuData.map((menuItem, index) => (
-                      <li key={index} className="group relative">
-                        {menuItem.path ? (
+                    {menuData.map((m) => {
+                      if (!m.path) return null;
+                      const anchor = isAnchorPath(m.path);
+
+                      return (
+                        <li key={m.id} className="group relative">
                           <Link
-                            href={menuItem.path}
+                            href={m.path}
+                            prefetch={false}
+                            onClick={(e) => {
+                              if (anchor) {
+                                // smooth scroll + set hash
+                                e.preventDefault();
+                                const id = normHash(m.path!).slice(1);
+                                document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "start" });
+                                history.replaceState(null, "", normHash(m.path!));
+                                setActiveHash(normHash(m.path!));
+                              } else if (m.path === "/") {
+                                // clear anchor highlight when going Home
+                                setActiveHash("");
+                              }
+                              // close mobile menu if open
+                              setNavbarOpen(false);
+                            }}
                             className={`flex py-2 text-base lg:mr-0 lg:inline-flex lg:px-0 lg:py-6 ${
-                              usePathName === menuItem.path
+                              isActive(m.path)
                                 ? "text-primary dark:text-white"
                                 : "text-dark hover:text-primary dark:text-white/70 dark:hover:text-white"
                             }`}
                           >
-                            {menuItem.title}
+                            {m.title}
                           </Link>
-                        ) : (
-                          <>
-                          </>
-                        )}
-                      </li>
-                    ))}
+                        </li>
+                      );
+                    })}
                   </ul>
                 </nav>
               </div>
