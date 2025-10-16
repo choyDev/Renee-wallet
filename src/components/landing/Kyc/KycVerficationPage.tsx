@@ -14,10 +14,7 @@ const KycVerificationPage = () => {
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setLoading(true);
-    setTimeout(() => {
-      router.push("/dashboard");
-      setLoading(false);
-    }, 1000);
+    
   };
 
   return (
