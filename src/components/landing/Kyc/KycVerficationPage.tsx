@@ -4,6 +4,7 @@
 import React, {useEffect, useState } from "react";
 import { FaPassport, FaIdCard, FaCar, FaHome, } from "react-icons/fa";
 import { useRouter } from "next/navigation";
+import toast from "react-hot-toast";
 
 const KycVerificationPage = () => {
   const [kycType, setKycType] = useState<"personal" | "corporate">("personal");
@@ -39,20 +40,19 @@ const KycVerificationPage = () => {
       const data = await res.json();
 
       if (!res.ok) {
-        alert(data.error || "KYC submission failed");
+        toast.error(data.error || "KYC submission failed");
         return;
       }
 
-      // ✅ Update local user
       const updatedUser = { ...user, kycVerified: true };
       localStorage.setItem("user", JSON.stringify(updatedUser));
 
-      alert("✅ KYC verified & wallet created successfully!");
+      toast.success(" KYC verified & wallet created successfully!");
 
       router.push("/dashboard");
     } catch (err) {
       console.error(err);
-      // alert("⚠️ Server error. Try again later.");
+      toast.error("An error occured. Please try again");
     } finally {
       setLoading(false);
     }

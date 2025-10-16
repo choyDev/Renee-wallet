@@ -2,6 +2,7 @@
 import Link from "next/link";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import toast from "react-hot-toast";
 
 const SignupPage = () => {
 
@@ -29,9 +30,9 @@ const SignupPage = () => {
       const data = await res.json();
 
       if (!res.ok) {
-        setMessage(data.error || "Registration failed");
+        toast.error(data.error);
       } else {
-        setMessage("✅ Account created successfully! You can now sign in.");
+        toast.success("Account created successfully! You can now sign in.");
         setFormData({ full_name: "", email: "", password: "" });
         setTimeout(() => {
           router.push("/signin");
@@ -39,7 +40,7 @@ const SignupPage = () => {
       }
     } catch (err) {
       console.error("Signup error:", err);
-      setMessage("⚠️ Server error. Please try again.");
+      toast.error("An error occured! Please try again.")
     } finally {
       setLoading(false);
     }
