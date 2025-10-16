@@ -78,7 +78,7 @@ const TokensTable = () => {
                 key={i}
                 className="border-b border-gray-100 dark:border-gray-800 hover:bg-gray-50 dark:hover:bg-gray-800/40 transition"
               >
-                <td className="py-4 px-4 flex items-center gap-2 font-medium text-gray-800 dark:text-white/90">
+                <td className="py-4 px-4 flex items-center gap-2 font-medium text-gray-800 dark:text-white/90 notranslate">
                   {t.icon}
                   <span>{t.name}</span>
                 </td>

@@ -1,60 +1,85 @@
 'use client';
 
 import Script from 'next/script';
-import { useEffect } from 'react';
+import {useEffect, useState} from 'react';
 
 type Lang = { name: string; title: string };
 
-declare global {
-  interface Window {
-    __GOOGLE_TRANSLATION_CONFIG__?: {
-      defaultLanguage: string;
-      languages: Lang[];
-    };
-    google?: any;
-    googleTranslateElementInit?: () => void;
-  }
+function shouldLoadGoogleTranslate(): boolean {
+  // Look for googtrans cookie and see if target != 'en'
+  const m = (typeof document !== 'undefined' ? document.cookie : '').match(/(?:^|;\s*)googtrans=([^;]+)/);
+  if (!m) return false; // no cookie => don't load
+  const parts = decodeURIComponent(m[1]).split('/'); // "/en/tr"
+  const to = (parts[2] || 'en').toLowerCase();
+  return to !== 'en';
 }
 
-// This renders the hidden host element and loads the Google script.
-// Put it once in your root layout.
 export default function GoogleTranslateProvider({
   defaultLanguage = 'en',
-  languages = [{ name: 'en', title: 'English' }, { name: 'tr', title: 'Türkçe' }],
+  languages = [
+    { name: 'en', title: 'English' },
+    { name: 'tr', title: 'Türkçe' },
+  ],
 }: {
   defaultLanguage?: string;
   languages?: Lang[];
 }) {
-  // make config available before the google script runs
+  const [loadGT, setLoadGT] = useState(false);
+
+  // Decide on the client whether to load the translator
   useEffect(() => {
-    window.__GOOGLE_TRANSLATION_CONFIG__ = { defaultLanguage, languages };
-  }, [defaultLanguage, languages]);
+    setLoadGT(shouldLoadGoogleTranslate());
+  }, []);
+
+  // Serialize config for the init
+  const cfg = JSON.stringify({ defaultLanguage, languages });
 
   return (
     <>
-      {/* Hidden host element for Google translator UI */}
-      <div id="google_translate_element" className="hidden" />
+      {/* host element for Google widget (kept hidden) */}
+      <div id="google_translate_element" className="hidden notranslate" />
 
-      {/* Your tiny initializer (equivalent to assets/translation.js) */}
-      <Script id="gt-init" strategy="afterInteractive">{`
-        function TranslateInit() {
-          if (!window.__GOOGLE_TRANSLATION_CONFIG__) return;
-          new google.translate.TranslateElement({
-            pageLanguage: window.__GOOGLE_TRANSLATION_CONFIG__.defaultLanguage,
-            includedLanguages: window.__GOOGLE_TRANSLATION_CONFIG__.languages.map(l => l.name).join(','),
-            layout: google.translate.TranslateElement.InlineLayout.SIMPLE,
-            autoDisplay: false,
-            multilanguagePage: true
-          }, 'google_translate_element');
-        }
-        window.googleTranslateElementInit = TranslateInit;
-      `}</Script>
+      {loadGT && (
+        <>
+          {/* Make config available before the external script runs */}
+          <Script id="gt-config" strategy="afterInteractive">
+            {`window.__GOOGLE_TRANSLATION_CONFIG__ = ${cfg};`}
+          </Script>
 
-      {/* Load Google Website Translator */}
-      <Script
-        src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"
-        strategy="afterInteractive"
-      />
+          {/* Define init (idempotent) before loading Google */}
+          <Script id="gt-init" strategy="afterInteractive">{`
+            (function () {
+              if (window.__gt_initialized__) return;
+              window.__gt_initialized__ = true;
+              window.googleTranslateElementInit = function TranslateInit() {
+                var cfg = window.__GOOGLE_TRANSLATION_CONFIG__ || {};
+                if (!window.google || !window.google.translate) return;
+                try {
+                  new window.google.translate.TranslateElement(
+                    {
+                      pageLanguage: cfg.defaultLanguage || 'en',
+                      // include only what you need; keeping 'en' is fine too
+                      includedLanguages: (Array.isArray(cfg.languages)
+                        ? cfg.languages.map(function (l) { return l.name; })
+                        : ['tr']).join(','),
+                      layout: window.google.translate.TranslateElement.InlineLayout.SIMPLE,
+                      autoDisplay: false,
+                      multilanguagePage: true
+                    },
+                    'google_translate_element'
+                  );
+                } catch (e) {}
+              };
+            })();
+          `}</Script>
+
+          {/* Load Google only when we actually need translation */}
+          <Script
+            src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"
+            strategy="afterInteractive"
+          />
+        </>
+      )}
     </>
   );
 }

@@ -27,7 +27,7 @@ const PortfolioAssets = () => {
       <h3 className="font-semibold text-gray-800 dark:text-white/90 mb-4">
         Portfolio Assets
       </h3>
-      <div className="flex justify-center flex-1 items-center">
+      <div className="flex justify-center flex-1 items-center notranslate">
         <ReactApexChart options={options} series={series} type="donut" height={260} />
       </div>
     </div>

@@ -45,7 +45,7 @@
     "regenerator-runtime": "^0.14.1",
     "swiper": "^11.2.0",
     "tailwind-merge": "^2.6.0",
-    "tronweb": "^6.0.2"
+    "tronweb": "^1.1.2"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
