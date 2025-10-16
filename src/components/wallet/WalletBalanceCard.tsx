@@ -252,7 +252,7 @@ export default function WalletBalanceCard() {
               {balances.map((b, i) => (
                 <tr
                   key={i}
-                  className="hover:bg-gray-50 dark:hover:bg-[#1A2235] transition"
+                  className="hover:bg-gray-50 dark:hover:bg-[#1A2235] transition notranslate"
                 >
                   <td className="px-5 py-3 flex items-center gap-2 font-medium">
                     <div className="flex items-center justify-center w-6 h-6 rounded-full bg-gray-100 dark:bg-gray-700">
