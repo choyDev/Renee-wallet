@@ -8,7 +8,7 @@ import Link from "next/link";
 export default function KycVerification() {
   return (
     <section className="relative flex min-h-screen items-center justify-center overflow-hidden bg-[#0B1120]">
-      {/* 🟢 Decorative background (same as SignIn) */}
+     
       <div className="absolute inset-0 z-0">
         <svg
           width="1440"

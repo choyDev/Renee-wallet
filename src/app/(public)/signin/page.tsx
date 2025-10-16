@@ -29,8 +29,13 @@ const SigninPage = () => {
       if (!res.ok) {
         setMessage(data.error || "Invalid credentials");
       } else {
+        localStorage.setItem("user", JSON.stringify(data.user));
         setMessage("✅ Logged in successfully!");
-        setTimeout(() => router.push("/kyc-verification"), 1000);
+        if (data.user.kycVerified) {
+          router.push("/dashboard");
+        } else {
+          router.push("/kyc-verification");
+        }
       }
     } catch (err) {
       setMessage("⚠️ Server error. Try again later.");

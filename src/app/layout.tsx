@@ -27,20 +27,13 @@
 
 import { Outfit } from "next/font/google";
 import "./globals.css";
-import type { Metadata } from "next";
+
 
 const outfit = Outfit({
   subsets: ["latin"],
 });
 
-export const metadata: Metadata = {
-  title: "Renee Wallet",
-  description: "Hot and Custodial Wallet",
-  icons: {
-    icon: "/favicon.ico",
-    shortcut: "/favicon.ico",
-  },
-};
+
 
 export default function RootLayout({
   children,
