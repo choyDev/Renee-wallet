@@ -14,12 +14,138 @@ datasource db {
 }
 
 model User {
-  id           Int       @id @default(autoincrement())
-  full_name    String
-  email        String    @unique
-  password_hash String
-  user_type    String    @default("personal")
-  kyc_status   String    @default("pending")
-  created_at   DateTime  @default(now())
-  updated_at   DateTime  @updatedAt
+  id             Int              @id @default(autoincrement())
+  email          String           @unique
+  password_hash  String
+  full_name      String?
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
+  wallets        Wallet[]
+  kycs           KycVerification[]
+  fiatDeposits   FiatDeposit[]
+  transactions   Transaction[]
 }
+
+model Network {
+  id             Int              @id @default(autoincrement())
+  name           String           // e.g. "Solana", "Tron"
+  symbol         String           // e.g. "SOL", "TRX"
+  chainId        String?          // optional chain id or RPC id
+  rpcUrl         String?          // node endpoint
+  explorerUrl    String?          // e.g. "https://tronscan.org/"
+  tokens         Token[]
+  wallets        Wallet[]
+}
+
+model Wallet {
+  id             Int              @id @default(autoincrement())
+  user           User             @relation(fields: [userId], references: [id])
+  userId         Int
+  network        Network          @relation(fields: [networkId], references: [id])
+  networkId      Int
+  address        String           @unique
+  privateKeyEnc  String?          // encrypted private key
+  createdAt      DateTime         @default(now())
+  balances       TokenBalance[]
+  transactions   Transaction[]
+}
+
+model Token {
+  id             Int              @id @default(autoincrement())
+  network        Network          @relation(fields: [networkId], references: [id])
+  networkId      Int
+  symbol         String
+  name           String
+  contractAddr   String?          // null for native coin
+  decimals       Int
+  isStablecoin   Boolean          @default(false)
+  balances       TokenBalance[]
+  transactions   Transaction[]
+}
+
+model TokenBalance {
+  id             Int              @id @default(autoincrement())
+  wallet         Wallet           @relation(fields: [walletId], references: [id])
+  walletId       Int
+  token          Token            @relation(fields: [tokenId], references: [id])
+  tokenId        Int
+  amount         Decimal          @default(0.0)
+  updatedAt      DateTime         @updatedAt
+}
+
+model Transaction {
+  id             Int              @id @default(autoincrement())
+  wallet         Wallet           @relation(fields: [walletId], references: [id])
+  walletId       Int
+  user           User             @relation(fields: [userId], references: [id])
+  userId         Int
+  token          Token?           @relation(fields: [tokenId], references: [id])
+  tokenId        Int?
+  type           TransactionType
+  amount         Decimal
+  txHash         String?          @unique
+  status         TxStatus         @default(PENDING)
+  fromAddress    String?
+  toAddress      String?
+  createdAt      DateTime         @default(now())
+}
+
+
+model FiatDeposit {
+  id             Int              @id @default(autoincrement())
+  user           User             @relation(fields: [userId], references: [id])
+  userId         Int
+  amountTRY      Decimal
+  convertedUSDT  Decimal?
+  bankRef        String?          // reference number / transaction id
+  status         DepositStatus    @default(PENDING)
+  createdAt      DateTime         @default(now())
+}
+
+model KycVerification {
+  id             Int              @id @default(autoincrement())
+  user           User             @relation(fields: [userId], references: [id])
+  userId         Int
+  type           KycType          // PERSONAL or CORPORATE
+  fullName       String?
+  companyName    String?
+  documentType   String?
+  documentNumber String?
+  verified       Boolean          @default(false)
+  verifiedAt     DateTime?
+  createdAt      DateTime         @default(now())
+}
+
+model ExchangeRate {
+  id             Int              @id @default(autoincrement())
+  baseCurrency   String           // "TRY"
+  quoteCurrency  String           // "USDT"
+  rate           Decimal
+  fetchedAt      DateTime         @default(now())
+}
+
+enum TransactionType {
+  DEPOSIT
+  WITHDRAW
+  TRANSFER
+  CONVERT
+}
+
+enum TxStatus {
+  PENDING
+  CONFIRMED
+  FAILED
+}
+
+enum DepositStatus {
+  PENDING
+  COMPLETED
+  FAILED
+}
+
+enum KycType {
+  PERSONAL
+  CORPORATE
+}
+
+

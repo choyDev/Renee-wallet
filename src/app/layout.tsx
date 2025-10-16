@@ -27,10 +27,20 @@
 
 import { Outfit } from "next/font/google";
 import "./globals.css";
+import type { Metadata } from "next";
 
 const outfit = Outfit({
   subsets: ["latin"],
 });
+
+export const metadata: Metadata = {
+  title: "Renee Wallet",
+  description: "Hot and Custodial Wallet",
+  icons: {
+    icon: "/favicon.ico",
+    shortcut: "/favicon.ico",
+  },
+};
 
 export default function RootLayout({
   children,
@@ -39,6 +49,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" suppressHydrationWarning>
+      
       <body className={`${outfit.className} bg-white dark:bg-gray-900`}>
         {children}
       </body>
