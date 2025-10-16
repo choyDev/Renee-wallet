@@ -741,9 +741,28 @@ span.flatpickr-weekday,
 
 
 /* Hide the big banner and bubble Google injects */
-.goog-te-banner-frame.skiptranslate, .goog-te-gadget-icon { display: none !important; }
-body { top: 0 !important; } /* prevent body offset */
+/* .goog-te-banner-frame.skiptranslate, .goog-te-gadget-icon { display: none !important; }
+body { top: 0 !important; } 
 #goog-gt-tt, .goog-tooltip, .goog-te-balloon-frame { display: none !important; }
 .goog-text-highlight { background: transparent !important; box-shadow: none !important; }
-/* If an iframe remains, collapse it */
-iframe[id^=":"] { display: none !important; }
+iframe[id^=":"] { display: none !important; } */
+
+
+#google_translate_element { display: none; }
+.goog-te-banner-frame.skiptranslate { display: none !important; }
+body { top: 0 !important; }
+
+.goog-te-banner-frame.skiptranslate,
+.goog-te-balloon-frame,
+.goog-logo-link,
+.goog-te-gadget {
+  display: none !important;
+}
+.skiptranslate {
+	display: none !important;
+}
+
+div[class*="VIpgJd-ZVi9od-aZ2wEe-OiiCO"] {
+  display: none !important;
+  pointer-events: none !important;
+}
