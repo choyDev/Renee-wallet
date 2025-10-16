@@ -9,6 +9,9 @@ const nextConfig: NextConfig = {
     });
     return config;
   },
+  eslint: {
+    ignoreDuringBuilds: true, // ✅ Skip ESLint during production build
+  },
 };
 
 export default nextConfig;

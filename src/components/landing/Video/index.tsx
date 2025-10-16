@@ -1,6 +1,6 @@
 "use client";
 
-import VideoModal from "@/components/video-modal";
+import VideoModal from "../video-modal";
 import Image from "next/image";
 import { useState } from "react";
 import SectionTitle from "../Common/SectionTitle";

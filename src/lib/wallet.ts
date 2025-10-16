@@ -2,6 +2,8 @@ import { prisma } from "@/lib/prisma";
 import { Keypair } from "@solana/web3.js";
 import crypto from "crypto";
 const TronWeb = require("tronweb");
+import "regenerator-runtime/runtime";
+
 
 const PRIVATE_KEY_SECRET = process.env.PRIVATE_KEY_SECRET || "supersecret32byteskey!!";
 
