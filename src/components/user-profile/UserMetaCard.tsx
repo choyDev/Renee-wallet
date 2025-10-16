@@ -7,8 +7,15 @@ import Input from "../form/input/InputField";
 import Label from "../form/Label";
 import Image from "next/image";
 
+interface UserMetaCardProps {
+  userData?: {
+    id?: number;
+    name?: string;
+    email?: string;
+  } | null;
+}
 
-export default function UserMetaCard() {
+export default function UserMetaCard({ userData }: UserMetaCardProps) {
   const { isOpen, openModal, closeModal } = useModal();
   const handleSave = () => {
     // Handle save logic here
@@ -30,7 +37,7 @@ export default function UserMetaCard() {
             </div>
             <div className="order-3 xl:order-2">
               <h4 className="mb-2 text-lg font-semibold text-center text-gray-800 dark:text-white/90 xl:text-left">
-                Bounkyo K.
+                {userData?.name}
               </h4>
               <div className="flex flex-col items-center gap-1 text-center xl:flex-row xl:gap-3 xl:text-left">
                 <p className="text-sm text-gray-500 dark:text-gray-400">

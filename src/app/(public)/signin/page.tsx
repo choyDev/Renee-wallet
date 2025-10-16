@@ -2,6 +2,7 @@
 import Link from "next/link";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import toast from "react-hot-toast";
 
 const SigninPage = () => {
   const router = useRouter();
@@ -27,10 +28,10 @@ const SigninPage = () => {
       const data = await res.json();
 
       if (!res.ok) {
-        setMessage(data.error || "Invalid credentials");
+        toast.error(data.error);
       } else {
         localStorage.setItem("user", JSON.stringify(data.user));
-        setMessage("✅ Logged in successfully!");
+        toast.success("Sign in successfully!")
         if (data.user.kycVerified) {
           router.push("/dashboard");
         } else {
@@ -38,7 +39,7 @@ const SigninPage = () => {
         }
       }
     } catch (err) {
-      setMessage("⚠️ Server error. Try again later.");
+      toast.error("Something went wrong!");
     } finally {
       setLoading(false);
     }

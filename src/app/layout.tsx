@@ -1,40 +1,14 @@
-// import { Outfit } from 'next/font/google';
-// import './globals.css';
-
-// import { SidebarProvider } from '@/context/SidebarContext';
-// import { ThemeProvider } from '@/context/ThemeContext';
-
-// const outfit = Outfit({
-//   subsets: ["latin"],
-// });
-
-// export default function RootLayout({
-//   children,
-// }: Readonly<{
-//   children: React.ReactNode;
-// }>) {
-//   return (
-//     <html lang="en">
-//       <body className={`${outfit.className} dark:bg-gray-900`}>
-//         <ThemeProvider>
-//           <SidebarProvider>{children}</SidebarProvider>
-//         </ThemeProvider>
-//       </body>
-//     </html>
-//   );
-// }
-
-
-"use client";
 
 import { Outfit } from "next/font/google";
+import { Toaster } from "react-hot-toast";
 import "./globals.css";
-import { ThemeProvider } from "next-themes";
-import GoogleTranslateProvider from "@/components/i18n/GoogleTranslateProvider";
+import RootClientWrapper from "@/components/RootClientWrapper";
 
-const outfit = Outfit({
-  subsets: ["latin"],
-});
+const outfit = Outfit({ subsets: ["latin"] });
+
+export const metadata = {
+  title: "Renee Wallet",
+};
 
 export default function RootLayout({
   children,
@@ -44,7 +18,6 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
-        {/* Prevent dark/light flicker before hydration */}
         <script
           dangerouslySetInnerHTML={{
             __html: `
@@ -60,23 +33,23 @@ export default function RootLayout({
           }}
         />
       </head>
-
       <body className={`${outfit.className} bg-white dark:bg-gray-900`}>
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="system"
-          enableSystem={true}
-        >
-          {children}
-          <GoogleTranslateProvider
-            defaultLanguage="en"
-            languages={[
-              { name: "en", title: "English" },
-              { name: "tr", title: "Türkçe" },
-            ]}
-          />
-        </ThemeProvider>
+        <RootClientWrapper>{children}</RootClientWrapper>
+        <Toaster
+          position="top-right"
+          toastOptions={{
+            className:
+              "bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100 border border-gray-200 dark:border-gray-700 rounded-xl shadow-lg px-4 py-3",
+            success: {
+              iconTheme: { primary: "#10B981", secondary: "#fff" },
+            },
+            error: {
+              iconTheme: { primary: "#EF4444", secondary: "#fff" },
+            },
+          }}
+        />
       </body>
     </html>
   );
 }
+

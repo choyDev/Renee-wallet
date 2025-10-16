@@ -186,7 +186,7 @@ import {
   FaPaperPlane,
   FaExchangeAlt,
   FaDollarSign,
-  FaMoneyBillWave,
+  FaCoins,
   FaLandmark,
   FaLink,
 } from "react-icons/fa";
@@ -290,7 +290,7 @@ export default function WalletBalanceCard() {
             <div className="absolute inset-0 bg-gradient-to-t from-transparent to-white/10 dark:to-white/5 pointer-events-none" />
 
             <div className="bg-gray-800/10 dark:bg-white/10 rounded-full p-4 mb-4 backdrop-blur-sm">
-              <FaMoneyBillWave className="text-gray-700 dark:text-white text-3xl" />
+              <FaCoins className="text-gray-700 dark:text-white text-3xl" />
             </div>
 
             <h2 className="text-5xl font-extrabold tracking-tight text-gray-900 dark:text-white">
