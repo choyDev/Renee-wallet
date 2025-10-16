@@ -22,7 +22,7 @@ const blogData: Blog[] = [
       "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras sit amet dictum neque, laoreet dolor.",
     image: "/images/blog/blog-02.jpg",
     author: {
-      name: "Musharof Chy",
+      name: "Bounkyo Chy",
       image: "/images/blog/author-02.png",
       designation: "Content Writer",
     },

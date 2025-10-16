@@ -1,4 +1,3 @@
-import SecurityArt from "@/components/illustrations/SecurityArt";
 import Image from "next/image";
 
 export default function Security() {
@@ -22,8 +21,8 @@ export default function Security() {
 
         {/* RIGHT: content card */}
         <div className="rounded-2xl border border-white/10 bg-white/5 p-6 shadow-[0_8px_24px_rgba(2,6,23,0.25)] backdrop-blur ring-1 ring-white/[0.04]">
-          <h3 className="text-xl font-semibold text-white">Security & Compliance</h3>
-          <ul className="mt-4 grid gap-3 text-slate-300 md:grid-cols-1">
+          <h3 className="text-xl font-semibold text-black dark:text-white">Security & Compliance</h3>
+          <ul className="mt-4 grid gap-3 text-slate-900 dark:text-slate-300 md:grid-cols-1">
             <Item> AES-256-GCM encrypted private keys (server only) </Item>
             <Item> HTTPS, rate limiting, audit logs </Item>
             <Item> KYC-gated access, role-based admin </Item>
