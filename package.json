@@ -18,12 +18,15 @@
     "@prisma/client": "^6.17.1",
     "@react-jvectormap/core": "^1.0.4",
     "@react-jvectormap/world": "^1.1.2",
+    "@solana/web3.js": "^1.98.4",
     "@tailwindcss/forms": "^0.5.9",
     "@tailwindcss/postcss": "^4.0.9",
     "apexcharts": "^4.3.0",
     "autoprefixer": "^10.4.20",
     "bcryptjs": "^3.0.2",
+    "crypto": "^1.0.1",
     "flatpickr": "^4.6.13",
+    "framer-motion": "^12.23.24",
     "jsonwebtoken": "^9.0.2",
     "next": "^15.5.5",
     "next-themes": "^0.2.1",
@@ -34,10 +37,15 @@
     "react-dom": "^19.0.0",
     "react-dropzone": "^14.3.5",
     "react-icons": "^5.5.0",
+    "react-qr-code": "^2.0.18",
     "swiper": "^11.2.0",
     "tailwind-merge": "^2.6.0",
+<<<<<<< HEAD
     "nookies": "^2.5.2",
     "lucide-react": "0.545.0"
+=======
+    "tronweb": "^6.0.2"
+>>>>>>> 62126810225cb5045b865c79b3f7c2158737001f
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",

@@ -41,7 +41,6 @@ const navItems = [
     subItems: [
       { name: "Overview", path: "/wallet" },
       { name: "Deposit", path: "/wallet/deposit" },
-      { name: "Withdraw", path: "/wallet/withdraw" },
       { name: "Transactions", path: "/wallet/transactions" },
     ],
   },
