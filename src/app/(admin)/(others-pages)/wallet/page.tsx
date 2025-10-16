@@ -23,16 +23,12 @@ export default function WalletOverviewPage() {
           symbol="TRX"
           tokenAmount="0"
           usdAmount="0.00"
-          color="#E11D48"
-          gradient="from-pink-500 to-pink-400"
         />
         <WalletNetworkCard
           name="Solana"
           symbol="SOL"
           tokenAmount="0"
           usdAmount="0.00"
-          color="#8B5CF6"
-          gradient="from-purple-600 to-purple-400"
         />
       </div>
 

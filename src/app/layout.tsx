@@ -41,8 +41,9 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={`${outfit.className} bg-white dark:bg-gray-900`}>
+      <body className={`${outfit.className} bg-white dark:bg-gray-900`} translate="no">
         {children}
+        <div id="google_translate_portal"></div>
         <GoogleTranslateProvider
           defaultLanguage="en"
           languages={[
