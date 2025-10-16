@@ -143,7 +143,7 @@ export default function LanguageSwitcher({
     <div className="relative" ref={rootRef}>
       <button
         onClick={() => setOpen(v => !v)}
-        className="inline-flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-medium
+        className="inline-flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-black font-medium
                    hover:bg-slate-50 dark:border-white/10 dark:bg-white/5 dark:text-white"
         aria-haspopup="listbox"
         aria-expanded={open}
@@ -167,7 +167,7 @@ export default function LanguageSwitcher({
               onClick={() => select(l.name)}
               className={`w-full rounded-md px-3 py-2 text-left text-sm
                 ${current === l.name
-                  ? 'bg-primary/15 text-primary'
+                  ? 'bg-brand-100 text-brand-500 dark:bg-white/10 dark:text-brand-400'
                   : 'hover:bg-slate-100 dark:hover:bg-white/10 text-slate-700 dark:text-slate-200'}`}
             >
               {l.title}

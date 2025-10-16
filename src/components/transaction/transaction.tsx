@@ -137,7 +137,7 @@ const TransactionTable = () => {
                 className="border-b border-gray-100 dark:border-gray-800 hover:bg-gray-50 dark:hover:bg-[#1A2235]/40 transition"
               >
                 {/* Coin */}
-                <td className="py-4 px-4 flex items-center gap-2 font-medium text-gray-800 dark:text-white/90">
+                <td className="py-4 px-4 flex items-center gap-2 font-medium text-gray-800 dark:text-white/90 notranslate">
                   {getIcon(a.coin)}
                   <span>{a.coin}</span>
                 </td>
