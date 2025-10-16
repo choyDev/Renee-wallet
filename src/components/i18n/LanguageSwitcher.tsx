@@ -89,7 +89,7 @@ export default function LanguageSwitcher({
     { name: 'tr', title: 'Türkçe' }
   ],
   defaultLanguage = 'en',
-  cookieDomain // optional override: e.g. ".yourdomain.com"
+  cookieDomain = "reneewallet.io",
 }: {
   languages?: Lang[];
   defaultLanguage?: 'en' | 'tr';
