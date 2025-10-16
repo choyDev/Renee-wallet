@@ -84,7 +84,7 @@ export default function LanguageSwitcher({
     <div className="relative" ref={rootRef}>
       <button
         onClick={() => setOpen(v => !v)}
-        className="inline-flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-medium
+        className="inline-flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-black font-medium
                    hover:bg-slate-50 dark:border-white/10 dark:bg-white/5 dark:text-white"
         aria-haspopup="listbox"
         aria-expanded={open}
