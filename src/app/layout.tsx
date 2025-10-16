@@ -27,21 +27,13 @@
 
 import { Outfit } from "next/font/google";
 import "./globals.css";
-<<<<<<< HEAD
-import GoogleTranslateProvider from '@/components/i18n/GoogleTranslateProvider';
-=======
 
->>>>>>> 6b96a81b8bc7c5badbf001bdd3f61a58f7c37855
+import GoogleTranslateProvider from '@/components/i18n/GoogleTranslateProvider';
 
 const outfit = Outfit({
   subsets: ["latin"],
 });
 
-<<<<<<< HEAD
-=======
-
-
->>>>>>> 6b96a81b8bc7c5badbf001bdd3f61a58f7c37855
 export default function RootLayout({
   children,
 }: {
