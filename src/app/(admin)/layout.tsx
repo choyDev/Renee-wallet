@@ -17,7 +17,9 @@ export default function AdminLayout({
   return (
     <ThemeProvider>
       <SidebarProvider>
-        <AdminLayoutInner>{children}</AdminLayoutInner>
+        <AdminLayoutInner>
+          {children}
+        </AdminLayoutInner>
       </SidebarProvider>
     </ThemeProvider>
   );

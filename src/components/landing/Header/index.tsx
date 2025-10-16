@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import ThemeToggler from "./ThemeToggler";
 import menuData from "./menuData";
+import LanguageSwitcher from '@/components/i18n/LanguageSwitcher';
 
 const Header = () => {
   // Navbar toggle
@@ -179,6 +180,7 @@ const Header = () => {
                 <div>
                   <ThemeToggler />
                 </div>
+                <LanguageSwitcher />
               </div>
             </div>
           </div>
