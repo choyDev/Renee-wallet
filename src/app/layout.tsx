@@ -27,6 +27,7 @@
 
 import { Outfit } from "next/font/google";
 import "./globals.css";
+import GoogleTranslateProvider from '@/components/i18n/GoogleTranslateProvider';
 
 
 const outfit = Outfit({
@@ -45,6 +46,13 @@ export default function RootLayout({
       
       <body className={`${outfit.className} bg-white dark:bg-gray-900`}>
         {children}
+        <GoogleTranslateProvider
+          defaultLanguage="en"
+          languages={[
+            { name: 'en', title: 'English' },
+            { name: 'tr', title: 'Türkçe' }
+          ]}
+        />
       </body>
     </html>
   );

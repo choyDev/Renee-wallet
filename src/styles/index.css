@@ -134,3 +134,12 @@ layer(base);
     @apply inline-flex;
   }
 }
+
+
+/* Hide the big banner and bubble Google injects */
+.goog-te-banner-frame.skiptranslate, .goog-te-gadget-icon { display: none !important; }
+body { top: 0 !important; } /* prevent body offset */
+#goog-gt-tt, .goog-tooltip, .goog-te-balloon-frame { display: none !important; }
+.goog-text-highlight { background: transparent !important; box-shadow: none !important; }
+/* If an iframe remains, collapse it */
+iframe[id^=":"] { display: none !important; }

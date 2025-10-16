@@ -40,7 +40,12 @@
     "react-qr-code": "^2.0.18",
     "swiper": "^11.2.0",
     "tailwind-merge": "^2.6.0",
+<<<<<<< HEAD
     "tronweb": "^6.0.2"
+=======
+    "nookies": "^2.5.2",
+    "lucide-react": "0.545.0"
+>>>>>>> 0759bf5 (add Turkey language switcher)
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
