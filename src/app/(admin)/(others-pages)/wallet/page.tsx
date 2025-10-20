@@ -16,6 +16,7 @@ interface WalletData {
   balances: {
     token: { symbol: string; name: string };
     amount: string;
+    usd: number;
   }[];
 }
 
@@ -28,27 +29,35 @@ export default function WalletOverviewPage() {
       try {
         const storedUser = localStorage.getItem("user");
         const userId = storedUser ? JSON.parse(storedUser).id : null;
-        if (!userId) {
-          console.warn("⚠️ No user_id found in localStorage");
-          return;
+        if (!userId) return;
+
+        const res = await fetch(`/api/wallets/balances?userId=${userId}`, { cache: "no-store" });
+
+        // Read text first so we can diagnose non-JSON / empty bodies
+        const text = await res.text();
+        let data: any = null;
+
+        try {
+          data = text ? JSON.parse(text) : null;
+        } catch {
+          // Not JSON (e.g., HTML error page)
+          throw new Error(`Non-JSON response (${res.status}): ${text.slice(0, 200)}`);
         }
 
-        const response = await fetch(`/api/wallets?userId=${userId}`);
-        const data = await response.json();
-
-        if (!response.ok) throw new Error(data.error || "Failed to fetch wallets");
+        if (!res.ok) {
+          throw new Error(data?.error || `Request failed with ${res.status}`);
+        }
 
         const wallets: WalletData[] = data.wallets || [];
-
-        // ✅ Filter Tron & Solana networks
         const tron = wallets.find((w) => w.network.symbol === "TRX") || null;
-        const solana = wallets.find((w) => w.network.symbol === "SOL") || null;
+        const sol  = wallets.find((w) => w.network.symbol === "SOL") || null;
 
         setTronWallet(tron);
-        setSolanaWallet(solana);
-      } catch (error) {
-        console.error("Error fetching wallet data:", error);
-      } 
+        setSolanaWallet(sol);
+      } catch (err) {
+        console.error("Error fetching wallet data:", err);
+        // optional: show a toast/UI hint
+      }
     };
 
     fetchWallets();
@@ -69,16 +78,17 @@ export default function WalletOverviewPage() {
         <WalletNetworkCard
           name="Tron"
           symbol="TRX"
-          tokenAmount="0"
-          usdAmount="0.00"
+          tokenAmount={tronWallet?.balances?.[0]?.amount ?? "0"}
+          usdAmount={(tronWallet?.balances?.[0]?.usd ?? 0).toFixed?.(2) ?? "0.00"}
           address={tronWallet?.address}
           explorerUrl={tronWallet?.network.explorerUrl}
         />
+
         <WalletNetworkCard
           name="Solana"
           symbol="SOL"
-          tokenAmount="0"
-          usdAmount="0.00"
+          tokenAmount={solanaWallet?.balances?.[0]?.amount ?? "0"}
+          usdAmount={(solanaWallet?.balances?.[0]?.usd ?? 0).toFixed?.(2) ?? "0.00"}
           address={solanaWallet?.address}
           explorerUrl={solanaWallet?.network.explorerUrl}
         />

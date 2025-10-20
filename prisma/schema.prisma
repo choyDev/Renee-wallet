@@ -30,8 +30,8 @@ model Network {
   id             Int              @id @default(autoincrement())
   name           String           // e.g. "Solana", "Tron"
   symbol         String           // e.g. "SOL", "TRX"
-  chainId        String?          // optional chain id or RPC id
-  rpcUrl         String?          // node endpoint
+  chainId        String          // optional chain id or RPC id
+  rpcUrl         String          // node endpoint
   explorerUrl    String?          // e.g. "https://tronscan.org/"
   tokens         Token[]
   wallets        Wallet[]
