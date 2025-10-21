@@ -172,7 +172,7 @@ import {
   FaEye,
   FaEyeSlash,
 } from "react-icons/fa";
-import { SiSolana, SiTether } from "react-icons/si";
+import { SiSolana, SiTether, SiEthereum, SiBitcoin } from "react-icons/si";
 import QRCode from "react-qr-code";
 
 // ✅ Tron Icon
@@ -189,21 +189,26 @@ const TronIcon = ({ className = "text-[#FF4747] w-5 h-5" }) => (
 
 interface Props {
   name: string;
-  symbol: string;
-  tokenAmount: string;
-  usdAmount: string;
+  symbol: "TRX" | "SOL" | "ETH" | "BTC";
   address?: string;
-  explorerUrl?: string;
+  explorerUrl?: string | null;
+  chainId?: string | null;
+  tokenAmount: string;
+  usdAmount: string; // or number you format inside
 }
 
 export default function WalletNetworkCard({
   name,
   symbol,
-  tokenAmount,
-  usdAmount,
   address,
   explorerUrl,
+  chainId,
+  tokenAmount,
+  usdAmount,
 }: Props) {
+  const viewHref = buildExplorerAddressUrl({ symbol, address, explorerUrl, chainId });
+  const canView = !!viewHref;
+
   const [showQR, setShowQR] = useState(false);
   const [showAddress, setShowAddress] = useState(false);
 
@@ -229,8 +234,12 @@ export default function WalletNetworkCard({
         return <SiSolana className="text-[#14F195] w-6 h-6" />;
       case "TRX":
         return <TronIcon />;
-      case "USDT":
-        return <SiTether className="text-[#50AF95] w-6 h-6" />;
+      // case "USDT":
+      //   return <SiTether className="text-[#50AF95] w-6 h-6" />;
+      case "ETH":
+        return <SiEthereum className="text-[#627EEA] w-6 h-6" />;
+      case "BTC":
+        return <SiBitcoin className="text-[#F7931A] w-6 h-6" />;
       default:
         return null;
     }
@@ -307,17 +316,18 @@ export default function WalletNetworkCard({
           {showAddress ? resolvedAddress : maskedAddress}
         </p>
 
-        {explorerUrl && address && (
-          <a
-            href={`${explorerUrl}${address}`}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex items-center gap-1 text-blue-600 dark:text-blue-400 hover:underline"
-          >
-            <FaExternalLinkAlt className="w-3 h-3" />
-            View
-          </a>
-        )}
+        <a
+          href={canView ? viewHref : undefined}
+          target="_blank"
+          rel="noopener noreferrer"
+          className={`flex items-center gap-1 text-blue-600 dark:text-blue-400 hover:underline ${
+            !canView ? "opacity-50 cursor-not-allowed pointer-events-none" : ""
+          }`}
+          aria-disabled={!canView}
+        >
+          <FaExternalLinkAlt className="w-3 h-3" />
+          View
+        </a>
       </div>
 
       {/* ---- QR POPUP ---- */}
@@ -343,4 +353,62 @@ export default function WalletNetworkCard({
       )}
     </div>
   );
+}
+
+
+type ChainSym = "BTC" | "ETH" | "TRX" | "SOL";
+
+function isTestnet(chainId?: string | null) {
+  const s = (chainId || "").toLowerCase();
+  return s.includes("testnet") || s.includes("devnet") || s.includes("shasta") || s.includes("sepolia");
+}
+
+function trimEndSlash(u: string) {
+  return u.replace(/\/+$/, "");
+}
+
+export function buildExplorerAddressUrl(opts: {
+  symbol: ChainSym;
+  address?: string;
+  chainId?: string | null;     // e.g. "testnet" | "sepolia" | "devnet" | "mainnet" | "mainnet-beta" | "shasta"
+  explorerUrl?: string | null; // from DB (optional)
+}) {
+  const { symbol, address, chainId, explorerUrl } = opts;
+  if (!address) return undefined;
+
+  switch (symbol) {
+    case "BTC": {
+      // Prefer your DB explorer if it looks like blockstream, else fallback
+      const base = explorerUrl && /blockstream\.info/.test(explorerUrl)
+        ? trimEndSlash(explorerUrl)
+        : isTestnet(chainId)
+        ? "https://blockstream.info/testnet"
+        : "https://blockstream.info";
+      return `${base}/address/${address}`;
+    }
+
+    case "ETH": {
+      // Prefer your DB explorer if it looks like etherscan, else fallback
+      const base = explorerUrl && /etherscan\.io/.test(explorerUrl)
+        ? trimEndSlash(explorerUrl)
+        : isTestnet(chainId)
+        ? "https://sepolia.etherscan.io"
+        : "https://etherscan.io";
+      return `${base}/address/${address}`;
+    }
+
+    case "TRX": {
+      // Tronscan uses a hash route segment
+      const base = isTestnet(chainId)
+        ? "https://shasta.tronscan.org/#/address"
+        : "https://tronscan.org/#/address";
+      return `${base}/${address}`;
+    }
+
+    case "SOL": {
+      // Solscan uses a query for devnet
+      const base = "https://solscan.io/address";
+      return `${base}/${address}${isTestnet(chainId) ? "?cluster=devnet" : ""}`;
+    }
+  }
 }

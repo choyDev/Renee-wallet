@@ -26,7 +26,10 @@
     "autoprefixer": "^10.4.20",
     "babel-runtime": "^6.26.0",
     "bcryptjs": "^3.0.2",
+    "bitcoinjs-lib": "^7.0.0",
     "crypto": "^1.0.1",
+    "ecpair": "^3.0.0",
+    "ethers": "^6.15.0",
     "flatpickr": "^4.6.13",
     "framer-motion": "^12.23.24",
     "jsonwebtoken": "^9.0.2",
@@ -46,7 +49,9 @@
     "regenerator-runtime": "^0.14.1",
     "swiper": "^11.2.0",
     "tailwind-merge": "^2.6.0",
-    "tronweb": "^5.3.4"
+    "tiny-secp256k1": "^2.2.4",
+    "tronweb": "^5.3.4",
+    "wif": "^5.0.0"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",

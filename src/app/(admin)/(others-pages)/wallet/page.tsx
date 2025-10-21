@@ -11,6 +11,7 @@ interface WalletData {
   network: {
     name: string;
     symbol: string;
+    chainId?: string;
     explorerUrl?: string;
   };
   balances: {
@@ -23,6 +24,8 @@ interface WalletData {
 export default function WalletOverviewPage() {
   const [tronWallet, setTronWallet] = useState<WalletData | null>(null);
   const [solanaWallet, setSolanaWallet] = useState<WalletData | null>(null);
+  const [ethWallet, setEthWallet] = useState<WalletData | null>(null);
+  const [btcWallet, setBtcWallet] = useState<WalletData | null>(null);
  
   useEffect(() => {
     const fetchWallets = async () => {
@@ -51,9 +54,13 @@ export default function WalletOverviewPage() {
         const wallets: WalletData[] = data.wallets || [];
         const tron = wallets.find((w) => w.network.symbol === "TRX") || null;
         const sol  = wallets.find((w) => w.network.symbol === "SOL") || null;
+        const eth = wallets.find(w => w.network.symbol === "ETH") || null;
+        const btc = wallets.find(w => w.network.symbol === "BTC") || null;
 
         setTronWallet(tron);
         setSolanaWallet(sol);
+        setEthWallet(eth);
+        setBtcWallet(btc);
       } catch (err) {
         console.error("Error fetching wallet data:", err);
         // optional: show a toast/UI hint
@@ -71,26 +78,55 @@ export default function WalletOverviewPage() {
       </h3>
 
       {/* ===== Balance + Actions ===== */}
-      <WalletBalanceCard />
+      <WalletBalanceCard
+        walletsBySymbol={{
+          SOL: solanaWallet ? { id: solanaWallet.id, address: solanaWallet.address } : undefined,
+          TRX: tronWallet ? { id: tronWallet.id, address: tronWallet.address } : undefined,
+          ETH: ethWallet ? { id: ethWallet.id, address: ethWallet.address } : undefined,
+          BTC: btcWallet ? { id: btcWallet.id, address: btcWallet.address } : undefined,
+        }}
+      />
 
       {/* ===== Network Balances ===== */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-2 gap-6">
+        <WalletNetworkCard
+          name="Ethereum"
+          symbol="ETH"
+          tokenAmount={ethWallet?.balances?.[0]?.amount ?? "0"}
+          usdAmount={(ethWallet?.balances?.[0]?.usd ?? 0).toFixed(2)}
+          address={ethWallet?.address}
+          explorerUrl={ethWallet?.network.explorerUrl}
+          chainId={ethWallet?.network.chainId}
+        />
+
+        <WalletNetworkCard
+          name="Bitcoin"
+          symbol="BTC"
+          tokenAmount={btcWallet?.balances?.[0]?.amount ?? "0"}
+          usdAmount={(btcWallet?.balances?.[0]?.usd ?? 0).toFixed(2)}
+          address={btcWallet?.address}
+          explorerUrl={btcWallet?.network.explorerUrl}
+          chainId={btcWallet?.network.chainId}
+        />
+
         <WalletNetworkCard
           name="Tron"
           symbol="TRX"
           tokenAmount={tronWallet?.balances?.[0]?.amount ?? "0"}
-          usdAmount={(tronWallet?.balances?.[0]?.usd ?? 0).toFixed?.(2) ?? "0.00"}
+          usdAmount={(tronWallet?.balances?.[0]?.usd ?? 0).toFixed(2)}
           address={tronWallet?.address}
           explorerUrl={tronWallet?.network.explorerUrl}
+          chainId={tronWallet?.network.chainId}
         />
 
         <WalletNetworkCard
           name="Solana"
           symbol="SOL"
           tokenAmount={solanaWallet?.balances?.[0]?.amount ?? "0"}
-          usdAmount={(solanaWallet?.balances?.[0]?.usd ?? 0).toFixed?.(2) ?? "0.00"}
+          usdAmount={(solanaWallet?.balances?.[0]?.usd ?? 0).toFixed(2)}
           address={solanaWallet?.address}
           explorerUrl={solanaWallet?.network.explorerUrl}
+          chainId={solanaWallet?.network.chainId}
         />
       </div>
 

@@ -207,7 +207,15 @@ const TronIcon = ({ className = "text-[#FF4747] w-4 h-4" }) => (
   </svg>
 );
 
-export default function WalletBalanceCard() {
+type SymbolCode = "SOL" | "TRX" | "ETH" | "BTC";
+type WalletBrief = { id: number; address: string };
+
+export default function WalletBalanceCard({
+  walletsBySymbol = {},                          // <= NEW prop with safe default
+}: {
+  walletsBySymbol?: Partial<Record<SymbolCode, WalletBrief>>;
+}) {
+
   const [modalType, setModalType] = useState<"send" | "receive" | null>(null);
   const [swapOpen, setSwapOpen] = useState(false);
   const [bridgeOpen, setBridgeOpen] = useState(false);
@@ -332,7 +340,11 @@ export default function WalletBalanceCard() {
 
       {/* ====== MODALS ====== */}
       {modalType && (
-        <SendReceiveModal type={modalType} onClose={() => setModalType(null)} />
+        <SendReceiveModal
+          type={modalType}
+          onClose={() => setModalType(null)}
+          walletsBySymbol={walletsBySymbol}           // <= pass down
+        />
       )}
       {swapOpen && <SwapModal onClose={() => setSwapOpen(false)} />}
       {bridgeOpen && <BridgeModal onClose={() => setBridgeOpen(false)} />}

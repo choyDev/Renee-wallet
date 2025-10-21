@@ -44,7 +44,7 @@ model Wallet {
   network        Network          @relation(fields: [networkId], references: [id])
   networkId      Int
   address        String           @unique
-  privateKeyEnc  String?          // encrypted private key
+  privateKeyEnc  String?          @db.Text // encrypted private key
   createdAt      DateTime         @default(now())
   balances       TokenBalance[]
   transactions   Transaction[]
