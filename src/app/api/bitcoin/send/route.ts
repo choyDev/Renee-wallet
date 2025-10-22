@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { Prisma } from "@prisma/client";
 import { decryptPrivateKey } from "@/lib/wallet";
 import * as bitcoin from "bitcoinjs-lib";
 import * as ecc from "tiny-secp256k1";
@@ -134,6 +135,24 @@ export async function POST(req: Request) {
       throw new Error(`Broadcast failed ${br.status}: ${msg.slice(0, 200)}`);
     }
     const txid = await br.text();
+
+    await prisma.transaction.create({
+      data: {
+        userId: wallet.userId,
+        walletId: wallet.id,
+        tokenId: null,
+        type: "TRANSFER",
+        amount: new Prisma.Decimal(Number(amountBtc)),
+        usdValue: new Prisma.Decimal(0),
+        fee: new Prisma.Decimal(fee / 1e8),
+        txHash: txid,
+        explorerUrl: `${explorer}/tx/${txid}`,
+        status: "CONFIRMED",
+        fromAddress: fromAddress,
+        toAddress: to,
+        direction: "SENT",
+      },
+    });
 
     return NextResponse.json({
       ok: true,

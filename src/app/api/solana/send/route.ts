@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { Prisma } from "@prisma/client";
 import { decryptPrivateKey } from "@/lib/wallet";
 import {
   Connection,
@@ -109,6 +110,27 @@ export async function POST(req: Request) {
     // optional explorer
     const clusterParam = wallet.network.chainId === "devnet" ? "?cluster=devnet" : "";
     const explorerTx = `https://solscan.io/tx/${signature}${clusterParam}`;
+
+    const feeSol = feeLamports / LAMPORTS_PER_SOL;
+
+    // 🧾 Store transaction in database
+    await prisma.transaction.create({
+      data: {
+        userId: wallet.userId,
+        walletId: wallet.id,
+        tokenId: null, // SOL = native token
+        type: "TRANSFER",
+        amount: new Prisma.Decimal(Number(amountSol)),
+        fee: new Prisma.Decimal(feeSol),
+        usdValue: new Prisma.Decimal(0), // can update later via price API
+        txHash: signature,
+        explorerUrl: explorerTx,
+        status: "CONFIRMED",
+        fromAddress: keypair.publicKey.toBase58(),
+        toAddress: toPub.toBase58(),
+        direction: "SENT",
+      },
+    });
 
     return NextResponse.json({
       ok: true,

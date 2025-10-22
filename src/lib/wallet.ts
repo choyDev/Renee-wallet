@@ -16,12 +16,12 @@ const CHAIN_ENV = process.env.CHAIN_ENV === "testnet" ? "testnet" : "mainnet";
 
 const CHAINS = {
   mainnet: {
-    sol: { name: "Solana",   chainId: "mainnet-beta", rpcUrl: "https://api.mainnet-beta.solana.com", symbol: "SOL" },
-    tron: { name: "Tron",     chainId: "mainnet",      rpcUrl: "https://api.trongrid.io",            symbol: "TRX" },
+    sol: { name: "Solana",   chainId: "mainnet-beta", rpcUrl: "https://api.mainnet-beta.solana.com", symbol: "SOL", explorerUrl: "https://solscan.io", },
+    tron: { name: "Tron",     chainId: "mainnet",      rpcUrl: "https://api.trongrid.io",            symbol: "TRX", explorerUrl: "https://tronscan.org", },
   },
   testnet: {
-    sol: { name: "Solana (Devnet)", chainId: "devnet", rpcUrl: process.env.SOLANA_DEVNET_RPC || "https://api.devnet.solana.com", symbol: "SOL" },
-    tron: { name: "Tron (Shasta)",  chainId: "shasta", rpcUrl: process.env.TRON_SHASTA_RPC  || "https://api.shasta.trongrid.io", symbol: "TRX" },
+    sol: { name: "Solana (Devnet)", chainId: "devnet", rpcUrl: process.env.SOLANA_DEVNET_RPC || "https://api.devnet.solana.com", symbol: "SOL", explorerUrl: "https://solscan.io/?cluster=devnet", },
+    tron: { name: "Tron (Shasta)",  chainId: "shasta", rpcUrl: process.env.TRON_NILE_RPC  || "https://nile.trongrid.io", symbol: "TRX", explorerUrl: "https://nile.tronscan.org", },
   },
 } as const;
 
@@ -90,8 +90,7 @@ export function decryptPrivateKey(ciphertext: string): string {
 // Create Solana + Tron wallets if missing
 // ----------------------
 export async function ensureWalletsForUser(userId: number) {
-  console.log(`� Checking wallets for user ${userId} on ${CHAIN_ENV}...`);
-
+  
   const existingWallets = await prisma.wallet.findMany({ where: { userId } });
   const existingNetworks = new Set(existingWallets.map((w) => w.networkId));
 
@@ -99,26 +98,27 @@ export async function ensureWalletsForUser(userId: number) {
   const TRON = CHAINS[CHAIN_ENV].tron;
 
   // Find or create networks (we already had Solana/Tron earlier)
-  let solanaNet = await prisma.network.findFirst({ where: { chainId: CHAIN_ENV === "testnet" ? "devnet" : "mainnet-beta" } });
-  let tronNet   = await prisma.network.findFirst({ where: { chainId: CHAIN_ENV === "testnet" ? "shasta" : "mainnet" } });
-  let ethNet    = await prisma.network.findFirst({ where: { chainId: ETH_NET.chainId } });
-  let btcNet    = await prisma.network.findFirst({ where: { chainId: BTC_NET.chainId } });
+  let solanaNet = await prisma.network.findFirst({ where: { symbol: "SOL" } });
+  let tronNet   = await prisma.network.findFirst({ where: { symbol: "TRX" } });
+  let ethNet    = await prisma.network.findFirst({ where: { symbol: "ETH" } });
+  let btcNet    = await prisma.network.findFirst({ where: { symbol: "BTC" } });
+
 
   if (!solanaNet) {
     solanaNet = await prisma.network.create({
-      data: { name: SOL.name, chainId: SOL.chainId, rpcUrl: SOL.rpcUrl, symbol: SOL.symbol },
+      data: { name: SOL.name, chainId: SOL.chainId, rpcUrl: SOL.rpcUrl, symbol: SOL.symbol, explorerUrl: SOL.explorerUrl, },
     });
   } else if (solanaNet.rpcUrl !== SOL.rpcUrl) {
     // keep fresh if you changed RPC
-    solanaNet = await prisma.network.update({ where: { id: solanaNet.id }, data: { rpcUrl: SOL.rpcUrl } });
+    solanaNet = await prisma.network.update({ where: { id: solanaNet.id }, data: { rpcUrl: SOL.rpcUrl, explorerUrl: SOL.explorerUrl } });
   }
 
   if (!tronNet) {
     tronNet = await prisma.network.create({
-      data: { name: TRON.name, chainId: TRON.chainId, rpcUrl: TRON.rpcUrl, symbol: TRON.symbol },
+      data: { name: TRON.name, chainId: TRON.chainId, rpcUrl: TRON.rpcUrl, symbol: TRON.symbol, explorerUrl: TRON.explorerUrl, },
     });
   } else if (tronNet.rpcUrl !== TRON.rpcUrl) {
-    tronNet = await prisma.network.update({ where: { id: tronNet.id }, data: { rpcUrl: TRON.rpcUrl } });
+    tronNet = await prisma.network.update({ where: { id: tronNet.id }, data: { rpcUrl: TRON.rpcUrl, explorerUrl: TRON.explorerUrl } });
   }
 
   // create/update ETH network

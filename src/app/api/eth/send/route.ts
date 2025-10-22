@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { Prisma } from "@prisma/client";
 import { decryptPrivateKey } from "@/lib/wallet";
 import { ethers } from "ethers";
 
@@ -62,6 +63,36 @@ export async function POST(req: Request) {
 
     const tx = await signer.sendTransaction({ to, value, maxFeePerGas, maxPriorityFeePerGas: maxPriorityPerGas, gasLimit });
     const receipt = await tx.wait(); // wait for inclusion
+
+    // Safely handle possible null
+    let gasUsed = BigInt(0);
+    let gasPrice = BigInt(0);
+    let feeEth = 0;
+
+    if (receipt) {
+      gasUsed = receipt.gasUsed ?? BigInt(0);
+      gasPrice = tx.gasPrice ?? tx.maxFeePerGas ?? BigInt(0);
+      feeEth = Number(ethers.formatEther(gasUsed * gasPrice));
+    }
+
+    // 🧾 Store transaction in database
+    await prisma.transaction.create({
+      data: {
+        userId: wallet.userId,
+        walletId: wallet.id,
+        tokenId: null, // ETH = native coin
+        type: "TRANSFER",
+        amount: new Prisma.Decimal(Number(amountEth)),
+        fee: new Prisma.Decimal(feeEth),
+        usdValue: new Prisma.Decimal(0), // can update later via price API
+        txHash: tx.hash,
+        explorerUrl: explorerFor(tx.hash),
+        status: "CONFIRMED",
+        fromAddress: signer.address,
+        toAddress: to,
+        direction: "SENT",
+      },
+    });
 
     return NextResponse.json({
       ok: true,

@@ -1,9 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -13,139 +7,159 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model User {
-  id             Int              @id @default(autoincrement())
-  email          String           @unique
-  password_hash  String
-  full_name      String?
-  createdAt      DateTime         @default(now())
-  updatedAt      DateTime         @updatedAt
-  wallets        Wallet[]
-  kycs           KycVerification[]
-  fiatDeposits   FiatDeposit[]
-  transactions   Transaction[]
+model exchangerate {
+  id            Int      @id @default(autoincrement())
+  baseCurrency  String
+  quoteCurrency String
+  rate          Decimal
+  fetchedAt     DateTime @default(now())
 }
 
-model Network {
-  id             Int              @id @default(autoincrement())
-  name           String           // e.g. "Solana", "Tron"
-  symbol         String           // e.g. "SOL", "TRX"
-  chainId        String          // optional chain id or RPC id
-  rpcUrl         String          // node endpoint
-  explorerUrl    String?          // e.g. "https://tronscan.org/"
-  tokens         Token[]
-  wallets        Wallet[]
+model fiatdeposit {
+  id            Int                @id @default(autoincrement())
+  userId        Int                @unique(map: "FiatDeposit_userId_key")
+  amountTRY     Decimal
+  convertedUSDT Decimal?
+  bankRef       String?
+  status        fiatdeposit_status @default(PENDING)
+  createdAt     DateTime           @default(now())
+  user          user               @relation(fields: [userId], references: [id], map: "FiatDeposit_userId_fkey")
 }
 
-model Wallet {
-  id             Int              @id @default(autoincrement())
-  user           User             @relation(fields: [userId], references: [id])
+model kycverification {
+  id             Int                  @id @default(autoincrement())
   userId         Int
-  network        Network          @relation(fields: [networkId], references: [id])
-  networkId      Int
-  address        String           @unique
-  privateKeyEnc  String?          @db.Text // encrypted private key
-  createdAt      DateTime         @default(now())
-  balances       TokenBalance[]
-  transactions   Transaction[]
-}
-
-model Token {
-  id             Int              @id @default(autoincrement())
-  network        Network          @relation(fields: [networkId], references: [id])
-  networkId      Int
-  symbol         String
-  name           String
-  contractAddr   String?          // null for native coin
-  decimals       Int
-  isStablecoin   Boolean          @default(false)
-  balances       TokenBalance[]
-  transactions   Transaction[]
-}
-
-model TokenBalance {
-  id             Int              @id @default(autoincrement())
-  wallet         Wallet           @relation(fields: [walletId], references: [id])
-  walletId       Int
-  token          Token            @relation(fields: [tokenId], references: [id])
-  tokenId        Int
-  amount         Decimal          @default(0.0)
-  updatedAt      DateTime         @updatedAt
-}
-
-model Transaction {
-  id             Int              @id @default(autoincrement())
-  wallet         Wallet           @relation(fields: [walletId], references: [id])
-  walletId       Int
-  user           User             @relation(fields: [userId], references: [id])
-  userId         Int
-  token          Token?           @relation(fields: [tokenId], references: [id])
-  tokenId        Int?
-  type           TransactionType
-  amount         Decimal
-  txHash         String?          @unique
-  status         TxStatus         @default(PENDING)
-  fromAddress    String?
-  toAddress      String?
-  createdAt      DateTime         @default(now())
-}
-
-
-model FiatDeposit {
-  id             Int              @id @default(autoincrement())
-  user           User             @relation(fields: [userId], references: [id])
-  userId         Int              @unique
-  amountTRY      Decimal
-  convertedUSDT  Decimal?
-  bankRef        String?          // reference number / transaction id
-  status         DepositStatus    @default(PENDING)
-  createdAt      DateTime         @default(now())
-}
-
-model KycVerification {
-  id             Int              @id @default(autoincrement())
-  user           User             @relation(fields: [userId], references: [id])
-  userId         Int
-  type           KycType          // PERSONAL or CORPORATE
+  type           kycverification_type
   fullName       String?
   companyName    String?
   documentType   String?
   documentNumber String?
-  verified       Boolean          @default(false)
+  verified       Boolean              @default(false)
   verifiedAt     DateTime?
-  createdAt      DateTime         @default(now())
+  createdAt      DateTime             @default(now())
+  user           user                 @relation(fields: [userId], references: [id], map: "KycVerification_userId_fkey")
+
+  @@index([userId], map: "KycVerification_userId_fkey")
 }
 
-model ExchangeRate {
-  id             Int              @id @default(autoincrement())
-  baseCurrency   String           // "TRY"
-  quoteCurrency  String           // "USDT"
-  rate           Decimal
-  fetchedAt      DateTime         @default(now())
+model network {
+  id          Int      @id @default(autoincrement())
+  name        String
+  symbol      String   @unique(map: "Network_symbol_key")
+  chainId     String
+  rpcUrl      String
+  explorerUrl String?
+  token       token[]
+  wallet      wallet[]
 }
 
-enum TransactionType {
+model token {
+  id           Int            @id @default(autoincrement())
+  networkId    Int
+  symbol       String
+  name         String
+  contractAddr String?
+  decimals     Int
+  isStablecoin Boolean        @default(false)
+  network      network        @relation(fields: [networkId], references: [id], map: "Token_networkId_fkey")
+  tokenbalance tokenbalance[]
+  transaction  transaction[]
+
+  @@index([networkId], map: "Token_networkId_fkey")
+}
+
+model tokenbalance {
+  id        Int      @id @default(autoincrement())
+  walletId  Int
+  tokenId   Int
+  amount    Decimal  @default(0.000000000000000000000000000000)
+  updatedAt DateTime
+  token     token    @relation(fields: [tokenId], references: [id], map: "TokenBalance_tokenId_fkey")
+  wallet    wallet   @relation(fields: [walletId], references: [id], map: "TokenBalance_walletId_fkey")
+
+  @@index([tokenId], map: "TokenBalance_tokenId_fkey")
+  @@index([walletId], map: "TokenBalance_walletId_fkey")
+}
+
+model transaction {
+  id          Int                    @id @default(autoincrement())
+  walletId    Int
+  userId      Int
+  tokenId     Int?
+  type        transaction_type
+  amount      Decimal
+  txHash      String?                @unique(map: "Transaction_txHash_key")
+  status      transaction_status     @default(PENDING)
+  fromAddress String
+  toAddress   String
+  createdAt   DateTime               @default(now())
+  direction   transaction_direction?
+  explorerUrl String?
+  usdValue    Decimal?
+  fee         Decimal                @default(0.000000000000000000000000000000)
+  token       token?                 @relation(fields: [tokenId], references: [id], map: "Transaction_tokenId_fkey")
+  user        user                   @relation(fields: [userId], references: [id], map: "Transaction_userId_fkey")
+  wallet      wallet                 @relation(fields: [walletId], references: [id], map: "Transaction_walletId_fkey")
+
+  @@index([tokenId], map: "Transaction_tokenId_fkey")
+  @@index([userId], map: "Transaction_userId_fkey")
+  @@index([walletId], map: "Transaction_walletId_fkey")
+}
+
+model user {
+  id              Int               @id @default(autoincrement())
+  email           String            @unique(map: "User_email_key")
+  password_hash   String
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime
+  full_name       String?
+  fiatdeposit     fiatdeposit?
+  kycverification kycverification[]
+  transaction     transaction[]
+  wallet          wallet[]
+}
+
+model wallet {
+  id            Int            @id @default(autoincrement())
+  userId        Int
+  networkId     Int
+  address       String         @unique(map: "Wallet_address_key")
+  privateKeyEnc String         @db.Text
+  createdAt     DateTime       @default(now())
+  tokenbalance  tokenbalance[]
+  transaction   transaction[]
+  network       network        @relation(fields: [networkId], references: [id], map: "Wallet_networkId_fkey")
+  user          user           @relation(fields: [userId], references: [id], map: "Wallet_userId_fkey")
+
+  @@index([networkId], map: "Wallet_networkId_fkey")
+  @@index([userId], map: "Wallet_userId_fkey")
+}
+
+enum kycverification_type {
+  PERSONAL
+  CORPORATE
+}
+
+enum transaction_type {
   DEPOSIT
   WITHDRAW
   TRANSFER
   CONVERT
 }
 
-enum TxStatus {
-  PENDING
-  CONFIRMED
-  FAILED
-}
-
-enum DepositStatus {
+enum fiatdeposit_status {
   PENDING
   COMPLETED
   FAILED
 }
 
-enum KycType {
-  PERSONAL
-  CORPORATE
+enum transaction_status {
+  PENDING
+  CONFIRMED
+  FAILED
 }
 
-
+enum transaction_direction {
+  SENT
+  RECEIVED
+}

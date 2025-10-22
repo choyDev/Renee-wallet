@@ -17,6 +17,7 @@ import {
   FaCog,            // Settings
   FaQuestionCircle, // Support
   FaIdCard,         // KYC
+  FaExchangeAlt,    // Transaction
 } from "react-icons/fa";
 
 type NavItem = {
@@ -38,12 +39,14 @@ const navItems = [
   {
     icon: <FaWallet className="w-5 h-5" />,
     name: "My Wallet",
-    subItems: [
-      { name: "Overview", path: "/wallet" },
-      { name: "Deposit", path: "/wallet/deposit" },
-      { name: "Transactions", path: "/wallet/transactions" },
-    ],
+    path: "/wallet"
   },
+  {
+    icon: <FaExchangeAlt className="w-5 h-5" />,
+    name: "Transaction",
+    path: "/transaction"
+  },
+
   {
     icon: <FaUserCircle className="w-5 h-5" />,
     name: "Profile",
@@ -81,17 +84,17 @@ const AppSidebar: React.FC = () => {
   const isActive = useCallback((path: string) => path === pathname, [pathname]);
 
   // Auto-open submenu if current route matches
-  useEffect(() => {
-    let matchedIndex: number | null = null;
-    navItems.forEach((nav, index) => {
-      if (nav.subItems) {
-        nav.subItems.forEach((subItem) => {
-          if (isActive(subItem.path)) matchedIndex = index;
-        });
-      }
-    });
-    setOpenSubmenu(matchedIndex);
-  }, [pathname, isActive]);
+  // useEffect(() => {
+  //   let matchedIndex: number | null = null;
+  //   navItems.forEach((nav, index) => {
+  //     if (nav.subItems) {
+  //       nav.subItems.forEach((subItem) => {
+  //         if (isActive(subItem.path)) matchedIndex = index;
+  //       });
+  //     }
+  //   });
+  //   setOpenSubmenu(matchedIndex);
+  // }, [pathname, isActive]);
 
   // Update submenu height when opened
   useEffect(() => {
