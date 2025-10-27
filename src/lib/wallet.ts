@@ -21,7 +21,7 @@ const CHAINS = {
   },
   testnet: {
     sol: { name: "Solana (Devnet)", chainId: "devnet", rpcUrl: process.env.SOLANA_DEVNET_RPC || "https://api.devnet.solana.com", symbol: "SOL", explorerUrl: "https://solscan.io/?cluster=devnet", },
-    tron: { name: "Tron (Shasta)",  chainId: "shasta", rpcUrl: process.env.TRON_NILE_RPC  || "https://nile.trongrid.io", symbol: "TRX", explorerUrl: "https://nile.tronscan.org", },
+    tron: { name: "Tron (Nile)",  chainId: "nile", rpcUrl: process.env.TRON_NILE_RPC  || "https://nile.trongrid.io", symbol: "TRX", explorerUrl: "https://nile.tronscan.org", },
   },
 } as const;
 
@@ -178,7 +178,7 @@ export async function ensureWalletsForUser(userId: number) {
     });
   }
 
-  // Tron wallet (same address format; network = Shasta when you broadcast)
+  // Tron wallet (same address format; network = Nile when you broadcast)
   if (!existingNetworks.has(tronNet.id)) {
     const account = TronWeb.utils.accounts.generateAccount();
     const address = account.address.base58;

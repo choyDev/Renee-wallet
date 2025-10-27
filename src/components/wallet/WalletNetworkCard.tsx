@@ -12,7 +12,7 @@ import {
 import { SiSolana, SiTether, SiEthereum, SiBitcoin } from "react-icons/si";
 import QRCode from "react-qr-code";
 
-// ✅ Tron Icon
+//  Tron Icon
 const TronIcon = ({ className = "text-[#FF4747] w-5 h-5" }) => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
@@ -29,9 +29,10 @@ interface Props {
   symbol: "TRX" | "SOL" | "ETH" | "BTC";
   address?: string;
   explorerUrl?: string | null;
-  chainId?: string | null;
+  chainId: string;
   tokenAmount: string;
   usdAmount: string; // or number you format inside
+  usdtTokenAmount?: string;
 }
 
 export default function WalletNetworkCard({
@@ -42,6 +43,7 @@ export default function WalletNetworkCard({
   chainId,
   tokenAmount,
   usdAmount,
+  usdtTokenAmount,
 }: Props) {
   const viewHref = buildExplorerAddressUrl({ symbol, address, explorerUrl, chainId });
   const canView = !!viewHref;
@@ -49,7 +51,7 @@ export default function WalletNetworkCard({
   const [showQR, setShowQR] = useState(false);
   const [showAddress, setShowAddress] = useState(false);
 
-  // ✅ Use backend-provided address, fallback to "Not available"
+  //  Use backend-provided address, fallback to "Not available"
   const resolvedAddress = address?.trim() || "Address not available";
   const maskedAddress =
     resolvedAddress !== "Address not available"
@@ -59,7 +61,7 @@ export default function WalletNetworkCard({
   const copyAddress = async () => {
     if (!address) return alert("⚠️ No address to copy.");
     await navigator.clipboard.writeText(resolvedAddress);
-    alert("✅ Address copied to clipboard!");
+    alert(" Address copied to clipboard!");
   };
 
   const toggleQR = () => setShowQR((p) => !p);
@@ -82,9 +84,14 @@ export default function WalletNetworkCard({
     }
   };
 
+  const showUSDT =
+    usdtTokenAmount !== undefined &&
+    usdtTokenAmount !== null &&
+    Number(usdtTokenAmount) > 0;
+
   return (
     <div
-      className="relative rounded-2xl p-6 border border-gray-200 dark:border-gray-700 
+      className="relative flex flex-col justify-between rounded-2xl p-6 border border-gray-200 dark:border-gray-700 
                  bg-white dark:bg-[#121B2E] shadow-sm hover:shadow-md
                  transition-all duration-300 hover:-translate-y-1"
     >
@@ -142,6 +149,13 @@ export default function WalletNetworkCard({
             ≈ ${parseFloat(usdAmount).toLocaleString()}
           </p>
         </div>
+
+        {showUSDT && (
+          <p className="text-3xl font-bold text-gray-900 dark:text-white">
+            {usdtTokenAmount} USDT
+          </p>
+        )}
+
         <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
           Available Balance
         </p>
@@ -157,9 +171,8 @@ export default function WalletNetworkCard({
           href={canView ? viewHref : undefined}
           target="_blank"
           rel="noopener noreferrer"
-          className={`flex items-center gap-1 text-blue-600 dark:text-blue-400 hover:underline ${
-            !canView ? "opacity-50 cursor-not-allowed pointer-events-none" : ""
-          }`}
+          className={`flex items-center gap-1 text-blue-600 dark:text-blue-400 hover:underline ${!canView ? "opacity-50 cursor-not-allowed pointer-events-none" : ""
+            }`}
           aria-disabled={!canView}
         >
           <FaExternalLinkAlt className="w-3 h-3" />
@@ -194,10 +207,21 @@ export default function WalletNetworkCard({
 
 
 type ChainSym = "BTC" | "ETH" | "TRX" | "SOL";
+type ChainIdLike = string | number | null | undefined;
 
-function isTestnet(chainId?: string | null) {
-  const s = (chainId || "").toLowerCase();
-  return s.includes("testnet") || s.includes("devnet") || s.includes("shasta") || s.includes("sepolia");
+const PUBLIC_CHAIN_ENV = (process.env.NEXT_PUBLIC_CHAIN_ENV ?? "mainnet").toLowerCase();
+
+function normalizeChainId(id: ChainIdLike): string {
+  if (id == null) return "";
+  return typeof id === "number" ? String(id) : String(id);
+}
+
+export function isTestnet(id: ChainIdLike): boolean {
+  if (id == null) return PUBLIC_CHAIN_ENV !== "mainnet"; // fallback to env
+  if (typeof id === "number") return id !== 1;                 // EVM: 1 = mainnet
+  const s = normalizeChainId(id).toLowerCase();
+  // cover Solana + Tron + common EVM testnets
+  return /(devnet|testnet|sepolia|goerli|holesky|amoy|mumbai|nile|shasta|bsc-testnet|base-sepolia|arbitrum-sepolia)/.test(s);
 }
 
 function trimEndSlash(u: string) {
@@ -207,7 +231,7 @@ function trimEndSlash(u: string) {
 export function buildExplorerAddressUrl(opts: {
   symbol: ChainSym;
   address?: string;
-  chainId?: string | null;     // e.g. "testnet" | "sepolia" | "devnet" | "mainnet" | "mainnet-beta" | "shasta"
+  chainId: string;     // e.g. "testnet" | "sepolia" | "devnet" | "mainnet" | "mainnet-beta" | "shasta"
   explorerUrl?: string | null; // from DB (optional)
 }) {
   const { symbol, address, chainId, explorerUrl } = opts;
@@ -219,8 +243,8 @@ export function buildExplorerAddressUrl(opts: {
       const base = explorerUrl && /blockstream\.info/.test(explorerUrl)
         ? trimEndSlash(explorerUrl)
         : isTestnet(chainId)
-        ? "https://blockstream.info/testnet"
-        : "https://blockstream.info";
+          ? "https://blockstream.info/testnet"
+          : "https://blockstream.info";
       return `${base}/address/${address}`;
     }
 
@@ -229,23 +253,33 @@ export function buildExplorerAddressUrl(opts: {
       const base = explorerUrl && /etherscan\.io/.test(explorerUrl)
         ? trimEndSlash(explorerUrl)
         : isTestnet(chainId)
-        ? "https://sepolia.etherscan.io"
-        : "https://etherscan.io";
+          ? "https://sepolia.etherscan.io"
+          : "https://etherscan.io";
       return `${base}/address/${address}`;
     }
 
     case "TRX": {
-      // Tronscan uses a hash route segment
-      const base = isTestnet(chainId)
-        ? "https://nile.tronscan.org/#/address"
-        : "https://tronscan.org/#/address";
+      const id = normalizeChainId(chainId);
+      // Pick exact testnet if provided, else fallback to nile for generic "testnet"
+      const base =
+        /nile/i.test(id) ? "https://nile.tronscan.org/#/address" :
+          /shasta/i.test(id) ? "https://shasta.tronscan.org/#/address" :
+          // /shasta/i.test(id) ? "https://nile.tronscan.org/#/address" :
+          isTestnet(id) ? "https://nile.tronscan.org/#/address" :
+              "https://tronscan.org/#/address";
       return `${base}/${address}`;
     }
 
     case "SOL": {
-      // Solscan uses a query for devnet
+      const id = normalizeChainId(chainId);
+      // Solscan supports ?cluster=devnet or ?cluster=testnet
+      const cluster =
+        /devnet/i.test(id) ? "devnet" :
+          /testnet/i.test(id) ? "testnet" :
+            isTestnet(id) ? "devnet" : ""; // default to devnet if generic testnet
       const base = "https://solscan.io/address";
-      return `${base}/${address}${isTestnet(chainId) ? "?cluster=devnet" : ""}`;
+      return `${base}/${address}${cluster ? `?cluster=${cluster}` : ""}`;
     }
+
   }
 }

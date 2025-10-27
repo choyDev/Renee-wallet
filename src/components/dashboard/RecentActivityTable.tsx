@@ -8,7 +8,7 @@
 // import Badge from "@/components/ui/badge/Badge";
 // import Link from "next/link";
 
-// // ✅ Tron Icon SVG (same size as other icons)
+// //  Tron Icon SVG (same size as other icons)
 // const TronIcon = ({ className = "w-5 h-5 text-[#FF060A]" }) => (
 //   <svg
 //     xmlns="http://www.w3.org/2000/svg"
@@ -63,13 +63,13 @@
 //   const getIcon = (coin: string) => {
 //     switch (coin) {
 //       case "TRX":
-//         return <TronIcon className="w-5 h-5 text-[#FF060A]" />; // ✅ Tron red
+//         return <TronIcon className="w-5 h-5 text-[#FF060A]" />; //  Tron red
 //       case "ETH":
 //         return <FaEthereum className="text-[#4B70C6] size-5" />;
 //       case "USDT":
-//         return <SiTether className="text-[#26A17B] size-5" />; // ✅ Official Tether green
+//         return <SiTether className="text-[#26A17B] size-5" />; //  Official Tether green
 //       case "SOL":
-//         return <SiSolana className="text-[#14F195] size-5" />; // ✅ Solana neon green
+//         return <SiSolana className="text-[#14F195] size-5" />; //  Solana neon green
 //       default:
 //         return <BsCurrencyBitcoin className="text-gray-400 size-5" />;
 //     }
@@ -159,7 +159,7 @@ import { BsCurrencyBitcoin } from "react-icons/bs";
 import Link from "next/link";
 import Badge from "@/components/ui/badge/Badge";
 
-/* ✅ Tron Icon */
+/*  Tron Icon */
 const TronIcon = ({ className = "w-5 h-5 text-[#FF060A]" }) => (
   <svg
     xmlns="http://www.w3.org/2000/svg"

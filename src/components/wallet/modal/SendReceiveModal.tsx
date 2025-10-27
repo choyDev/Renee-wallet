@@ -723,7 +723,7 @@ export default function SendReceiveModal({ type, onClose, walletsBySymbol = {} }
     return { id: data.txid || data.hash, link: data.explorerTx };
   }
 
-  // ✅ USDT send: ERC-20 (ETH) & TRC-20 (TRX)
+  //  USDT send: ERC-20 (ETH) & TRC-20 (TRX)
   async function sendUSDT(): Promise<SendResult> {
     const amt = parseFloat(amount);
     if (selectedSym === "ETH") {

@@ -5,7 +5,7 @@
 // import { SiTether, SiSolana } from "react-icons/si";
 // import { BsCurrencyBitcoin } from "react-icons/bs";
 
-// /* ✅ Tron SVG icon (componentized inside this file) */
+// /*  Tron SVG icon (componentized inside this file) */
 // const TronIcon = ({ className = "w-5 h-5 text-[#FF060A]" }) => (
 //   <svg
 //     xmlns="http://www.w3.org/2000/svg"
@@ -75,7 +75,7 @@
 //     },
 //   ];
 
-//   // ✅ Icon selector
+//   //  Icon selector
 //   const getIcon = (coin: string) => {
 //     switch (coin) {
 //       case "TRX":
@@ -91,7 +91,7 @@
 //     }
 //   };
 
-//   // ✅ Status color mapping
+//   //  Status color mapping
 //   const getStatusColor = (status: string) => {
 //     switch (status) {
 //       case "Completed":
@@ -105,7 +105,7 @@
 //     }
 //   };
 
-//   // ✅ Shorten Tx hash visually
+//   //  Shorten Tx hash visually
 //   const shortenId = (id: string) =>
 //     id.length > 16 ? `${id.slice(0, 6)}...${id.slice(-6)}` : id;
 
@@ -117,7 +117,7 @@
 
 //       <div className="overflow-x-auto">
 //         <table className="w-full text-sm rounded-lg">
-//           {/* ✅ Table Header */}
+//           {/*  Table Header */}
 //           <thead>
 //             <tr className="text-gray-500 dark:text-gray-400 border-b border-gray-200 dark:border-gray-700">
 //               <th className="text-left py-3 px-4">Coin</th>
@@ -129,7 +129,7 @@
 //             </tr>
 //           </thead>
 
-//           {/* ✅ Table Body */}
+//           {/*  Table Body */}
 //           <tbody>
 //             {activities.map((a, i) => (
 //               <tr
@@ -203,7 +203,7 @@ import { SiTether, SiSolana } from "react-icons/si";
 import { BsCurrencyBitcoin } from "react-icons/bs";
 import { FiLoader } from "react-icons/fi";
 
-/* ✅ Tron SVG icon */
+/*  Tron SVG icon */
 const TronIcon = ({ className = "w-5 h-5 text-[#FF060A]" }) => (
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" fill="currentColor" className={className}>
     <path d="M16 2 2 5.5l12.6 24.5L30 5.5 16 2zm0 2.2 10.3 2.6-10.3 20.2L5.7 4.8 16 4.2zm-4.2 3.3L16 17.3l4.2-9.8h-8.4z" />

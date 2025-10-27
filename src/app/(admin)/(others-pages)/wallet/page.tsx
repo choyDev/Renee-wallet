@@ -11,7 +11,7 @@ interface WalletData {
   network: {
     name: string;
     symbol: string;
-    chainId?: string;
+    chainId: string;
     explorerUrl?: string;
   };
   balances: {
@@ -47,6 +47,10 @@ export default function WalletOverviewPage() {
           throw new Error(`Non-JSON response (${res.status}): ${text.slice(0, 200)}`);
         }
 
+        // inside fetchWallets, after: const data = text ? JSON.parse(text) : null;
+console.log("API wallets payload:", data.wallets);
+
+
         if (!res.ok) {
           throw new Error(data?.error || `Request failed with ${res.status}`);
         }
@@ -68,8 +72,15 @@ export default function WalletOverviewPage() {
     };
 
     fetchWallets();
+
   }, []);
 
+  const tronUSDT =
+    tronWallet?.balances.find(b => b.token.symbol === "USDT")?.amount ?? "0";
+  const solUSDT  =
+    solanaWallet?.balances.find(b => b.token.symbol === "USDT")?.amount ?? "0";
+  const ethUSDT  =
+    ethWallet?.balances.find(b => b.token.symbol === "USDT")?.amount ?? "0"; // if you have ETH card
 
   return (
     <div className="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03] lg:p-6 space-y-6">
@@ -94,9 +105,10 @@ export default function WalletOverviewPage() {
           symbol="ETH"
           tokenAmount={ethWallet?.balances?.[0]?.amount ?? "0"}
           usdAmount={(ethWallet?.balances?.[0]?.usd ?? 0).toFixed(2)}
+          usdtTokenAmount={ethUSDT}
           address={ethWallet?.address}
           explorerUrl={ethWallet?.network.explorerUrl}
-          chainId={ethWallet?.network.chainId}
+          chainId={ethWallet?.network.chainId ?? ""}
         />
 
         <WalletNetworkCard
@@ -106,7 +118,7 @@ export default function WalletOverviewPage() {
           usdAmount={(btcWallet?.balances?.[0]?.usd ?? 0).toFixed(2)}
           address={btcWallet?.address}
           explorerUrl={btcWallet?.network.explorerUrl}
-          chainId={btcWallet?.network.chainId}
+          chainId={btcWallet?.network.chainId ?? ""}
         />
 
         <WalletNetworkCard
@@ -114,9 +126,10 @@ export default function WalletOverviewPage() {
           symbol="TRX"
           tokenAmount={tronWallet?.balances?.[0]?.amount ?? "0"}
           usdAmount={(tronWallet?.balances?.[0]?.usd ?? 0).toFixed(2)}
+          usdtTokenAmount={tronUSDT}
           address={tronWallet?.address}
           explorerUrl={tronWallet?.network.explorerUrl}
-          chainId={tronWallet?.network.chainId}
+          chainId={tronWallet?.network.chainId ?? ""}
         />
 
         <WalletNetworkCard
@@ -124,9 +137,10 @@ export default function WalletOverviewPage() {
           symbol="SOL"
           tokenAmount={solanaWallet?.balances?.[0]?.amount ?? "0"}
           usdAmount={(solanaWallet?.balances?.[0]?.usd ?? 0).toFixed(2)}
+          usdtTokenAmount={solUSDT}
           address={solanaWallet?.address}
           explorerUrl={solanaWallet?.network.explorerUrl}
-          chainId={solanaWallet?.network.chainId}
+          chainId={solanaWallet?.network.chainId ?? ""}
         />
       </div>
 

@@ -75,7 +75,7 @@ export async function POST(req: Request) {
       feeEth = Number(ethers.formatEther(gasUsed * gasPrice));
     }
 
-    // 🧾 Store transaction in database
+    //  Store transaction in database
     await prisma.transaction.create({
       data: {
         userId: wallet.userId,

@@ -21,7 +21,7 @@ export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
-// ✅ USDT mint addresses
+//  USDT mint addresses
 const USDT_MINTS = {
   devnet: "4GGCyYz3eqmKeSfvP86nDfYRAJK2gaTEWVcchxYsDhLJ", // Devnet (unofficial test)
   mainnet: "Es9vMFrzaCERbXqzQDvBaxK3fTAvqUyF7jEihQYjPz8A", // Mainnet official

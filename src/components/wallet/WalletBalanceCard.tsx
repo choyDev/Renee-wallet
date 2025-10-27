@@ -195,7 +195,7 @@ import SendReceiveModal from "./modal/SendReceiveModal";
 import SwapModal from "./modal/SwapModal";
 import BridgeModal from "./modal/BridgeModal";
 
-// ✅ Tron Icon
+//  Tron Icon
 const TronIcon = ({ className = "text-[#FF4747] w-4 h-4" }) => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
@@ -221,26 +221,31 @@ export default function WalletBalanceCard({
   const [bridgeOpen, setBridgeOpen] = useState(false);
   const router = useRouter();
 
-  const balances = [
-    { name: "Solana", symbol: "SOL", amount: "0.00", icon: <SiSolana className="text-[#14F195]" /> },
-    { name: "Tron", symbol: "TRX", amount: "0.00", icon: <TronIcon /> },
-    { name: "Tether", symbol: "USDT", amount: "0.00", icon: <SiTether className="text-[#50AF95]" /> },
-  ];
+  // derive specific wallet briefs from the incoming map so these names exist below
+  const solanaWallet = walletsBySymbol.SOL;
+  const tronWallet = walletsBySymbol.TRX;
+  const ethWallet = walletsBySymbol.ETH;
+
+  // const balances = [
+  //   { name: "Solana", symbol: "SOL", amount: "0.00", icon: <SiSolana className="text-[#14F195]" /> },
+  //   { name: "Tron", symbol: "TRX", amount: "0.00", icon: <TronIcon /> },
+  //   { name: "Tether", symbol: "USDT", amount: "0.00", icon: <SiTether className="text-[#50AF95]" /> },
+  // ];
 
   const actions = [
     { label: "Receive", icon: <FaQrcode />, onClick: () => setModalType("receive") },
     { label: "Send", icon: <FaPaperPlane />, onClick: () => setModalType("send") },
     { label: "Swap", icon: <FaExchangeAlt />, onClick: () => setSwapOpen(true) },
     { label: "Bridge", icon: <FaLink />, onClick: () => setBridgeOpen(true) },
-    { label: "Buy", icon: <FaDollarSign />, onClick: () => router.push("wallet/deposit") },
+    // { label: "Buy", icon: <FaDollarSign />, onClick: () => router.push("wallet/deposit") },
   ];
 
   return (
     <>
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
         {/* ===== LEFT SIDE — BALANCE TABLE ===== */}
-        <div className="flex flex-col justify-between rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-[#121B2E] shadow-sm overflow-hidden h-full">
-          {/* Header */}
+        {/* <div className="flex flex-col justify-between rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-[#121B2E] shadow-sm overflow-hidden h-full">
+          
           <div className="flex items-center gap-2 border-b border-gray-100 dark:border-gray-700 px-5 py-4 bg-gray-50 dark:bg-[#0E1624]">
             <FaLandmark className="text-blue-500 text-lg" />
             <h3 className="text-lg font-semibold text-gray-800 dark:text-white">
@@ -248,7 +253,6 @@ export default function WalletBalanceCard({
             </h3>
           </div>
 
-          {/* Table */}
           <table className="w-full text-sm text-gray-700 dark:text-gray-300 flex-grow">
             <thead>
               <tr className="bg-gray-100 dark:bg-[#1C2436] text-gray-600 dark:text-gray-400">
@@ -286,10 +290,36 @@ export default function WalletBalanceCard({
               </tr>
             </tfoot>
           </table>
+        </div> */}
+
+        <div className="flex flex-col justify-between h-full">
+          <div className="grid grid-cols-1 gap-4 mt-auto">
+            {actions
+              .filter(a => a.label === "Send" || a.label === "Receive")
+              .map((btn, i) => (
+                <button
+                  key={i}
+                  onClick={btn.onClick}
+                  className="group flex flex-row gap-4 items-center justify-center w-full py-5 rounded-2xl
+                           bg-white dark:bg-[#121B2E]
+                           text-gray-700 dark:text-[#C7C9D1]
+                           border border-gray-200 dark:border-gray-800
+                           hover:bg-gray-50 dark:hover:bg-[#1A2235]
+                           hover:border-blue-400 dark:hover:border-blue-500
+                           transition-all duration-200 ease-in-out"
+                >
+                  <span className="text-2xl text-gray-500 dark:text-[#9B9FB5] group-hover:text-blue-500 transition-colors mb-1">
+                    {btn.icon}
+                  </span>
+                  <span className="text-lg font-medium group-hover:text-blue-600 dark:group-hover:text-blue-400">
+                    {btn.label}
+                  </span>
+                </button>
+              ))}
+          </div>
         </div>
 
-        {/* ===== RIGHT SIDE — TOTAL BALANCE CARD ===== */}
-        <div className="flex flex-col justify-between h-full">
+        <div className="flex flex-col justify-between rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-[#121B2E] shadow-sm overflow-hidden h-full w-full lg:col-span-2">
           <div
             className="w-full rounded-2xl p-8 flex flex-col items-center justify-center text-center relative overflow-hidden h-full
                        bg-white dark:bg-[#121B2E]
@@ -307,33 +337,37 @@ export default function WalletBalanceCard({
             <p className="text-sm font-medium text-gray-700 dark:text-gray-300 mt-2">
               Total Wallet Balance
             </p>
-            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+            {/* <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
               Across Solana, Tron & USDT
-            </p>
+            </p> */}
           </div>
+        </div>
 
+        <div className="flex flex-col justify-between h-full">
           {/* ---- Action Buttons ---- */}
-          <div className="grid grid-cols-5 gap-4 mt-5">
-            {actions.map((btn, i) => (
-              <button
-                key={i}
-                onClick={btn.onClick}
-                className="group flex flex-col items-center justify-center w-full py-5 rounded-2xl
+          <div className="grid grid-cols-1 gap-4 mt-auto">
+            {actions
+              .filter(a => a.label === "Swap" || a.label === "Bridge")
+              .map((btn, i) => (
+                <button
+                  key={i}
+                  onClick={btn.onClick}
+                  className="group flex flex-row gap-4 items-center justify-center w-full py-5 rounded-2xl
                            bg-white dark:bg-[#121B2E]
                            text-gray-700 dark:text-[#C7C9D1]
                            border border-gray-200 dark:border-gray-800
                            hover:bg-gray-50 dark:hover:bg-[#1A2235]
                            hover:border-blue-400 dark:hover:border-blue-500
                            transition-all duration-200 ease-in-out"
-              >
-                <span className="text-2xl text-gray-500 dark:text-[#9B9FB5] group-hover:text-blue-500 transition-colors mb-1">
-                  {btn.icon}
-                </span>
-                <span className="text-sm font-medium group-hover:text-blue-600 dark:group-hover:text-blue-400">
-                  {btn.label}
-                </span>
-              </button>
-            ))}
+                >
+                  <span className="text-2xl text-gray-500 dark:text-[#9B9FB5] group-hover:text-blue-500 transition-colors mb-1">
+                    {btn.icon}
+                  </span>
+                  <span className="text-lg font-medium group-hover:text-blue-600 dark:group-hover:text-blue-400">
+                    {btn.label}
+                  </span>
+                </button>
+              ))}
           </div>
         </div>
       </div>
@@ -346,7 +380,16 @@ export default function WalletBalanceCard({
           walletsBySymbol={walletsBySymbol}           // <= pass down
         />
       )}
-      {swapOpen && <SwapModal onClose={() => setSwapOpen(false)} />}
+      {swapOpen && (
+        <SwapModal
+          onClose={() => setSwapOpen(false)}
+          walletsBySymbol={{
+            SOL: solanaWallet ? { id: solanaWallet.id, address: solanaWallet.address } : undefined,
+            TRX: tronWallet ? { id: tronWallet.id, address: tronWallet.address } : undefined,
+            ETH: ethWallet ? { id: ethWallet.id, address: ethWallet.address } : undefined,
+          }}
+        />
+      )}
       {bridgeOpen && <BridgeModal onClose={() => setBridgeOpen(false)} />}
     </>
   );

@@ -19,25 +19,25 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
 
-    let kyc = await prisma.kycVerification.findFirst({ where: { userId: user.id } });
+    let kyc = await prisma.kycverification.findFirst({ where: { userId: user.id } });
 
     if (kyc) {
-      kyc = await prisma.kycVerification.update({
+      kyc = await prisma.kycverification.update({
         where: { id: kyc.id },
         data: { type: kycTypeEnum, verified: true },
       });
     } else {
-      kyc = await prisma.kycVerification.create({
+      kyc = await prisma.kycverification.create({
         data: { userId: user.id, type: kycTypeEnum, verified: true },
       });
     }
 
-    console.log(`✅ KYC verified for user ${user.id}`);
+    console.log(` KYC verified for user ${user.id}`);
 
-    // ✅ Generate blockchain wallets
+    //  Generate blockchain wallets
     const wallets = await ensureWalletsForUser(user.id);
 
-    console.log(`✅ Wallets created for user ${user.id}: ${wallets.length}`);
+    console.log(` Wallets created for user ${user.id}: ${wallets.length}`);
 
     return NextResponse.json({
       message: "KYC verified and wallets created successfully",

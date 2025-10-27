@@ -9,7 +9,7 @@ export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
 // Replace with your actual ERC20 USDT contract address
-const USDT_CONTRACT = process.env.USDT_CONTRACT_ETH ?? "0xdAC17F958D2ee523a2206206994597C13D831ec7"; // mainnet fallback
+const USDT_CONTRACT = process.env.USDT_CONTRACT_ETH ?? "0xdac17f958d2ee523a2206206994597c13d831ec7"; // mainnet fallback
 const USDT_ABI = [
   "function decimals() view returns (uint8)",
   "function balanceOf(address) view returns (uint256)",
@@ -75,7 +75,7 @@ export async function POST(req: Request) {
         tokenId: null, // you can link to Token table later
         type: "TRANSFER",
         amount: new Prisma.Decimal(Number(amountUsdt)),
-        fee: new Prisma.Decimal(feeEth), // ✅ store fee in ETH
+        fee: new Prisma.Decimal(feeEth), //  store fee in ETH
         txHash: tx.hash,
         explorerUrl: explorerFor(tx.hash),
         status: "CONFIRMED",

@@ -4,7 +4,7 @@ const pick = (testVal?: string, mainVal?: string) =>
 
 export const rpc = {
   SOL: () => pick(process.env.SOLANA_DEVNET_RPC, process.env.SOLANA_MAINNET_RPC),
-  TRX: () => pick(process.env.TRON_SHASTA_RPC,   process.env.TRON_MAINNET_RPC),
+  TRX: () => pick(process.env.TRON_NILE_RPC,   process.env.TRON_MAINNET_RPC),
   ETH: () => pick(process.env.ETH_RPC_TESTNET,   process.env.ETH_RPC_MAINNET),
 };
 export const explorer = {
