@@ -63,7 +63,21 @@ export async function executeBridge({
     let fromTx: { txHash: string } | null = null;
     let toTx: { txHash: string } | null = null;
 
-    if (fromChain === "TRX" && toChain === "SOL") {
+    if (fromChain === "TRX" && toChain === "SOL" && fromToken === "USDT") {
+      const result = await bridgeTronUsdtToSolana({
+        tronPrivateKey: fromPriv,
+        tronVault: process.env.TRON_USDT_VAULT!,
+        solBridgePrivateKeyBase58: process.env.SOL_BRIDGE_PRIVATE_KEY_BASE58!,
+        solToAddress: toWallet.address,
+        amount: amt,
+      });
+    
+      if (result.status === "failed") throw new Error(result.error);
+      fromTx = { txHash: result.fromTxHash || "" };
+      toTx = { txHash: result.toTxHash || "" };
+    }
+
+    else if (fromChain === "TRX" && toChain === "SOL") {
       fromTx = await bridgeTron({
         privateKey: fromPriv,
         amount: amt,
@@ -227,22 +241,7 @@ export async function executeBridge({
       if (result.status === "failed") throw new Error(result.error);
       fromTx = { txHash: result.fromTxHash || "" };
       toTx = { txHash: result.toTxHash || "" };
-    } else if (fromChain === "TRX" && toChain === "SOL" && fromToken === "USDT") {
-      const result = await bridgeTronUsdtToSolana({
-        tronPrivateKey: fromPriv,
-        tronVault: process.env.TRON_USDT_VAULT!,
-        solBridgePrivateKeyBase58: process.env.SOL_BRIDGE_PRIVATE_KEY_BASE58!,
-        solToAddress: toWallet.address,
-        amount: amt,
-      });
-    
-      if (result.status === "failed") throw new Error(result.error);
-      fromTx = { txHash: result.fromTxHash || "" };
-      toTx = { txHash: result.toTxHash || "" };
-    }
-    
-    
-    
+    } 
     else {
       throw new Error(`Unsupported bridge path: ${fromChain} → ${toChain}`);
     }

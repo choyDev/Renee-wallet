@@ -1,3 +1,4 @@
+
 import TronWeb from "tronweb";
 
 export async function bridgeTron({
@@ -11,18 +12,30 @@ export async function bridgeTron({
   amount: number;
   toAddress: string;
 }) {
-  const tronWeb = new TronWeb({
-    fullHost: process.env.TRON_NILE_RPC!,
-    privateKey,
-  });
+  try {
+    const tronWeb = new TronWeb({
+      fullHost: process.env.TRON_NILE_RPC!,
+      headers: { "TRON-PRO-API-KEY": process.env.TRONGRID_API_KEY },
+      privateKey,
+    });
 
-  const vaultAddress = process.env.TRX_BRIDGE_VAULT!;
-  const contract = await tronWeb.contract().at(vaultAddress);
+    const vaultAddress = process.env.TRX_BRIDGE_VAULT!;
+    const fromAddress = tronWeb.address.fromPrivateKey(privateKey);
+    const sun = Math.floor(tronWeb.toSun(amount));
 
-  const sun = tronWeb.toSun(amount);
-  const tx = await contract.lock("SOL", toAddress).send({ callValue: sun });
+    console.log(`🔒 Locking ${amount} TRX (${sun} sun) from ${fromAddress} → vault ${vaultAddress}`);
 
-  return { txHash: tx };
+    const tx = await tronWeb.trx.sendTransaction(vaultAddress, sun);
+
+    if (!tx?.result) {
+      throw new Error(`TRX lock failed: ${JSON.stringify(tx)}`);
+    }
+
+    console.log("✅ TRX locked TX:", tx.txid);
+    return { txHash: tx.txid };
+  } catch (err: any) {
+    console.error("bridgeTron error:", err);
+    throw new Error(err.message || "Failed to lock TRX");
+  }
 }
-
 

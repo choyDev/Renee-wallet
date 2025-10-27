@@ -263,8 +263,6 @@ export function buildExplorerAddressUrl(opts: {
       // Pick exact testnet if provided, else fallback to nile for generic "testnet"
       const base =
         /nile/i.test(id) ? "https://nile.tronscan.org/#/address" :
-          /shasta/i.test(id) ? "https://shasta.tronscan.org/#/address" :
-          // /shasta/i.test(id) ? "https://nile.tronscan.org/#/address" :
           isTestnet(id) ? "https://nile.tronscan.org/#/address" :
               "https://tronscan.org/#/address";
       return `${base}/${address}`;

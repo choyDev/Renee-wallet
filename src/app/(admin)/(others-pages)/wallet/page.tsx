@@ -47,10 +47,6 @@ export default function WalletOverviewPage() {
           throw new Error(`Non-JSON response (${res.status}): ${text.slice(0, 200)}`);
         }
 
-        // inside fetchWallets, after: const data = text ? JSON.parse(text) : null;
-console.log("API wallets payload:", data.wallets);
-
-
         if (!res.ok) {
           throw new Error(data?.error || `Request failed with ${res.status}`);
         }
@@ -73,6 +69,11 @@ console.log("API wallets payload:", data.wallets);
 
     fetchWallets();
 
+    const handleRefresh = () => fetchWallets();
+    window.addEventListener("wallet:refresh", handleRefresh);
+
+    return () => window.removeEventListener("wallet:refresh", handleRefresh);
+
   }, []);
 
   const tronUSDT =
@@ -81,6 +82,12 @@ console.log("API wallets payload:", data.wallets);
     solanaWallet?.balances.find(b => b.token.symbol === "USDT")?.amount ?? "0";
   const ethUSDT  =
     ethWallet?.balances.find(b => b.token.symbol === "USDT")?.amount ?? "0"; // if you have ETH card
+  
+  const totalUsd =
+    (tronWallet?.balances.reduce((sum, b) => sum + (b.usd || 0), 0) || 0) +
+    (solanaWallet?.balances.reduce((sum, b) => sum + (b.usd || 0), 0) || 0) +
+    (ethWallet?.balances.reduce((sum, b) => sum + (b.usd || 0), 0) || 0) +
+    (btcWallet?.balances.reduce((sum, b) => sum + (b.usd || 0), 0) || 0);
 
   return (
     <div className="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03] lg:p-6 space-y-6">
@@ -96,6 +103,7 @@ console.log("API wallets payload:", data.wallets);
           ETH: ethWallet ? { id: ethWallet.id, address: ethWallet.address } : undefined,
           BTC: btcWallet ? { id: btcWallet.id, address: btcWallet.address } : undefined,
         }}
+        totalUsd={totalUsd}
       />
 
       {/* ===== Network Balances ===== */}

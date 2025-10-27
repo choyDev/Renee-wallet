@@ -5,6 +5,9 @@ import { motion, AnimatePresence } from "framer-motion";
 import { FiX } from "react-icons/fi";
 import { FaExchangeAlt } from "react-icons/fa";
 import { SiSolana, SiEthereum } from "react-icons/si";
+import { walletEventBus } from "@/lib/events";
+import toast from "react-hot-toast";
+
 
 /* Tron icon */
 const TronIcon = ({ className = "w-4 h-4 text-[#FF4747]" }) => (
@@ -124,6 +127,8 @@ export default function SwapModal({ onClose, walletsBySymbol }: Props) {
       if (!r.ok) throw new Error(j?.error || "Swap failed");
 
       setTxLink(j.explorerTx || j.link || null);
+      walletEventBus.refresh();   // ✅ refresh balances
+      toast.success("Swap completed!");
       setFromAmount("");
       setToAmount("");
       setQuoteRoute(null);
