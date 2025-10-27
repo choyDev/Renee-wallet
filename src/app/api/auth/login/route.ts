@@ -20,7 +20,7 @@ export async function POST(req: Request) {
     if (!valid)
       return NextResponse.json({ error: "Invalid password" }, { status: 401 });
 
-    const kyc = await prisma.kycVerification.findFirst({ where: { userId: user.id } });
+    const kyc = await prisma.kycverification.findFirst({ where: { userId: user.id } });
 
     const token = jwt.sign({ id: user.id, email: user.email }, JWT_SECRET, { expiresIn: "1d" });
 
