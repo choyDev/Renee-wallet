@@ -33,6 +33,7 @@
     "ethers": "^6.15.0",
     "flatpickr": "^4.6.13",
     "framer-motion": "^12.23.24",
+    "fs-extra": "^11.3.2",
     "jsonwebtoken": "^9.0.2",
     "lucide-react": "^0.545.0",
     "next": "^15.5.5",
@@ -48,6 +49,7 @@
     "react-icons": "^5.5.0",
     "react-qr-code": "^2.0.18",
     "regenerator-runtime": "^0.14.1",
+    "solc": "^0.8.30",
     "swiper": "^11.2.0",
     "tailwind-merge": "^2.6.0",
     "tiny-secp256k1": "^2.2.4",
@@ -57,6 +59,7 @@
   "devDependencies": {
     "@eslint/eslintrc": "^3",
     "@svgr/webpack": "^8.1.0",
+    "@types/bs58": "^4.0.4",
     "@types/jsonwebtoken": "^9.0.10",
     "@types/node": "^20",
     "@types/react": "^19",
