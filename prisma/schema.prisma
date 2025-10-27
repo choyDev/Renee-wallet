@@ -108,17 +108,17 @@ model transaction {
 }
 
 model user {
-
-  id              Int               @id @default(autoincrement())
-  email           String            @unique(map: "User_email_key")
-  password_hash   String
-  createdAt       DateTime          @default(now())
-  updatedAt       DateTime           @updatedAt
-  full_name       String?
-  fiatdeposit     fiatdeposit?
-  kycverification kycverification[]
-  transaction     transaction[]
-  wallet          wallet[]
+  id                Int                 @id @default(autoincrement())
+  email             String              @unique(map: "User_email_key")
+  password_hash     String
+  createdAt         DateTime            @default(now())
+  updatedAt         DateTime            @default(now())
+  full_name         String?
+  fiatdeposit       fiatdeposit?
+  kycverification   kycverification[]
+  transaction       transaction[]
+  wallet            wallet[]
+  bridgetransaction bridgetransaction[]
 }
 
 model wallet {
@@ -150,14 +150,14 @@ model bridgetransaction {
   toChain         String
   amount          Decimal       @db.Decimal(36, 18) // Add precision for crypto amounts
   bridgeFee       Decimal?      @db.Decimal(36, 18) // Track bridge fees
-  estimatedTime   Int?          // Estimated completion time in seconds
+  estimatedTime   Int? // Estimated completion time in seconds
   status          bridge_status @default(INITIATED)
   fromTxHash      String?       @db.VarChar(255)
   toTxHash        String?       @db.VarChar(255)
   explorerUrlFrom String?       @db.Text
   explorerUrlTo   String?       @db.Text
   errorMessage    String?       @db.Text // For failed transactions
-  completedAt     DateTime?     // Track when bridge completed
+  completedAt     DateTime? // Track when bridge completed
   createdAt       DateTime      @default(now())
   updatedAt       DateTime      @updatedAt
 
