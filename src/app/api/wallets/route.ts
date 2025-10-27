@@ -14,9 +14,6 @@ export async function GET(req: Request) {
       where: { userId: Number(userId) },
       include: {
         network: true,
-        balances: {
-          include: { token: true },
-        },
       },
     });
 
