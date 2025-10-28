@@ -388,7 +388,7 @@ export default function CryptoPriceChart({
                   fill="currentColor"
                   fillOpacity={0.15}
                   className={colorClass}
-                  activeDot={<circle r={5} className="fill-black dark:fill-white" stroke="none" />}
+                  activeDot={{ r: 5, className: "fill-black dark:fill-white", stroke: "none" }}
                 />
               </AreaChart>
             </ResponsiveContainer>
