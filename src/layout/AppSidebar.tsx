@@ -51,12 +51,6 @@ const navItems = [
     ],
   },
   {
-    icon: <FaExchangeAlt className="w-5 h-5" />,
-    name: "Transaction",
-    path: "/transaction"
-  },
-
-  {
     icon: <FaUserCircle className="w-5 h-5" />,
     name: "Profile",
     path: "/profile"
