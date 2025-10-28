@@ -4,7 +4,7 @@
 import React, { useEffect, useRef, useState, useCallback } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useSidebar } from "../context/SidebarContext";
 import {
   ChevronDownIcon,
@@ -40,6 +40,15 @@ const navItems = [
     icon: <FaWallet className="w-5 h-5" />,
     name: "My Wallet",
     path: "/wallet",
+    subItems: [
+      { name: "Bitcoin (BTC)", path: "/wallet/btc" },
+      { name: "Ethereum (ETH)", path: "/wallet/eth" },
+      { name: "Solana (SOL)", path: "/wallet/sol" },
+      { name: "Tron (TRX)", path: "/wallet/trx" },
+      { name: "XRP", path: "/wallet/xrp" },
+      { name: "Monero (XMR)", path: "/wallet/xmr" },
+      { name: "Dogecoin (DOGE)", path: "/wallet/doge" },
+    ],
   },
   {
     icon: <FaExchangeAlt className="w-5 h-5" />,
@@ -83,18 +92,24 @@ const AppSidebar: React.FC = () => {
 
   const isActive = useCallback((path: string) => path === pathname, [pathname]);
 
-  // Auto-open submenu if current route matches
-  // useEffect(() => {
-  //   let matchedIndex: number | null = null;
-  //   navItems.forEach((nav, index) => {
-  //     if (nav.subItems) {
-  //       nav.subItems.forEach((subItem) => {
-  //         if (isActive(subItem.path)) matchedIndex = index;
-  //       });
-  //     }
-  //   });
-  //   setOpenSubmenu(matchedIndex);
-  // }, [pathname, isActive]);
+  useEffect(() => {
+    let matchedIndex: number | null = null;
+
+    navItems.forEach((nav, index) => {
+      if (nav.subItems) {
+        // open if main path or any sub-item path matches current URL
+        const isWalletSection =
+          pathname === nav.path ||
+          nav.subItems.some((subItem) => pathname.startsWith(subItem.path));
+
+        if (isWalletSection) {
+          matchedIndex = index;
+        }
+      }
+    });
+
+    setOpenSubmenu(matchedIndex);
+  }, [pathname]);
 
   // Update submenu height when opened
   useEffect(() => {
@@ -113,6 +128,8 @@ const AppSidebar: React.FC = () => {
     setOpenSubmenu((prev) => (prev === index ? null : index));
   };
 
+
+  const router = useRouter();
   // ----------------------------
   // Render Menu
   // ----------------------------
@@ -121,24 +138,23 @@ const AppSidebar: React.FC = () => {
       {navItems.map((nav, index) => (
         <li key={nav.name}>
           {nav.subItems ? (
-            <button
-              onClick={() => handleSubmenuToggle(index)}
-              className={`menu-item group ${
-                openSubmenu === index
-                  ? "menu-item-active"
-                  : "menu-item-inactive"
-              } cursor-pointer ${
-                !isExpanded && !isHovered
-                  ? "lg:justify-center"
-                  : "lg:justify-start"
-              }`}
+            <Link
+              href={nav.path ?? "#"}
+              onClick={(e) => {
+                e.preventDefault(); // prevent default navigation first
+                handleSubmenuToggle(index); // toggle submenu
+                // then navigate programmatically
+                router.push(nav.path!);
+              }}
+              className={`menu-item group ${openSubmenu === index ? "menu-item-active" : "menu-item-inactive"
+                } cursor-pointer ${!isExpanded && !isHovered ? "lg:justify-center" : "lg:justify-start"
+                }`}
             >
               <span
-                className={`${
-                  openSubmenu === index
-                    ? "menu-item-icon-active"
-                    : "menu-item-icon-inactive"
-                }`}
+                className={`${openSubmenu === index
+                  ? "menu-item-icon-active"
+                  : "menu-item-icon-inactive"
+                  }`}
               >
                 {nav.icon}
               </span>
@@ -147,26 +163,23 @@ const AppSidebar: React.FC = () => {
               )}
               {(isExpanded || isHovered || isMobileOpen) && (
                 <ChevronDownIcon
-                  className={`ml-auto w-5 h-5 transition-transform duration-200 ${
-                    openSubmenu === index ? "rotate-180 text-brand-500" : ""
-                  }`}
+                  className={`ml-auto w-5 h-5 transition-transform duration-200 ${openSubmenu === index ? "rotate-180 text-brand-500" : ""
+                    }`}
                 />
               )}
-            </button>
+            </Link>
           ) : (
             nav.path && (
               <Link
                 href={nav.path}
-                className={`menu-item group ${
-                  isActive(nav.path) ? "menu-item-active" : "menu-item-inactive"
-                }`}
+                className={`menu-item group ${isActive(nav.path) ? "menu-item-active" : "menu-item-inactive"
+                  }`}
               >
                 <span
-                  className={`${
-                    isActive(nav.path)
-                      ? "menu-item-icon-active"
-                      : "menu-item-icon-inactive"
-                  }`}
+                  className={`${isActive(nav.path)
+                    ? "menu-item-icon-active"
+                    : "menu-item-icon-inactive"
+                    }`}
                 >
                   {nav.icon}
                 </span>
@@ -196,32 +209,29 @@ const AppSidebar: React.FC = () => {
                   <li key={subItem.name}>
                     <Link
                       href={subItem.path}
-                      className={`menu-dropdown-item ${
-                        isActive(subItem.path)
-                          ? "menu-dropdown-item-active"
-                          : "menu-dropdown-item-inactive"
-                      }`}
+                      className={`menu-dropdown-item ${isActive(subItem.path)
+                        ? "menu-dropdown-item-active"
+                        : "menu-dropdown-item-inactive"
+                        }`}
                     >
                       {subItem.name}
                       <span className="flex items-center gap-1 ml-auto">
                         {subItem.new && (
                           <span
-                            className={`${
-                              isActive(subItem.path)
-                                ? "menu-dropdown-badge-active"
-                                : "menu-dropdown-badge-inactive"
-                            } menu-dropdown-badge`}
+                            className={`${isActive(subItem.path)
+                              ? "menu-dropdown-badge-active"
+                              : "menu-dropdown-badge-inactive"
+                              } menu-dropdown-badge`}
                           >
                             new
                           </span>
                         )}
                         {subItem.pro && (
                           <span
-                            className={`${
-                              isActive(subItem.path)
-                                ? "menu-dropdown-badge-active"
-                                : "menu-dropdown-badge-inactive"
-                            } menu-dropdown-badge`}
+                            className={`${isActive(subItem.path)
+                              ? "menu-dropdown-badge-active"
+                              : "menu-dropdown-badge-inactive"
+                              } menu-dropdown-badge`}
                           >
                             pro
                           </span>
@@ -244,10 +254,9 @@ const AppSidebar: React.FC = () => {
   return (
     <aside
       className={`fixed mt-16 flex flex-col lg:mt-0 top-0 px-5 left-0 bg-white dark:bg-gray-900 dark:border-gray-800 text-gray-900 h-screen transition-all duration-300 ease-in-out z-50 border-r border-gray-200 
-        ${
-          isExpanded || isMobileOpen
-            ? "w-[290px]"
-            : isHovered
+        ${isExpanded || isMobileOpen
+          ? "w-[290px]"
+          : isHovered
             ? "w-[290px]"
             : "w-[90px]"
         }
@@ -258,9 +267,8 @@ const AppSidebar: React.FC = () => {
     >
       {/* Logo */}
       <div
-        className={`py-8 flex ${
-          !isExpanded && !isHovered ? "lg:justify-center" : "justify-start"
-        }`}
+        className={`py-8 flex ${!isExpanded && !isHovered ? "lg:justify-center" : "justify-start"
+          }`}
       >
         <Link href="/">
           {isExpanded || isHovered || isMobileOpen ? (

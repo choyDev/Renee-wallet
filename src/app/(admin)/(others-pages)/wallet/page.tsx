@@ -4,6 +4,7 @@ import React, { useEffect, useState } from "react";
 import WalletBalanceCard from "@/components/wallet/WalletBalanceCard";
 import WalletNetworkCard from "@/components/wallet/WalletNetworkCard";
 // import WalletRecentActivity from "@/components/wallet/WalletRecentActivity";
+import { useRouter } from "next/navigation";
 
 interface WalletData {
   id: number;
@@ -26,7 +27,7 @@ export default function WalletOverviewPage() {
   const [solanaWallet, setSolanaWallet] = useState<WalletData | null>(null);
   const [ethWallet, setEthWallet] = useState<WalletData | null>(null);
   const [btcWallet, setBtcWallet] = useState<WalletData | null>(null);
- 
+
   useEffect(() => {
     const fetchWallets = async () => {
       try {
@@ -53,7 +54,7 @@ export default function WalletOverviewPage() {
 
         const wallets: WalletData[] = data.wallets || [];
         const tron = wallets.find((w) => w.network.symbol === "TRX") || null;
-        const sol  = wallets.find((w) => w.network.symbol === "SOL") || null;
+        const sol = wallets.find((w) => w.network.symbol === "SOL") || null;
         const eth = wallets.find(w => w.network.symbol === "ETH") || null;
         const btc = wallets.find(w => w.network.symbol === "BTC") || null;
 
@@ -78,9 +79,9 @@ export default function WalletOverviewPage() {
 
   const tronUSDT =
     tronWallet?.balances.find(b => b.token.symbol === "USDT")?.amount ?? "0";
-  const solUSDT  =
+  const solUSDT =
     solanaWallet?.balances.find(b => b.token.symbol === "USDT")?.amount ?? "0";
-  const ethUSDT  =
+  const ethUSDT =
     ethWallet?.balances.find(b => b.token.symbol === "USDT")?.amount ?? "0"; // if you have ETH card
   
   const totalUsd =
@@ -89,67 +90,91 @@ export default function WalletOverviewPage() {
     (ethWallet?.balances.reduce((sum, b) => sum + (b.usd || 0), 0) || 0) +
     (btcWallet?.balances.reduce((sum, b) => sum + (b.usd || 0), 0) || 0);
 
+  const router = useRouter();
+
+  const handleNavigate = (path: string) => {
+    router.push(path);
+  };
+
+  const TotalUsd = Number(ethWallet?.balances?.[0]?.usd ?? "0")
+    + Number(solanaWallet?.balances?.[0]?.usd ?? "0")
+    + Number(tronWallet?.balances?.[0]?.usd ?? "0")
+    + Number(btcWallet?.balances?.[0]?.usd ?? "0")
+    + Number(ethUSDT ?? "0")
+    + Number(solUSDT ?? "0")
+    + Number(tronUSDT ?? "0");
+
   return (
     <div className="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03] lg:p-6 space-y-6">
-      <h3 className="mb-5 text-lg font-semibold text-gray-800 dark:text-white/90">
+      <div className="mb-5 text-lg font-semibold text-gray-800 dark:text-white/90 flex justify-between items-center">
         Wallet Overview
-      </h3>
+        <p>TotalUsd:&nbsp;&nbsp;&nbsp;${TotalUsd.toFixed(2)}$</p>
+      </div>
 
       {/* ===== Balance + Actions ===== */}
-      <WalletBalanceCard
+      {/* <WalletBalanceCard
         walletsBySymbol={{
           SOL: solanaWallet ? { id: solanaWallet.id, address: solanaWallet.address } : undefined,
           TRX: tronWallet ? { id: tronWallet.id, address: tronWallet.address } : undefined,
           ETH: ethWallet ? { id: ethWallet.id, address: ethWallet.address } : undefined,
           BTC: btcWallet ? { id: btcWallet.id, address: btcWallet.address } : undefined,
         }}
-        totalUsd={totalUsd}
       />
+      /> */}
 
       {/* ===== Network Balances ===== */}
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-2 gap-6">
-        <WalletNetworkCard
-          name="Ethereum"
-          symbol="ETH"
-          tokenAmount={ethWallet?.balances?.[0]?.amount ?? "0"}
-          usdAmount={(ethWallet?.balances?.[0]?.usd ?? 0).toFixed(2)}
-          usdtTokenAmount={ethUSDT}
-          address={ethWallet?.address}
-          explorerUrl={ethWallet?.network.explorerUrl}
-          chainId={ethWallet?.network.chainId ?? ""}
-        />
+        <div onClick={() => handleNavigate("/wallet/eth")} className="cursor-pointer">
+          <WalletNetworkCard
+            name="Ethereum"
+            symbol="ETH"
+            tokenAmount={ethWallet?.balances?.[0]?.amount ?? "0"}
+            usdAmount={(ethWallet?.balances?.[0]?.usd ?? 0).toFixed(2)}
+            usdtTokenAmount={ethUSDT}
+            address={ethWallet?.address}
+            explorerUrl={ethWallet?.network.explorerUrl}
+            chainId={ethWallet?.network.chainId ?? ""}
+          />
+        </div>
 
-        <WalletNetworkCard
-          name="Bitcoin"
-          symbol="BTC"
-          tokenAmount={btcWallet?.balances?.[0]?.amount ?? "0"}
-          usdAmount={(btcWallet?.balances?.[0]?.usd ?? 0).toFixed(2)}
-          address={btcWallet?.address}
-          explorerUrl={btcWallet?.network.explorerUrl}
-          chainId={btcWallet?.network.chainId ?? ""}
-        />
+        <div onClick={() => handleNavigate("/wallet/btc")} className="cursor-pointer grid">
+          <WalletNetworkCard
+            name="Bitcoin"
+            symbol="BTC"
+            tokenAmount={btcWallet?.balances?.[0]?.amount ?? "0"}
+            usdAmount={(btcWallet?.balances?.[0]?.usd ?? 0).toFixed(2)}
+            address={btcWallet?.address}
+            explorerUrl={btcWallet?.network.explorerUrl}
+            chainId={btcWallet?.network.chainId ?? ""}
+          />
+        </div>
 
-        <WalletNetworkCard
-          name="Tron"
-          symbol="TRX"
-          tokenAmount={tronWallet?.balances?.[0]?.amount ?? "0"}
-          usdAmount={(tronWallet?.balances?.[0]?.usd ?? 0).toFixed(2)}
-          usdtTokenAmount={tronUSDT}
-          address={tronWallet?.address}
-          explorerUrl={tronWallet?.network.explorerUrl}
-          chainId={tronWallet?.network.chainId ?? ""}
-        />
+        <div onClick={() => handleNavigate("/wallet/trx")} className="cursor-pointer">
+          <WalletNetworkCard
+            name="Tron"
+            symbol="TRX"
+            tokenAmount={tronWallet?.balances?.[0]?.amount ?? "0"}
+            usdAmount={(tronWallet?.balances?.[0]?.usd ?? 0).toFixed(2)}
+            usdtTokenAmount={tronUSDT}
+            address={tronWallet?.address}
+            explorerUrl={tronWallet?.network.explorerUrl}
+            chainId={tronWallet?.network.chainId ?? ""}
+          />
+        </div>
 
-        <WalletNetworkCard
-          name="Solana"
-          symbol="SOL"
-          tokenAmount={solanaWallet?.balances?.[0]?.amount ?? "0"}
-          usdAmount={(solanaWallet?.balances?.[0]?.usd ?? 0).toFixed(2)}
-          usdtTokenAmount={solUSDT}
-          address={solanaWallet?.address}
-          explorerUrl={solanaWallet?.network.explorerUrl}
-          chainId={solanaWallet?.network.chainId ?? ""}
-        />
+        <div onClick={() => handleNavigate("/wallet/sol")} className="cursor-pointer">
+
+          <WalletNetworkCard
+            name="Solana"
+            symbol="SOL"
+            tokenAmount={solanaWallet?.balances?.[0]?.amount ?? "0"}
+            usdAmount={(solanaWallet?.balances?.[0]?.usd ?? 0).toFixed(2)}
+            usdtTokenAmount={solUSDT}
+            address={solanaWallet?.address}
+            explorerUrl={solanaWallet?.network.explorerUrl}
+            chainId={solanaWallet?.network.chainId ?? ""}
+          />
+        </div>
       </div>
 
       {/* ===== Recent Activity ===== */}

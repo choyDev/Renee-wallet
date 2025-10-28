@@ -18,27 +18,27 @@ import SwapModal from "./modal/SwapModal";
 import BridgeModal from "./modal/BridgeModal";
 
 //  Tron Icon
-const TronIcon = ({ className = "text-[#FF4747] w-4 h-4" }) => (
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    fill="currentColor"
-    viewBox="0 0 24 24"
-    className={className}
-  >
-    <path d="M1.5 3.75L12 22.5L22.5 3.75L12 1.5L1.5 3.75ZM12 4.5L18.24 5.76L12 20.1L5.76 5.76L12 4.5ZM9.3 7.26L12 12.93L14.7 7.26H9.3Z" />
-  </svg>
-);
+// const TronIcon = ({ className = "text-[#FF4747] w-4 h-4" }) => (
+//   <svg
+//     xmlns="http://www.w3.org/2000/svg"
+//     fill="currentColor"
+//     viewBox="0 0 24 24"
+//     className={className}
+//   >
+//     <path d="M1.5 3.75L12 22.5L22.5 3.75L12 1.5L1.5 3.75ZM12 4.5L18.24 5.76L12 20.1L5.76 5.76L12 4.5ZM9.3 7.26L12 12.93L14.7 7.26H9.3Z" />
+//   </svg>
+// );
 
 type SymbolCode = "SOL" | "TRX" | "ETH" | "BTC";
 type WalletBrief = { id: number; address: string };
 
-export default function WalletBalanceCard({
-  walletsBySymbol = {},
-  totalUsd = 0,                              // <= NEW prop with safe default
+export default function WalletBalanceCard(
+  {
+  walletsBySymbol = {},                          // <= NEW prop with safe default
 }: {
   walletsBySymbol?: Partial<Record<SymbolCode, WalletBrief>>;
-  totalUsd?: number;
-}) {
+}
+) {
 
   const [modalType, setModalType] = useState<"send" | "receive" | null>(null);
   const [swapOpen, setSwapOpen] = useState(false);
@@ -60,12 +60,59 @@ export default function WalletBalanceCard({
 
   return (
     <>
-      <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-      
+      {/* <div className="grid grid-cols-1 lg:grid-cols-4 gap-6"> */}
+        {/* ===== LEFT SIDE — BALANCE TABLE ===== */}
+        {/* <div className="flex flex-col justify-between rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-[#121B2E] shadow-sm overflow-hidden h-full">
+          
+          <div className="flex items-center gap-2 border-b border-gray-100 dark:border-gray-700 px-5 py-4 bg-gray-50 dark:bg-[#0E1624]">
+            <FaLandmark className="text-blue-500 text-lg" />
+            <h3 className="text-lg font-semibold text-gray-800 dark:text-white">
+              Balances
+            </h3>
+          </div>
+
+          <table className="w-full text-sm text-gray-700 dark:text-gray-300 flex-grow">
+            <thead>
+              <tr className="bg-gray-100 dark:bg-[#1C2436] text-gray-600 dark:text-gray-400">
+                <th className="text-left px-5 py-3 font-semibold">Currency</th>
+                <th className="text-left px-5 py-3 font-semibold">Amount</th>
+              </tr>
+            </thead>
+            <tbody>
+              {balances.map((b, i) => (
+                <tr
+                  key={i}
+                  className="hover:bg-gray-50 dark:hover:bg-[#1A2235] transition notranslate"
+                >
+                  <td className="px-5 py-3 flex items-center gap-2 font-medium">
+                    <div className="flex items-center justify-center w-6 h-6 rounded-full bg-gray-100 dark:bg-gray-700">
+                      {b.icon}
+                    </div>
+                    <span>{b.symbol}</span>
+                  </td>
+                  <td className="px-5 py-3 text-gray-800 dark:text-gray-100">
+                    {b.amount} {b.symbol}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+
+            <tfoot>
+              <tr className="border-t border-gray-200 dark:border-gray-700">
+                <td className="px-5 py-3 font-semibold text-gray-600 dark:text-gray-400">
+                  Est. Total
+                </td>
+                <td className="px-5 py-3 font-bold text-gray-900 dark:text-white">
+                  0.00 USD
+                </td>
+              </tr>
+            </tfoot>
+          </table>
+        </div> */}
+        
         <div className="flex flex-col justify-between h-full">
-          <div className="grid grid-cols-1 gap-4 mt-auto">
+          <div className="grid grid-cols-4 gap-4 mt-auto">
             {actions
-              .filter(a => a.label === "Send" || a.label === "Receive")
               .map((btn, i) => (
                 <button
                   key={i}
@@ -89,7 +136,7 @@ export default function WalletBalanceCard({
           </div>
         </div>
 
-        <div className="flex flex-col justify-between rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-[#121B2E] shadow-sm overflow-hidden h-full w-full lg:col-span-2">
+        {/* <div className="flex flex-col justify-between rounded-2xl border border-gray-200 dark:border-gray-800 bg-white dark:bg-[#121B2E] shadow-sm overflow-hidden h-full w-full lg:col-span-2">
           <div
             className="w-full rounded-2xl p-8 flex flex-col items-center justify-center text-center relative overflow-hidden h-full
                        bg-white dark:bg-[#121B2E]
@@ -108,10 +155,9 @@ export default function WalletBalanceCard({
               Total Wallet Balance
             </p>
           </div>
-        </div>
+        </div> */}
 
-        <div className="flex flex-col justify-between h-full">
-          {/* ---- Action Buttons ---- */}
+        {/* <div className="flex flex-col justify-between h-full">
           <div className="grid grid-cols-1 gap-4 mt-auto">
             {actions
               .filter(a => a.label === "Swap" || a.label === "Bridge")
@@ -136,8 +182,8 @@ export default function WalletBalanceCard({
                 </button>
               ))}
           </div>
-        </div>
-      </div>
+        </div> */}
+      {/* </div>  */}
 
       {/* ====== MODALS ====== */}
       {modalType && (

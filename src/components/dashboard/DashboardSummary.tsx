@@ -12,6 +12,7 @@ import {
   SiDogecoin,
 } from "react-icons/si";
 import { FaMonero } from "react-icons/fa";
+import { useRouter } from "next/navigation";
 
 // Custom Tron Icon
 const TronIcon = ({ className = "text-[#FF4747] w-4 h-4" }) => (
@@ -30,6 +31,12 @@ interface WalletData {
 
 export default function DashboardSummary() {
   const [wallets, setWallets] = useState<WalletData[]>([]);
+
+  const router = useRouter();
+
+  const handleNavigate = (path: string) => {
+    router.push(path);
+  };
 
   useEffect(() => {
     const fetchWallets = async () => {
@@ -56,63 +63,71 @@ export default function DashboardSummary() {
 
   return (
     <div className="col-span-12 grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-6">
-      {/* 🔴 TRON */}
-      <CryptoCard
-        title="TRX-USD"
-        subtitle="Tron"
-        value={`$${getUsd("TRX")}`}
-        sub={`${getAmount("TRX")} TRX`}
-        change="-0.4%"
-        changeAbs="-0.25%"
-        color="#FF060A"
-        iconBg="bg-[#FFECEC]"
-        icon={<TronIcon className="text-[#FF060A] size-6" />}
-        data={[12, 18, 20, 16, 14, 12, 10]}
-      />
+      {/* TRON */}
+      <div onClick={() => handleNavigate("/wallet/trx")} className="cursor-pointer">
+        <CryptoCard
+          title="TRX-USD"
+          subtitle="Tron"
+          value={`$${getUsd("TRX")}`}
+          sub={`${getAmount("TRX")} TRX`}
+          change="-0.4%"
+          changeAbs="-0.25%"
+          color="#FF060A"
+          iconBg="bg-[#FFECEC]"
+          icon={<TronIcon className="text-[#FF060A] size-6" />}
+          data={[12, 18, 20, 16, 14, 12, 10]}
+        />
+      </div>
 
-      {/* 🟢 SOLANA */}
-      <CryptoCard
-        title="SOL-USD"
-        subtitle="Solana"
-        value={`$${getUsd("SOL")}`}
-        sub={`${getAmount("SOL")} SOL`}
-        change="+9.25%"
-        changeAbs="+182.10%"
-        color="#14F195"
-        iconBg="bg-[#E8FFF9]"
-        icon={<SiSolana className="text-[#14F195] size-6" />}
-        data={[10, 12, 15, 18, 21, 24, 26]}
-      />
+      {/* SOLANA */}
+      <div onClick={() => handleNavigate("/wallet/sol")} className="cursor-pointer">
+        <CryptoCard
+          title="SOL-USD"
+          subtitle="Solana"
+          value={`$${getUsd("SOL")}`}
+          sub={`${getAmount("SOL")} SOL`}
+          change="+9.25%"
+          changeAbs="+182.10%"
+          color="#14F195"
+          iconBg="bg-[#E8FFF9]"
+          icon={<SiSolana className="text-[#14F195] size-6" />}
+          data={[10, 12, 15, 18, 21, 24, 26]}
+        />
+      </div>
 
-      {/* 🔵 ETHEREUM */}
-      <CryptoCard
-        title="ETH-USD"
-        subtitle="Ethereum"
-        value={`$${getUsd("ETH")}`}
-        sub={`${getAmount("ETH")} ETH`}
-        change="+5.12%"
-        changeAbs="+97.32%"
-        color="#627EEA"
-        iconBg="bg-[#EEF2FF]"
-        icon={<SiEthereum className="text-[#627EEA] size-6" />}
-        data={[8, 9, 10, 12, 13, 14, 15]}
-      />
+      {/* ETHEREUM */}
+      <div onClick={() => handleNavigate("/wallet/eth")} className="cursor-pointer">
+        <CryptoCard
+          title="ETH-USD"
+          subtitle="Ethereum"
+          value={`$${getUsd("ETH")}`}
+          sub={`${getAmount("ETH")} ETH`}
+          change="+5.12%"
+          changeAbs="+97.32%"
+          color="#627EEA"
+          iconBg="bg-[#EEF2FF]"
+          icon={<SiEthereum className="text-[#627EEA] size-6" />}
+          data={[8, 9, 10, 12, 13, 14, 15]}
+        />
+      </div>
 
-      {/* 🟠 BITCOIN */}
-      <CryptoCard
-        title="BTC-USD"
-        subtitle="Bitcoin"
-        value={`$${getUsd("BTC")}`}
-        sub={`${getAmount("BTC")} BTC`}
-        change="+3.84%"
-        changeAbs="+56.43%"
-        color="#F7931A"
-        iconBg="bg-[#FFF4E5]"
-        icon={<SiBitcoin className="text-[#F7931A] size-6" />}
-        data={[20, 22, 23, 25, 24, 23, 26]}
-      />
+      {/* BITCOIN */}
+      <div onClick={() => handleNavigate("/wallet/btc")} className="cursor-pointer">
+        <CryptoCard
+          title="BTC-USD"
+          subtitle="Bitcoin"
+          value={`$${getUsd("BTC")}`}
+          sub={`${getAmount("BTC")} BTC`}
+          change="+3.84%"
+          changeAbs="+56.43%"
+          color="#F7931A"
+          iconBg="bg-[#FFF4E5]"
+          icon={<SiBitcoin className="text-[#F7931A] size-6" />}
+          data={[20, 22, 23, 25, 24, 23, 26]}
+        />
+      </div>
 
-      {/* 🟧 MONERO */}
+      {/* MONERO */}
       <CryptoCard
         title="XMR-USD"
         subtitle="Monero"
@@ -126,7 +141,7 @@ export default function DashboardSummary() {
         data={[6, 7, 8, 7, 8, 9, 10]}
       />
 
-      {/* 💜 XRP */}
+      {/* XRP */}
       <CryptoCard
         title="XRP-USD"
         subtitle="Ripple"
@@ -140,7 +155,7 @@ export default function DashboardSummary() {
         data={[7, 9, 10, 9, 11, 12, 13]}
       />
 
-      {/* 🟡 DOGECOIN */}
+      {/* DOGECOIN */}
       <CryptoCard
         title="DOGE-USD"
         subtitle="Dogecoin"
@@ -154,7 +169,7 @@ export default function DashboardSummary() {
         data={[5, 7, 8, 9, 11, 10, 12]}
       />
 
-      {/* 💚 USDT */}
+      {/* USDT */}
       <CryptoCard
         title="USDT"
         subtitle="Tether"
