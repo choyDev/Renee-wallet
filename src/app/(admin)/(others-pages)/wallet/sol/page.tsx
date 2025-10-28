@@ -106,6 +106,7 @@ console.log("API wallets payload:", data.wallets);
 
       {/* ===== Balance + Actions ===== */}
       <WalletBalanceCard
+        currentChain="SOL"
         walletsBySymbol={{
           SOL: solanaWallet ? { id: solanaWallet.id, address: solanaWallet.address } : undefined,
           TRX: tronWallet ? { id: tronWallet.id, address: tronWallet.address } : undefined,
@@ -122,7 +123,7 @@ console.log("API wallets payload:", data.wallets);
           <div className="flex justify-between items-start">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 flex items-center justify-center rounded-xl bg-gray-100 dark:bg-gray-700">
-                <SiSolana className="text-[#627EEA] w-6 h-6" />
+                <SiSolana className="text-[#14F195] w-6 h-6" />
               </div>
               <div>
                 <h3 className="text-lg font-semibold text-gray-800 dark:text-white">Solana</h3>
@@ -157,7 +158,7 @@ console.log("API wallets payload:", data.wallets);
         </div>
       </div>
 
-      <TransactionTable />
+      <TransactionTable chain="SOL"/>
     </div>
   );
 }

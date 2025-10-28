@@ -53,10 +53,6 @@ export default function WalletOverviewPage() {
           throw new Error(`Non-JSON response (${res.status}): ${text.slice(0, 200)}`);
         }
 
-        // inside fetchWallets, after: const data = text ? JSON.parse(text) : null;
-console.log("API wallets payload:", data.wallets);
-
-
         if (!res.ok) {
           throw new Error(data?.error || `Request failed with ${res.status}`);
         }
@@ -103,6 +99,7 @@ console.log("API wallets payload:", data.wallets);
 
       {/* ===== Balance + Actions ===== */}
       <WalletBalanceCard
+        currentChain="BTC"
         walletsBySymbol={{
           SOL: solanaWallet ? { id: solanaWallet.id, address: solanaWallet.address } : undefined,
           TRX: tronWallet ? { id: tronWallet.id, address: tronWallet.address } : undefined,
@@ -122,7 +119,7 @@ console.log("API wallets payload:", data.wallets);
           <div className="flex justify-between items-start">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 flex items-center justify-center rounded-xl bg-gray-100 dark:bg-gray-700">
-                <SiBitcoin className="text-[#627EEA] w-6 h-6" />
+                <SiBitcoin className="text-[#F7931A] w-6 h-6" />
               </div>
               <div>
                 <h3 className="text-lg font-semibold text-gray-800 dark:text-white">Bitcoin</h3>
@@ -139,7 +136,7 @@ console.log("API wallets payload:", data.wallets);
         </div>
       </div>
 
-        <TransactionTable />
+        <TransactionTable chain="BTC"/>
       
     </div>
   );

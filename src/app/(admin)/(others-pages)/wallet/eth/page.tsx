@@ -106,6 +106,7 @@ export default function WalletOverviewPage() {
 
       {/* ===== Balance + Actions ===== */}
       <WalletBalanceCard
+        currentChain="ETH"
         walletsBySymbol={{
           SOL: solanaWallet ? { id: solanaWallet.id, address: solanaWallet.address } : undefined,
           TRX: tronWallet ? { id: tronWallet.id, address: tronWallet.address } : undefined,
@@ -157,7 +158,7 @@ export default function WalletOverviewPage() {
         </div>
       </div>
 
-      <TransactionTable />
+      <TransactionTable chain="ETH"/>
     </div>
   );
 }

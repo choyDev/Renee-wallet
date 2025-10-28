@@ -54,9 +54,6 @@ export default function WalletOverviewPage() {
           throw new Error(`Non-JSON response (${res.status}): ${text.slice(0, 200)}`);
         }
 
-        // inside fetchWallets, after: const data = text ? JSON.parse(text) : null;
-console.log("API wallets payload:", data.wallets);
-
 
         if (!res.ok) {
           throw new Error(data?.error || `Request failed with ${res.status}`);
@@ -106,6 +103,7 @@ console.log("API wallets payload:", data.wallets);
 
       {/* ===== Balance + Actions ===== */}
       <WalletBalanceCard
+        currentChain="TRX"
         walletsBySymbol={{
           SOL: solanaWallet ? { id: solanaWallet.id, address: solanaWallet.address } : undefined,
           TRX: tronWallet ? { id: tronWallet.id, address: tronWallet.address } : undefined,
@@ -125,8 +123,8 @@ console.log("API wallets payload:", data.wallets);
                 <TronIcon />
               </div>
               <div>
-                <h3 className="text-lg font-semibold text-gray-800 dark:text-white">Ethereum</h3>
-                <p className="text-xs text-gray-500 dark:text-gray-400">ETH</p>
+                <h3 className="text-lg font-semibold text-gray-800 dark:text-white">Tron</h3>
+                <p className="text-xs text-gray-500 dark:text-gray-400">TRX</p>
               </div>
             </div>
           </div>
@@ -157,7 +155,7 @@ console.log("API wallets payload:", data.wallets);
         </div>
       </div>
 
-      <TransactionTable />
+      <TransactionTable chain="TRX"/>
     </div>
   );
 }

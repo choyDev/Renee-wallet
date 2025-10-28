@@ -1,98 +1,119 @@
 
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { FiX, FiLoader, FiChevronDown } from "react-icons/fi";
+import { FiX, FiLoader, FiChevronDown, FiArrowRight } from "react-icons/fi";
 import { FaExchangeAlt, FaEthereum, FaBitcoin } from "react-icons/fa";
-import { SiSolana } from "react-icons/si";
+import { SiSolana, SiTether } from "react-icons/si";
 import toast from "react-hot-toast";
 import { walletEventBus } from "@/lib/events";
 
-
-/* ✅ Tron Icon with direct color binding */
+/* ---------- Tron Icon ---------- */
 const TronIcon = ({ color = "#FF4747", className = "w-5 h-5" }) => (
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    viewBox="0 0 24 24"
-    width="20"
-    height="20"
-    className={className}
-    fill={color}
-  >
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className={className} fill={color}>
     <path d="M1.5 3.75L12 22.5L22.5 3.75L12 1.5L1.5 3.75ZM12 4.5L18.24 5.76L12 20.1L5.76 5.76L12 4.5ZM9.3 7.26L12 12.93L14.7 7.26H9.3Z" />
   </svg>
 );
 
-/* ✅ Network definitions with icons + brand colors */
+/* ---------- Networks ---------- */
 const NETWORKS = [
-  { name: "Ethereum", symbol: "ETH", Icon: FaEthereum, color: "#627EEA", tokens: ["ETH", "USDT"] },
-  { name: "Tron", symbol: "TRX", Icon: TronIcon, color: "#FF4747", tokens: ["TRX", "USDT"] },
-  { name: "Solana", symbol: "SOL", Icon: SiSolana, color: "#14F195", tokens: ["SOL", "USDT"] },
+  { name: "Ethereum", symbol: "ETH", Icon: FaEthereum, color: "#627EEA", tokens: ["ETH", "USDT(ERC20)"] },
+  { name: "Tron", symbol: "TRX", Icon: TronIcon, color: "#FF4747", tokens: ["TRX", "USDT(TRC20)"] },
+  { name: "Solana", symbol: "SOL", Icon: SiSolana, color: "#14F195", tokens: ["SOL", "USDT(SPL)"] },
   { name: "Bitcoin", symbol: "BTC", Icon: FaBitcoin, color: "#F7931A", tokens: ["BTC"] },
 ];
 
-export default function BridgeModal({ onClose }: { onClose: () => void }) {
-  const [fromNetwork, setFromNetwork] = useState(NETWORKS[1]);
-  const [toNetwork, setToNetwork] = useState(NETWORKS[2]);
-  const [fromToken, setFromToken] = useState("TRX");
-  const [toToken, setToToken] = useState("SOL");
+/* ---------- Token Icons ---------- */
+const getTokenIcon = (token: string) => {
+  if (token.includes("USDT")) return <SiTether className="text-[#26A17B] w-5 h-5" />;
+  if (token.startsWith("TRX")) return <TronIcon />;
+  if (token.startsWith("SOL")) return <SiSolana className="text-[#14F195] w-5 h-5" />;
+  if (token.startsWith("ETH")) return <FaEthereum className="text-[#627EEA] w-5 h-5" />;
+  if (token.startsWith("BTC")) return <FaBitcoin className="text-[#F7931A] w-5 h-5" />;
+  return null;
+};
+
+/* ---------- Helper: strip network suffix ---------- */
+const cleanTokenName = (token: string): string => token.replace(/\(.*?\)/, "").trim();
+
+export default function BridgeModal({
+  onClose,
+  currentChain,
+}: {
+  onClose: () => void;
+  currentChain?: "TRX" | "SOL" | "ETH" | "BTC";
+}) {
+  const initialFrom = NETWORKS.find((n) => n.symbol === currentChain)!;
+  const [fromNetwork] = useState(initialFrom);
+  const [fromToken, setFromToken] = useState(initialFrom.tokens[0]);
+  const [toNetwork, setToNetwork] = useState(NETWORKS.find((n) => n.symbol !== currentChain)!);
+  const [toToken, setToToken] = useState(toNetwork.tokens[0]);
   const [amount, setAmount] = useState("");
   const [quote, setQuote] = useState<any>(null);
   const [userId, setUserId] = useState<number | null>(null);
   const [submitting, setSubmitting] = useState(false);
 
-  // dropdown toggles
-  const [openFromNet, setOpenFromNet] = useState(false);
-  const [openToNet, setOpenToNet] = useState(false);
   const [openFromToken, setOpenFromToken] = useState(false);
+  const [openToNet, setOpenToNet] = useState(false);
   const [openToToken, setOpenToToken] = useState(false);
 
-  /* ✅ Auto load user */
+  /* 🔹 Load user ID */
   useEffect(() => {
     const stored = localStorage.getItem("user");
     if (stored) setUserId(JSON.parse(stored).id);
   }, []);
 
-  /* ✅ Sync tokens when network changes */
+  /* 🔹 Auto-reset To-Token when network changes */
   useEffect(() => {
-    if (!fromNetwork.tokens.includes(fromToken)) setFromToken(fromNetwork.tokens[0]);
-  }, [fromNetwork]);
-  useEffect(() => {
-    if (!toNetwork.tokens.includes(toToken)) setToToken(toNetwork.tokens[0]);
+    setToToken(toNetwork.tokens[0]);
   }, [toNetwork]);
 
-  /* ✅ Fetch conversion quote dynamically */
+  /* 🔹 Compatibility Logic */
+  const isCompatible = useMemo(() => {
+    const fromIsBTC = fromToken.startsWith("BTC") || fromNetwork.symbol === "BTC";
+    const toIsBTC = toToken.startsWith("BTC") || toNetwork.symbol === "BTC";
+    const fromIsUSDT = fromToken.includes("USDT");
+    const toIsUSDT = toToken.includes("USDT");
+
+    if ((fromIsBTC && toIsUSDT) || (toIsBTC && fromIsUSDT)) return false;
+    if ((fromIsBTC && !toIsBTC) || (!fromIsBTC && toIsBTC)) return !fromIsUSDT && !toIsUSDT;
+
+    return true;
+  }, [fromToken, toToken, fromNetwork, toNetwork]);
+
+  /* 🔹 Fetch Quote (cleaned token names) */
   useEffect(() => {
-    if (!amount || Number(amount) <= 0) return;
+    if (!amount || Number(amount) <= 0 || !isCompatible) {
+      setQuote(null);
+      return;
+    }
+
     const fetchQuote = async () => {
       try {
-        const res = await fetch(`/api/bridge/quote?from=${fromToken}&to=${toToken}&amount=${amount}`);
+        const fromBase = cleanTokenName(fromToken);
+        const toBase = cleanTokenName(toToken);
+        const res = await fetch(`/api/bridge/quote?from=${fromBase}&to=${toBase}&amount=${amount}`);
         const data = await res.json();
         setQuote(data);
       } catch (err) {
         console.error("Quote fetch failed", err);
+        setQuote(null);
       }
     };
     fetchQuote();
-  }, [fromToken, toToken, amount]);
+  }, [fromToken, toToken, amount, isCompatible]);
 
-  const handleSwitch = () => {
-    const tempNet = fromNetwork;
-    const tempToken = fromToken;
-    setFromNetwork(toNetwork);
-    setToNetwork(tempNet);
-    setFromToken(toToken);
-    setToToken(tempToken);
-  };
-
+  /* 🔹 Handle Bridge */
   const handleBridge = async () => {
-    if (!amount || Number(amount) <= 0) {
-      toast.error("Enter a valid amount");
-      return;
-    }
+    if (!amount || Number(amount) <= 0) return toast.error("Enter a valid amount");
+    if (!isCompatible) return toast.error("This bridge pair is not supported");
+
     setSubmitting(true);
     try {
+      const fromBase = cleanTokenName(fromToken);
+      const toBase = cleanTokenName(toToken);
+
       const res = await fetch("/api/bridge/transfer", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -100,13 +121,14 @@ export default function BridgeModal({ onClose }: { onClose: () => void }) {
           fromUser: userId,
           fromChain: fromNetwork.symbol,
           toChain: toNetwork.symbol,
-          fromToken,
-          toToken,
+          fromToken: fromBase,
+          toToken: toBase,
           amount,
         }),
       });
       const data = await res.json();
       if (!res.ok || data.error) throw new Error(data.error || "Bridge failed");
+
       toast.success("Bridge completed successfully!");
       walletEventBus.refresh();
       setTimeout(() => onClose(), 500);
@@ -117,21 +139,47 @@ export default function BridgeModal({ onClose }: { onClose: () => void }) {
     }
   };
 
-  /* ========= Subcomponents ========= */
+  /* ---------- Dropdown Components ---------- */
+  const TokenDropdown = ({ open, setOpen, tokens, current, onSelect }: any) => (
+    <div className="relative">
+      <button
+        onClick={() => setOpen(!open)}
+        className="flex items-center justify-between w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 mt-2 text-white hover:bg-white/10 transition"
+      >
+        <div className="flex items-center gap-2">
+          {getTokenIcon(current)}
+          <span>{current}</span>
+        </div>
+        <FiChevronDown className={`text-gray-400 transition ${open ? "rotate-180" : ""}`} />
+      </button>
+      <AnimatePresence>
+        {open && (
+          <motion.div
+            initial={{ opacity: 0, y: -5 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -5 }}
+            className="absolute mt-2 w-full bg-[#1e293b]/95 border border-white/10 rounded-xl shadow-lg z-20 overflow-hidden"
+          >
+            {tokens.map((t: string) => (
+              <button
+                key={t}
+                onClick={() => {
+                  onSelect(t);
+                  setOpen(false);
+                }}
+                className="flex items-center gap-2 w-full px-4 py-2 text-left text-white hover:bg-blue-500/20 transition"
+              >
+                {getTokenIcon(t)}
+                <span>{t}</span>
+              </button>
+            ))}
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
 
-  const Dropdown = ({
-    open,
-    setOpen,
-    items,
-    onSelect,
-    current,
-  }: {
-    open: boolean;
-    setOpen: (v: boolean) => void;
-    items: any[];
-    onSelect: (item: any) => void;
-    current: any;
-  }) => (
+  const Dropdown = ({ open, setOpen, items, onSelect, current }: any) => (
     <div className="relative">
       <button
         onClick={() => setOpen(!open)}
@@ -143,7 +191,6 @@ export default function BridgeModal({ onClose }: { onClose: () => void }) {
         </div>
         <FiChevronDown className={`text-gray-400 transition ${open ? "rotate-180" : ""}`} />
       </button>
-
       <AnimatePresence>
         {open && (
           <motion.div
@@ -152,7 +199,7 @@ export default function BridgeModal({ onClose }: { onClose: () => void }) {
             exit={{ opacity: 0, y: -5 }}
             className="absolute mt-2 w-full bg-[#1e293b]/95 border border-white/10 rounded-xl shadow-lg z-20 overflow-hidden"
           >
-            {items.map((item) => (
+            {items.map((item: any) => (
               <button
                 key={item.symbol}
                 onClick={() => {
@@ -171,55 +218,7 @@ export default function BridgeModal({ onClose }: { onClose: () => void }) {
     </div>
   );
 
-  const TokenDropdown = ({
-    open,
-    setOpen,
-    tokens,
-    current,
-    onSelect,
-  }: {
-    open: boolean;
-    setOpen: (v: boolean) => void;
-    tokens: string[];
-    current: string;
-    onSelect: (v: string) => void;
-  }) => (
-    <div className="relative">
-      <button
-        onClick={() => setOpen(!open)}
-        className="flex items-center justify-between w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 mt-2 text-white hover:bg-white/10 transition"
-      >
-        <span>{current}</span>
-        <FiChevronDown className={`text-gray-400 transition ${open ? "rotate-180" : ""}`} />
-      </button>
-
-      <AnimatePresence>
-        {open && (
-          <motion.div
-            initial={{ opacity: 0, y: -5 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -5 }}
-            className="absolute mt-2 w-full bg-[#1e293b]/95 border border-white/10 rounded-xl shadow-lg z-20 overflow-hidden"
-          >
-            {tokens.map((t) => (
-              <button
-                key={t}
-                onClick={() => {
-                  onSelect(t);
-                  setOpen(false);
-                }}
-                className="w-full text-left px-4 py-2 text-white hover:bg-blue-500/20 transition"
-              >
-                {t}
-              </button>
-            ))}
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </div>
-  );
-
-  /* ========= Main Modal ========= */
+  /* ---------- UI ---------- */
   return (
     <AnimatePresence>
       <motion.div
@@ -229,13 +228,13 @@ export default function BridgeModal({ onClose }: { onClose: () => void }) {
         exit={{ opacity: 0 }}
       >
         <motion.div
-          className="relative w-full max-w-md rounded-2xl shadow-2xl border border-white/10 bg-gradient-to-br from-[#0f172a] via-[#1e293b] to-[#0f172a] p-6 space-y-6 overflow-hidden"
+          className="relative w-full max-w-md rounded-2xl shadow-2xl border border-white/10 bg-gradient-to-br from-[#0f172a] via-[#1e293b] to-[#0f172a] p-6 space-y-6"
           initial={{ y: 40, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           exit={{ y: 40, opacity: 0 }}
-          transition={{ type: 'spring', stiffness: 240, damping: 25 }}
+          transition={{ type: "spring", stiffness: 240, damping: 25 }}
         >
-          {/* Close Button */}
+          {/* Close */}
           <button
             onClick={() => !submitting && onClose()}
             disabled={submitting}
@@ -252,14 +251,12 @@ export default function BridgeModal({ onClose }: { onClose: () => void }) {
 
           {/* FROM */}
           <div>
-            <label className="text-sm text-gray-400">From</label>
-            <Dropdown
-              open={openFromNet}
-              setOpen={setOpenFromNet}
-              items={NETWORKS}
-              onSelect={setFromNetwork}
-              current={fromNetwork}
-            />
+            <label className="text-sm text-gray-400">From Chain</label>
+            <div className="flex items-center bg-white/5 border border-white/10 rounded-xl px-4 py-3 mt-1 text-white">
+              <fromNetwork.Icon color={fromNetwork.color} className="w-5 h-5" />
+              <span className="ml-2">{fromNetwork.name}</span>
+            </div>
+            <label className="text-sm text-gray-400 mt-2">From Token</label>
             <TokenDropdown
               open={openFromToken}
               setOpen={setOpenFromToken}
@@ -269,26 +266,17 @@ export default function BridgeModal({ onClose }: { onClose: () => void }) {
             />
           </div>
 
-          {/* SWITCH */}
-          <div className="flex justify-center">
-            <button
-              onClick={handleSwitch}
-              className="p-3 rounded-full bg-blue-500/10 border border-blue-500/20 hover:bg-blue-500/20 transition"
-            >
-              <FaExchangeAlt className="text-blue-500 text-lg rotate-90" />
-            </button>
-          </div>
-
           {/* TO */}
           <div>
-            <label className="text-sm text-gray-400">To</label>
+            <label className="text-sm text-gray-400">To Chain</label>
             <Dropdown
               open={openToNet}
               setOpen={setOpenToNet}
-              items={NETWORKS}
+              items={NETWORKS.filter((n) => n.symbol !== currentChain)}
               onSelect={setToNetwork}
               current={toNetwork}
             />
+            <label className="text-sm text-gray-400 mt-2">To Token</label>
             <TokenDropdown
               open={openToToken}
               setOpen={setOpenToToken}
@@ -310,36 +298,65 @@ export default function BridgeModal({ onClose }: { onClose: () => void }) {
             />
           </div>
 
-          {/* QUOTE */}
-          {quote && (
-            <div className="text-xs text-gray-400 text-center">
-              Fee: {quote.fee || "—"} | Rate: {quote.toAmount?.toFixed(4)} {toToken}
+          {/* RATE */}
+          {!isCompatible ? (
+            <div className="rounded-xl bg-red-500/10 border border-red-500/30 text-red-300 text-sm text-center py-2">
+              ❌ This bridge pair is not supported
             </div>
+          ) : (
+            quote && (
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="rounded-xl bg-gradient-to-r from-blue-500/10 to-indigo-500/10 border border-blue-500/30 px-4 py-3 flex items-center justify-between text-white mt-2"
+              >
+                <div className="flex items-center gap-2">
+                  {getTokenIcon(fromToken)}
+                  <span className="font-semibold">{amount || "0.00"}</span>
+                  <span className="text-gray-400 text-sm">{cleanTokenName(fromToken)}</span>
+                </div>
+                <FiArrowRight className="text-blue-400 text-lg" />
+                <div className="flex items-center gap-2">
+                  {getTokenIcon(toToken)}
+                  <span className="font-semibold">
+                    {quote.toAmount?.toFixed(4) ?? "—"}
+                  </span>
+                  <span className="text-gray-400 text-sm">{cleanTokenName(toToken)}</span>
+                </div>
+              </motion.div>
+            )
           )}
 
           {/* BUTTON */}
           <button
             onClick={handleBridge}
-            disabled={submitting}
-            className="w-full py-3 bg-gradient-to-r from-blue-500 to-indigo-600 text-white rounded-xl font-semibold hover:opacity-90 transition disabled:opacity-50"
+            disabled={submitting || !isCompatible || !quote}
+            className={`w-full py-3 rounded-xl font-semibold transition ${
+              submitting || !isCompatible || !quote
+                ? "bg-gray-600/40 text-gray-400 cursor-not-allowed"
+                : "bg-gradient-to-r from-blue-500 to-indigo-600 text-white hover:opacity-90"
+            }`}
           >
-            {submitting ? "Processing..." : `Bridge ${fromToken} → ${toToken}`}
+            {submitting
+              ? "Processing..."
+              : !isCompatible
+              ? "Unsupported Pair"
+              : quote
+              ? `Bridge ${cleanTokenName(fromToken)} → ${cleanTokenName(toToken)}`
+              : "Enter amount to get rate"}
           </button>
 
-          {/* Overlay Loader */}
-          <AnimatePresence>
-            {submitting && (
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                className="absolute inset-0 bg-black/70 backdrop-blur-sm flex flex-col items-center justify-center rounded-2xl"
-              >
-                <FiLoader className="text-blue-400 animate-spin mb-3" size={28} />
-                <p className="text-gray-200 text-sm">Processing transfer...</p>
-              </motion.div>
-            )}
-          </AnimatePresence>
+          {submitting && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="absolute inset-0 bg-black/70 backdrop-blur-sm flex flex-col items-center justify-center rounded-2xl"
+            >
+              <FiLoader className="text-blue-400 animate-spin mb-3" size={28} />
+              <p className="text-gray-200 text-sm">Processing transfer...</p>
+            </motion.div>
+          )}
         </motion.div>
       </motion.div>
     </AnimatePresence>

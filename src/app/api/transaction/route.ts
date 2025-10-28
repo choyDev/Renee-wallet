@@ -5,22 +5,34 @@ export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
-// GET /api/transactions
 export async function GET(req: Request) {
   try {
     const { searchParams } = new URL(req.url);
     const userId = Number(searchParams.get("userId"));
+    const chain = searchParams.get("chain"); // 👈 optional chain filter
+
     if (!userId) {
       return NextResponse.json({ error: "userId required" }, { status: 400 });
     }
 
-    // 1️⃣ Fetch all transactions related to user wallets (sent or received)
-    const userWallets = await prisma.wallet.findMany({
-      where: { userId },
-      select: { id: true, address: true },
-    });
-    const addresses = userWallets.map(w => w.address);
+    // 1️⃣ Get user's wallets (optionally only for that chain)
+    const walletFilter: any = { userId };
+    if (chain) {
+      walletFilter.network = { symbol: chain };
+    }
 
+    const userWallets = await prisma.wallet.findMany({
+      where: walletFilter,
+      select: { id: true, address: true, network: { select: { symbol: true } } },
+    });
+
+    const addresses = userWallets.map((w) => w.address);
+
+    if (addresses.length === 0) {
+      return NextResponse.json({ ok: true, transactions: [] });
+    }
+
+    // 2️⃣ Fetch transactions involving these addresses
     const txs = await prisma.transaction.findMany({
       where: {
         OR: [
@@ -34,15 +46,15 @@ export async function GET(req: Request) {
       },
     });
 
-    // 2️⃣ Compute direction dynamically
-    const formatted = txs.map(tx => {
+    // 3️⃣ Format + direction logic
+    const formatted = txs.map((tx) => {
       const isSent = addresses.includes(tx.fromAddress);
       const direction = isSent ? "SENT" : "RECEIVED";
       return {
         id: tx.id,
         txHash: tx.txHash,
         amount: tx.amount,
-        fee: tx.fee,
+        fee: tx.fee?.toString(),
         token: tx.tokenId ? "USDT" : tx.wallet?.network?.symbol || "UNKNOWN",
         type: tx.type,
         direction,
