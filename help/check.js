@@ -1,21 +1,8 @@
-import TronWeb from "tronweb";
+const bs58 = require('bs58');
+const fs = require('fs');
 
-(async () => {
-  const tronWeb = new TronWeb({
-    fullHost: process.env.TRON_NILE_RPC || "https://nile.trongrid.io",
-    headers: { "TRON-PRO-API-KEY": process.env.TRONGRID_API_KEY },
-  });
-
-  const addr = process.env.TRON_TESTNET_USDT_CONTRACT || "TXYZopYRdj2D9XRtbG411XZZ3kM5VkAeBf";
-
-  console.log("🔍 Testing contract:", addr);
-  console.log("Valid address?", tronWeb.isAddress(addr));
-
-  try {
-    const contract = await tronWeb.contract().at(addr);
-    const name = await contract.name().call();
-    console.log("✅ Contract loaded:", name);
-  } catch (err) {
-    console.error("❌ Failed:", err.message);
-  }
-})();
+const base58key = "Cxq55oAZSEYfs3Ghi2VPhJ673wnyJ4t1poLKqsE1HgecjWS5UGDEhB7GtbuLmpDkvxxzpHNgHAGbwuHCos66eVo";
+const secret = bs58.decode(base58key);
+fs.writeFileSync('bridge-keypair.json', JSON.stringify(Array.from(secret)));
+console.log("✅ Saved to bridge-keypair.json");
+process.exit(0);

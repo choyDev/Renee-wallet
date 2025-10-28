@@ -10,7 +10,7 @@ export const revalidate = 0;
 
 // Replace with your actual ERC20 USDT contract address
 
-const USDT_CONTRACT = process.env.USDT_CONTRACT_ETH ?? "0x361049DdA69F353C8414331B8eaBc57342F4bD97"; // mainnet fallback
+const USDT_CONTRACT = process.env.USDT_CONTRACT_ETH ?? "0x56D4c1C3B2133d5Aa2138aC86e1A79ec0C5a4a2D"; // mainnet fallback
 
 const USDT_ABI = [
   "function decimals() view returns (uint8)",

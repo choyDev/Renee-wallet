@@ -39,7 +39,16 @@ const navItems = [
   {
     icon: <FaWallet className="w-5 h-5" />,
     name: "My Wallet",
-    path: "/wallet"
+    path: "/wallet",
+    subItems: [
+      { name: "Tron", path: "/wallet/tron", },
+      { name: "Solana", path: "/wallet/solana"},
+      { name: "Ethereum", path: "/wallet/ethereum", },
+      { name: "Bitcoin", path: "/wallet/bitcoin"},
+      { name: "Monero", path: "/wallet/monero", },
+      { name: "XRP", path: "/wallet/xrp"},
+      { name: "DogeCoin", path: "/wallet/dogecoin", },
+    ],
   },
   {
     icon: <FaExchangeAlt className="w-5 h-5" />,

@@ -5,7 +5,7 @@ import { executeBridge } from "@/lib/bridge/executeBridge";
 export async function POST(req: Request) {
   try {
     const body = await req.json();
-    console.log(body)
+
     const { fromUser, fromChain, toChain, fromToken, toToken, amount } = body;
     
 
@@ -17,7 +17,6 @@ export async function POST(req: Request) {
       );
     }
 
-    console.log(body);
     // 🔹 2) Run bridge execution logic
     const result = await executeBridge({
       fromUser: Number(fromUser),
@@ -27,8 +26,6 @@ export async function POST(req: Request) {
       toToken,
       amount: Number(amount),
     });
-
-    console.log(result);
 
     // 🔹 3) Return response
     if (result.status === "failed") {

@@ -23,7 +23,7 @@ export const revalidate = 0;
 
 //  USDT mint addresses
 const USDT_MINTS = {
-  devnet: "4GGCyYz3eqmKeSfvP86nDfYRAJK2gaTEWVcchxYsDhLJ", // Devnet (unofficial test)
+  devnet: "5Bsf22GqRGPxFvgyS5LLF3xaSFgFha4hW9deothDFgpe", // Devnet (unofficial test)
   mainnet: "Es9vMFrzaCERbXqzQDvBaxK3fTAvqUyF7jEihQYjPz8A", // Mainnet official
 };
 
