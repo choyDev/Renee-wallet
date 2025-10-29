@@ -80,15 +80,15 @@ export default function WalletOverviewPage() {
     fetchWallets();
 
   }, []);
-  
+
   const ethUSDT =
     ethWallet?.balances.find(b => b.token.symbol === "USDT")?.amount ?? "0"; // if you have ETH card
 
-  const TotalUsd = Number(ethWallet?.balances?.[0]?.usd?? "0") + Number(ethUSDT?? "0");
+  const TotalUsd = Number(ethWallet?.balances?.[0]?.usd ?? "0") + Number(ethUSDT ?? "0");
 
   return (
     <div className="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03] lg:p-6 space-y-5">
-      <div className="mb-0 text-lg font-semibold text-gray-800 dark:text-white/90 flex justify-between items-center">
+      <div className="mb-0 text-lg font-semibold text-gray-800 dark:text-white/90 flex justify-between items-center px-6">
         <AddressSection
           symbol="ETH"
           address={ethWallet?.address}
@@ -97,10 +97,17 @@ export default function WalletOverviewPage() {
           className="justify-start gap-6"
           textSize="base"
         />
-        <p>TotalUsd:&nbsp;&nbsp;&nbsp;${TotalUsd.toFixed(2)}$</p>
+        <div className="border border-brand-500 dark:border-brand-400 rounded-lg px-3 py-1.5">
+          <p className="font-semibold text-brand-500 dark:text-brand-400">
+            Total Balance:&nbsp;&nbsp;${TotalUsd.toFixed(2)}$
+          </p>
+        </div>
       </div>
 
-      <div className="max-w-5xl mx-auto p-5">
+      <div
+        className="relative flex flex-row justify-between rounded-2xl p-6 border border-gray-200 dark:border-gray-700 
+                 bg-white dark:bg-[#121B2E] shadow-sm hover:shadow-md transition-all duration-300"
+      >
         <CryptoPriceChart initialAsset={"ETH"} hideAssetTabs />
       </div>
 

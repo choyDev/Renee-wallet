@@ -193,7 +193,7 @@ export function AddressSection({ symbol, address, explorerUrl, chainId, textSize
   };
 
   return (
-    <div className="mt-5">
+    <div className="mb-4 mt-5">
       {/* Row */}
       <div
         className={`flex items-center justify-between text-gray-600 dark:text-gray-300 ${textSize === "xl"
@@ -207,7 +207,7 @@ export function AddressSection({ symbol, address, explorerUrl, chainId, textSize
                 : "text-xs"
           } ${className ?? ""}`}
       >
-        <p className={`truncate ${addressTextClassName ?? "text-blue-600 dark:text-blue-400"}`}>{showAddress ? resolvedAddress : maskedAddress}</p>
+        <p className={`truncate ${addressTextClassName ?? "text-brand-500 dark:text-brand-400"}`}>{showAddress ? resolvedAddress : maskedAddress}</p>
         
         <div className="flex items-center gap-6">
           <div className="flex items-center gap-3">
@@ -241,7 +241,7 @@ export function AddressSection({ symbol, address, explorerUrl, chainId, textSize
             href={canView ? viewHref : undefined}
             target="_blank"
             rel="noopener noreferrer"
-            className={`flex items-center gap-1 text-blue-600 dark:text-blue-400 hover:underline ${!canView ? "opacity-50 cursor-not-allowed pointer-events-none" : ""
+            className={`flex items-center gap-1 text-brand-500 dark:text-brand-400 hover:underline ${!canView ? "opacity-50 cursor-not-allowed pointer-events-none" : ""
               }`}
             aria-disabled={!canView}
           >

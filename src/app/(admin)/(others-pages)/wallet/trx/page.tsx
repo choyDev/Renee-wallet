@@ -33,7 +33,7 @@ export default function WalletOverviewPage() {
   const [solanaWallet, setSolanaWallet] = useState<WalletData | null>(null);
   const [ethWallet, setEthWallet] = useState<WalletData | null>(null);
   const [btcWallet, setBtcWallet] = useState<WalletData | null>(null);
- 
+
   useEffect(() => {
     const fetchWallets = async () => {
       try {
@@ -54,14 +54,13 @@ export default function WalletOverviewPage() {
           throw new Error(`Non-JSON response (${res.status}): ${text.slice(0, 200)}`);
         }
 
-
         if (!res.ok) {
           throw new Error(data?.error || `Request failed with ${res.status}`);
         }
 
         const wallets: WalletData[] = data.wallets || [];
         const tron = wallets.find((w) => w.network.symbol === "TRX") || null;
-        const sol  = wallets.find((w) => w.network.symbol === "SOL") || null;
+        const sol = wallets.find((w) => w.network.symbol === "SOL") || null;
         const eth = wallets.find(w => w.network.symbol === "ETH") || null;
         const btc = wallets.find(w => w.network.symbol === "BTC") || null;
 
@@ -82,11 +81,11 @@ export default function WalletOverviewPage() {
   const tronUSDT =
     tronWallet?.balances.find(b => b.token.symbol === "USDT")?.amount ?? "0";
 
-  const TotalUsd = Number(tronWallet?.balances?.[0]?.usd?? "0") + Number(tronUSDT?? "0");
+  const TotalUsd = Number(tronWallet?.balances?.[0]?.usd ?? "0") + Number(tronUSDT ?? "0");
 
   return (
     <div className="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03] lg:p-6 space-y-5">
-      <div className="mb-0 text-lg font-semibold text-gray-800 dark:text-white/90 flex justify-between items-center">
+      <div className="mb-0 text-lg font-semibold text-gray-800 dark:text-white/90 flex justify-between items-center px-6">
         <AddressSection
           symbol="TRX"
           address={tronWallet?.address}
@@ -95,9 +94,17 @@ export default function WalletOverviewPage() {
           className="justify-start gap-6"
           textSize="base"
         />
-        <p>TotalUsd:&nbsp;&nbsp;&nbsp;${TotalUsd.toFixed(2)}$</p>
+        <div className="border border-brand-500 dark:border-brand-400 rounded-lg px-3 py-1.5">
+          <p className="font-semibold text-brand-500 dark:text-brand-400">
+            Total Balance:&nbsp;&nbsp;${TotalUsd.toFixed(2)}$
+          </p>
+        </div>
       </div>
-      <div className="max-w-5xl mx-auto p-5">
+
+      <div
+        className="relative flex flex-row justify-between rounded-2xl p-6 border border-gray-200 dark:border-gray-700 
+                 bg-white dark:bg-[#121B2E] shadow-sm hover:shadow-md transition-all duration-300"
+      >
         <CryptoPriceChart initialAsset={"TRX"} hideAssetTabs />
       </div>
 

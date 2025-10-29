@@ -396,12 +396,12 @@ export default function CryptoPriceChart({
         </div>
 
         {/* Footer */}
-        <div className="mt-3 flex items-center justify-between text-xs text-muted-foreground">
+        {/* <div className="mt-3 flex items-center justify-between text-xs text-muted-foreground">
           <span>
             Data shown for <span className="font-medium">{range}</span>. Hover to inspect values. Source: CoinGecko.
           </span>
           {last && <span>Last updated {last.date.toLocaleTimeString()}.</span>}
-        </div>
+        </div> */}
       </CardContent>
     </Card>
   );

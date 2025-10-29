@@ -45,7 +45,7 @@
 
 //   return (
 //     <>
-      
+
 //         <div className="flex flex-col justify-between h-full">
 //           <div className="grid grid-cols-4 gap-4 mt-auto">
 //             {actions
@@ -134,26 +134,27 @@ export default function WalletBalanceCard({
     <>
       <div className="flex flex-col justify-between h-full">
         <div className="grid grid-cols-4 gap-4 mt-auto">
-          {actions.map((btn, i) => (
-            <button
-              key={i}
-              onClick={btn.onClick}
-              className="group flex flex-row gap-4 items-center justify-center w-full py-5 rounded-2xl
-                       bg-white dark:bg-[#121B2E]
-                       text-gray-700 dark:text-[#C7C9D1]
-                       border border-gray-200 dark:border-gray-800
-                       hover:bg-gray-50 dark:hover:bg-[#1A2235]
-                       hover:border-blue-400 dark:hover:border-blue-500
-                       transition-all duration-200 ease-in-out"
-            >
-              <span className="text-2xl text-gray-500 dark:text-[#9B9FB5] group-hover:text-blue-500 transition-colors mb-1">
-                {btn.icon}
-              </span>
-              <span className="text-lg font-medium group-hover:text-blue-600 dark:group-hover:text-blue-400">
-                {btn.label}
-              </span>
-            </button>
-          ))}
+          {actions
+            .map((btn, i) => (
+              <button
+                key={i}
+                onClick={btn.onClick}
+                className="group flex flex-row gap-4 items-center justify-center w-full py-5 rounded-2xl
+                           bg-white dark:bg-[#121B2E]
+                           text-gray-700 dark:text-[#C7C9D1]
+                           border border-gray-200 dark:border-gray-700
+                           hover:bg-gray-50 dark:hover:bg-[#1A2235]
+                           hover:border-blue-400 dark:hover:border-blue-500
+                           transition-all duration-200 ease-in-out"
+              >
+                <span className="text-2xl text-gray-500 dark:text-[#9B9FB5] group-hover:text-blue-500 dark:group-hover:text-blue-500 transition-colors mb-1">
+                  {btn.icon}
+                </span>
+                <span className="text-lg font-medium group-hover:text-blue-500 dark:group-hover:text-blue-500">
+                  {btn.label}
+                </span>
+              </button>
+            ))}
         </div>
       </div>
 

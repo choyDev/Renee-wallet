@@ -1,14 +1,11 @@
-
 "use client";
 
 import React, { useEffect, useRef, useState, useCallback } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
-import { useSidebar } from "../context/SidebarContext";
-import {
-  ChevronDownIcon,
-} from "../icons/index";
+import { useSidebar } from "@/context/SidebarContext";
+import { ChevronDownIcon } from "../icons/index";
 
 import {
   FaTachometerAlt,  // Dashboard
@@ -20,17 +17,18 @@ import {
   FaExchangeAlt,    // Transaction
 } from "react-icons/fa";
 
+type SubItem = { name: string; path: string; pro?: boolean; new?: boolean };
 type NavItem = {
   name: string;
   icon: React.ReactNode;
   path?: string;
-  subItems?: { name: string; path: string; pro?: boolean; new?: boolean }[];
+  subItems?: SubItem[];
 };
 
 // ----------------------------
 // Only Main Nav Items
 // ----------------------------
-const navItems = [
+const navItems: NavItem[] = [
   {
     icon: <FaTachometerAlt className="w-5 h-5" />,
     name: "Dashboard",
@@ -53,12 +51,12 @@ const navItems = [
   {
     icon: <FaUserCircle className="w-5 h-5" />,
     name: "Profile",
-    path: "/profile"
+    path: "/profile",
   },
   {
     icon: <FaIdCard className="w-5 h-5" />,
     name: "KYC",
-    path: "/kyc-verification"
+    path: "/kyc-verification",
   },
   {
     icon: <FaCog className="w-5 h-5" />,
@@ -72,36 +70,60 @@ const navItems = [
   },
 ];
 
+// compact USD badge formatter
+const fmtUsdShort = (n: number) =>
+  n >= 1000 ? `$${Math.round(n).toLocaleString()}` : `$${n.toFixed(2)}`;
 
 // ----------------------------
 // Component
 // ----------------------------
 const AppSidebar: React.FC = () => {
-  const { isExpanded, isMobileOpen, isHovered, setIsHovered } = useSidebar();
+  const { isExpanded, isMobileOpen, isHovered, setIsHovered, walletBadges } = useSidebar() as {
+    isExpanded: boolean;
+    isMobileOpen: boolean;
+    isHovered: boolean;
+    setIsHovered: (v: boolean) => void;
+    walletBadges?: Record<string, number>;
+  };
+
   const pathname = usePathname();
+  const router = useRouter();
 
   const [openSubmenu, setOpenSubmenu] = useState<number | null>(null);
   const [subMenuHeight, setSubMenuHeight] = useState<Record<string, number>>({});
   const subMenuRefs = useRef<Record<string, HTMLDivElement | null>>({});
 
-  const isActive = useCallback((path: string) => path === pathname, [pathname]);
+  // Active if exact or nested (/path or /path/child)
+  const isActive = useCallback(
+    (path: string) => pathname === path || pathname.startsWith(path + "/"),
+    [pathname]
+  );
 
+  const parentWalletTotal = React.useMemo(() => {
+    if (!walletBadges) return 0;
+    let sum = 0;
+    for (const [path, val] of Object.entries(walletBadges)) {
+      if (path.startsWith("/wallet/")) sum += Number(val ?? 0);
+    }
+    return sum;
+  }, [walletBadges]);
+
+  const inWalletSection =
+    pathname === "/wallet" || pathname.startsWith("/wallet/");
+
+  const badgeClass = (active: boolean) =>
+    `${active ? "menu-dropdown-badge-active" : "menu-dropdown-badge-inactive"} menu-dropdown-badge`;
+
+  // Auto-open Wallet submenu when on /wallet or any /wallet/*
   useEffect(() => {
     let matchedIndex: number | null = null;
-
     navItems.forEach((nav, index) => {
-      if (nav.subItems) {
-        // open if main path or any sub-item path matches current URL
-        const isWalletSection =
-          pathname === nav.path ||
-          nav.subItems.some((subItem) => pathname.startsWith(subItem.path));
-
-        if (isWalletSection) {
-          matchedIndex = index;
-        }
-      }
+      if (!nav.subItems) return;
+      const open =
+        pathname === nav.path ||
+        nav.subItems.some((s) => pathname === s.path || pathname.startsWith(s.path + "/"));
+      if (open) matchedIndex = index;
     });
-
     setOpenSubmenu(matchedIndex);
   }, [pathname]);
 
@@ -122,32 +144,27 @@ const AppSidebar: React.FC = () => {
     setOpenSubmenu((prev) => (prev === index ? null : index));
   };
 
-
-  const router = useRouter();
   // ----------------------------
   // Render Menu
   // ----------------------------
-  const renderMenuItems = (navItems: NavItem[]) => (
+  const renderMenuItems = (items: NavItem[]) => (
     <ul className="flex flex-col gap-4">
-      {navItems.map((nav, index) => (
+      {items.map((nav, index) => (
         <li key={nav.name}>
           {nav.subItems ? (
             <Link
               href={nav.path ?? "#"}
               onClick={(e) => {
-                e.preventDefault(); // prevent default navigation first
-                handleSubmenuToggle(index); // toggle submenu
-                // then navigate programmatically
-                router.push(nav.path!);
+                e.preventDefault();              // toggle without losing scroll
+                handleSubmenuToggle(index);
+                if (nav.path) router.push(nav.path); // still navigate to parent
               }}
               className={`menu-item group ${openSubmenu === index ? "menu-item-active" : "menu-item-inactive"
                 } cursor-pointer ${!isExpanded && !isHovered ? "lg:justify-center" : "lg:justify-start"
                 }`}
             >
               <span
-                className={`${openSubmenu === index
-                  ? "menu-item-icon-active"
-                  : "menu-item-icon-inactive"
+                className={`${openSubmenu === index ? "menu-item-icon-active" : "menu-item-icon-inactive"
                   }`}
               >
                 {nav.icon}
@@ -156,10 +173,21 @@ const AppSidebar: React.FC = () => {
                 <span className="menu-item-text">{nav.name}</span>
               )}
               {(isExpanded || isHovered || isMobileOpen) && (
-                <ChevronDownIcon
-                  className={`ml-auto w-5 h-5 transition-transform duration-200 ${openSubmenu === index ? "rotate-180 text-brand-500" : ""
-                    }`}
-                />
+                <span className="ml-auto flex items-center gap-2">
+                  {/* Only show for the Wallet parent */}
+                  {nav.name === "My Wallet" && (
+                    <span
+                      className={badgeClass(inWalletSection)}
+                      title="Total USD across all chains"
+                    >
+                      {fmtUsdShort(parentWalletTotal)}
+                    </span>
+                  )}
+                  <ChevronDownIcon
+                    className={`ml-auto w-5 h-5 transition-transform duration-200 ${openSubmenu === index ? "rotate-180 text-brand-500" : ""
+                      }`}
+                  />
+                </span>
               )}
             </Link>
           ) : (
@@ -170,9 +198,7 @@ const AppSidebar: React.FC = () => {
                   }`}
               >
                 <span
-                  className={`${isActive(nav.path)
-                    ? "menu-item-icon-active"
-                    : "menu-item-icon-inactive"
+                  className={`${isActive(nav.path) ? "menu-item-icon-active" : "menu-item-icon-inactive"
                     }`}
                 >
                   {nav.icon}
@@ -194,46 +220,66 @@ const AppSidebar: React.FC = () => {
               style={{
                 height:
                   openSubmenu === index
-                    ? `${subMenuHeight[`main-${index}`]}px`
+                    ? `${subMenuHeight[`main-${index}`] ?? 0}px`
                     : "0px",
               }}
             >
               <ul className="mt-2 space-y-1 ml-9">
-                {nav.subItems.map((subItem) => (
-                  <li key={subItem.name}>
-                    <Link
-                      href={subItem.path}
-                      className={`menu-dropdown-item ${isActive(subItem.path)
-                        ? "menu-dropdown-item-active"
-                        : "menu-dropdown-item-inactive"
-                        }`}
-                    >
-                      {subItem.name}
-                      <span className="flex items-center gap-1 ml-auto">
-                        {subItem.new && (
-                          <span
-                            className={`${isActive(subItem.path)
-                              ? "menu-dropdown-badge-active"
-                              : "menu-dropdown-badge-inactive"
-                              } menu-dropdown-badge`}
-                          >
-                            new
-                          </span>
-                        )}
-                        {subItem.pro && (
-                          <span
-                            className={`${isActive(subItem.path)
-                              ? "menu-dropdown-badge-active"
-                              : "menu-dropdown-badge-inactive"
-                              } menu-dropdown-badge`}
-                          >
-                            pro
-                          </span>
-                        )}
-                      </span>
-                    </Link>
-                  </li>
-                ))}
+                {nav.subItems.map((subItem) => {
+                  const total = walletBadges?.[subItem.path] ?? 0;
+                  const hasTotal = typeof total === "number" && total >= 0;
+
+                  return (
+                    <li key={subItem.name}>
+                      <Link
+                        href={subItem.path}
+                        className={`menu-dropdown-item ${isActive(subItem.path)
+                          ? "menu-dropdown-item-active"
+                          : "menu-dropdown-item-inactive"
+                          }`}
+                      >
+                        {subItem.name}
+
+                        <span className="flex items-center gap-1 ml-auto">
+                          {/* Total USD badge (always available if set in context) */}
+                          {hasTotal && (
+                            <span
+                              className={`${isActive(subItem.path)
+                                ? "menu-dropdown-badge-active"
+                                : "menu-dropdown-badge-inactive"
+                                } menu-dropdown-badge`}
+                              title="Total USD (native + USDT)"
+                            >
+                              {fmtUsdShort(total!)}
+                            </span>
+                          )}
+
+                          {/* other flags remain */}
+                          {subItem.new && (
+                            <span
+                              className={`${isActive(subItem.path)
+                                ? "menu-dropdown-badge-active"
+                                : "menu-dropdown-badge-inactive"
+                                } menu-dropdown-badge`}
+                            >
+                              new
+                            </span>
+                          )}
+                          {subItem.pro && (
+                            <span
+                              className={`${isActive(subItem.path)
+                                ? "menu-dropdown-badge-active"
+                                : "menu-dropdown-badge-inactive"
+                                } menu-dropdown-badge`}
+                            >
+                              pro
+                            </span>
+                          )}
+                        </span>
+                      </Link>
+                    </li>
+                  );
+                })}
               </ul>
             </div>
           )}
@@ -248,22 +294,14 @@ const AppSidebar: React.FC = () => {
   return (
     <aside
       className={`fixed mt-16 flex flex-col lg:mt-0 top-0 px-5 left-0 bg-white dark:bg-gray-900 dark:border-gray-800 text-gray-900 h-screen transition-all duration-300 ease-in-out z-50 border-r border-gray-200 
-        ${isExpanded || isMobileOpen
-          ? "w-[290px]"
-          : isHovered
-            ? "w-[290px]"
-            : "w-[90px]"
-        }
+        ${isExpanded || isMobileOpen ? "w-[290px]" : isHovered ? "w-[290px]" : "w-[90px]"}
         ${isMobileOpen ? "translate-x-0" : "-translate-x-full"}
         lg:translate-x-0`}
       onMouseEnter={() => !isExpanded && setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
       {/* Logo */}
-      <div
-        className={`py-8 flex ${!isExpanded && !isHovered ? "lg:justify-center" : "justify-start"
-          }`}
-      >
+      <div className={`py-8 flex ${!isExpanded && !isHovered ? "lg:justify-center" : "justify-start"}`}>
         <Link href="/">
           {isExpanded || isHovered || isMobileOpen ? (
             <>
@@ -283,12 +321,7 @@ const AppSidebar: React.FC = () => {
               />
             </>
           ) : (
-            <Image
-              src="/images/logo/logo-icon.svg"
-              alt="Logo"
-              width={32}
-              height={32}
-            />
+            <Image src="/images/logo/logo-icon.svg" alt="Logo" width={32} height={32} />
           )}
         </Link>
       </div>

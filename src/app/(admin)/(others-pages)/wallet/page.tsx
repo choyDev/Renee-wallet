@@ -83,7 +83,7 @@ export default function WalletOverviewPage() {
     solanaWallet?.balances.find(b => b.token.symbol === "USDT")?.amount ?? "0";
   const ethUSDT =
     ethWallet?.balances.find(b => b.token.symbol === "USDT")?.amount ?? "0"; // if you have ETH card
-  
+
   const totalUsd =
     (tronWallet?.balances.reduce((sum, b) => sum + (b.usd || 0), 0) || 0) +
     (solanaWallet?.balances.reduce((sum, b) => sum + (b.usd || 0), 0) || 0) +
@@ -105,10 +105,16 @@ export default function WalletOverviewPage() {
     + Number(tronUSDT ?? "0");
 
   return (
-    <div className="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03] lg:p-6 space-y-6">
-      <div className="mb-5 text-lg font-semibold text-gray-800 dark:text-white/90 flex justify-between items-center">
-        Wallet Overview
-        <p>TotalUsd:&nbsp;&nbsp;&nbsp;${TotalUsd.toFixed(2)}$</p>
+    <div className="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03] lg:p-6 space-y-5">
+      <div className="mb-3 text-lg font-semibold text-gray-800 dark:text-white/90 flex justify-between items-center px-6">
+        <p className="font-semibold text-brand-500 dark:text-brand-400">
+          Wallet Overview
+        </p>
+        <div className="border border-brand-500 dark:border-brand-400 rounded-lg px-3 py-1.5">
+          <p className="font-semibold text-brand-500 dark:text-brand-400">
+            Total Balance:&nbsp;&nbsp;${TotalUsd.toFixed(2)}$
+          </p>
+        </div>
       </div>
 
       {/* ===== Balance + Actions ===== */}
