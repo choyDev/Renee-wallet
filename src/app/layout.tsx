@@ -1,10 +1,12 @@
-
-import { Outfit } from "next/font/google";
+import { Inter } from "next/font/google";
 import { Toaster } from "react-hot-toast";
 import "./globals.css";
 import RootClientWrapper from "@/components/RootClientWrapper";
 
-const outfit = Outfit({ subsets: ["latin"] });
+const inter = Inter({
+  subsets: ["latin"],
+  variable: "--font-inter",
+});
 
 export const metadata = {
   title: "Renee Wallet",
@@ -16,7 +18,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="en" suppressHydrationWarning className={inter.variable}>
       <head>
         <script
           dangerouslySetInnerHTML={{
@@ -33,7 +35,8 @@ export default function RootLayout({
           }}
         />
       </head>
-      <body className={`${outfit.className} bg-white dark:bg-gray-900`}>
+
+      <body className="font-inter bg-white dark:bg-gray-900">
         <RootClientWrapper>{children}</RootClientWrapper>
         <Toaster
           position="top-right"
@@ -52,4 +55,3 @@ export default function RootLayout({
     </html>
   );
 }
-

@@ -47,6 +47,7 @@ async function getUsdPrices(symbols: ("SOL"|"TRX"|"ETH"|"BTC")[]) {
   if (!ids) return { SOL:0, TRX:0, ETH:0, BTC:0, USDT:1 };
   try {
     const res = await fetch(`https://api.coingecko.com/api/v3/simple/price?ids=${ids}&vs_currencies=usd`, { cache: "no-store" });
+    // const res = await fetch(`/api/prices/simple?ids=${ids}&vs=usd`, { cache: "no-store" });
     const j = await res.json();
     return {
       SOL: j.solana?.usd ?? 0,
@@ -170,6 +171,7 @@ export async function GET(req: Request) {
       new Set(wallets.map((w) => w.network.symbol as ChainSym))
     );
     const prices = await getUsdPrices(chainSymbols);
+    console.log("Fetched prices:", prices);
 
     const enriched = await Promise.all(
       wallets.map(async (w) => {

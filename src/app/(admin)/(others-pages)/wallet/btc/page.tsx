@@ -83,9 +83,12 @@ export default function WalletOverviewPage() {
 
     const TotalUsd = Number(btcWallet?.balances?.[0]?.usd ?? "0");
 
+    const usd = (n: number) =>
+        new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", minimumFractionDigits: 2 }).format(n);
+
     return (
         <div className="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03] lg:p-6 space-y-5">
-            <div className="mb-0 text-lg font-semibold text-gray-800 dark:text-white/90 flex justify-between items-center px-6">
+            <div className="mb-5 text-lg font-semibold text-gray-800 dark:text-white/90 flex justify-between items-center px-6">
                 <AddressSection
                     symbol="BTC"
                     address={btcWallet?.address}
@@ -94,61 +97,103 @@ export default function WalletOverviewPage() {
                     className="justify-start gap-6"
                     textSize="base"
                 />
-                <div className="border border-brand-500 dark:border-brand-400 rounded-lg px-3 py-1.5">
-                    <p className="font-semibold text-brand-500 dark:text-brand-400">
-                        Total Balance:&nbsp;&nbsp;${TotalUsd.toFixed(2)}$
-                    </p>
-                </div>
             </div>
 
-            <div
-                className="relative flex flex-row justify-between rounded-2xl p-6 border border-gray-200 dark:border-gray-700 
-                 bg-white dark:bg-[#121B2E] shadow-sm hover:shadow-md transition-all duration-300"
-            >
-                <CryptoPriceChart initialAsset={"BTC"} hideAssetTabs />
-            </div>
-
-            {/* ===== Balance + Actions ===== */}
-            <WalletBalanceCard
-                currentChain="BTC"
-                walletsBySymbol={{
-                    SOL: solanaWallet ? { id: solanaWallet.id, address: solanaWallet.address } : undefined,
-                    TRX: tronWallet ? { id: tronWallet.id, address: tronWallet.address } : undefined,
-                    ETH: ethWallet ? { id: ethWallet.id, address: ethWallet.address } : undefined,
-                    BTC: btcWallet ? { id: btcWallet.id, address: btcWallet.address } : undefined,
-                }}
-            />
-
-            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-2 gap-6 justify-center">
-                <div className="md:col-span-2 flex justify-center">
-
-                    <div
-                        className="relative flex flex-row justify-between rounded-2xl p-6 border border-gray-200 dark:border-gray-700 
-                 bg-white dark:bg-[#121B2E] shadow-sm hover:shadow-md transition-all duration-300 hover:-translate-y-1 
-                 w-full md:w-1/2"
-                    >
-                        <div className="flex justify-between items-start">
-                            <div className="flex items-center gap-3">
-                                <div className="w-10 h-10 flex items-center justify-center rounded-xl bg-gray-100 dark:bg-gray-700">
-                                    <SiBitcoin className="text-[#627EEA] w-6 h-6" />
+            <div className="grid grid-cols-12 gap-4 items-stretch">
+                {/* LEFT: Chart */}
+                <section className="col-span-12 lg:col-span-8">
+                    <div className="group relative h-full rounded-2xl p-px bg-gradient-to-br from-brand-400/40 via-transparent to-[#F59E0B]/30">
+                        <div className="h-full rounded-2xl border border-gray-200/60 dark:border-white/10 
+                          bg-white/70 dark:bg-[#0B1220]/80 backdrop-blur-sm 
+                          shadow-[0_1px_0_0_rgba(255,255,255,0.06)_inset,0_10px_30px_-10px_rgba(0,0,0,0.35)]
+                          transition-all duration-300 group-hover:shadow-lg">
+                            <div className="p-5 sm:p-6">
+                                <div className="mb-4 flex items-center justify-between">
+                                    <h2 className="text-base sm:text-lg font-semibold tracking-tight text-gray-900 dark:text-white">
+                                        Market Overview
+                                    </h2>
+                                    <span className="text-xs text-gray-500 dark:text-gray-400">Last 24h</span>
                                 </div>
-                                <div>
-                                    <h3 className="text-lg font-semibold text-gray-800 dark:text-white">Bitcoin</h3>
-                                    <p className="text-xs text-gray-500 dark:text-gray-400">BTC</p>
+
+                                {/* Give the chart room to breathe and a consistent height */}
+                                <div className="min-h-[360px]">
+                                    <CryptoPriceChart initialAsset="BTC" hideAssetTabs />
                                 </div>
                             </div>
                         </div>
-                        <NativeAmountSection
-                            symbol="BTC"
-                            tokenAmount={btcWallet?.balances?.[0]?.amount ?? "0"}
-                            usdAmount={(btcWallet?.balances?.[0]?.usd ?? 0).toFixed(2)}
-                        />
                     </div>
-                </div>
+                </section>
+
+                {/* RIGHT: Wallet Summary */}
+                <aside className="col-span-12 lg:col-span-4">
+                    <div className="flex h-full flex-col gap-4">
+                        {/* Total Balance */}
+                        <div className="h-full rounded-2xl p-px bg-gradient-to-r from-brand-500/50 to-cyan-500/40">
+                            <div className="h-full flex flex-col rounded-2xl border border-gray-200/60 dark:border-white/10 
+                            bg-white/70 dark:bg-[#0B1220]/80 backdrop-blur-sm p-4 sm:p-5 
+                            shadow-sm transition-all duration-300 hover:shadow-md">
+                                <div className="flex items-center justify-between">
+                                    <span className="text-sm text-gray-500 dark:text-gray-400">Total Balance</span>
+                                    <span className="text-[10px] px-2 py-0.5 rounded-full bg-gray-100 dark:bg-white/10 text-gray-600 dark:text-gray-300">
+                                        USD
+                                    </span>
+                                </div>
+                                <div className="h-full flex items-center mt-2 text-2xl sm:text-3xl font-semibold tabular-nums tracking-tight text-gray-900 dark:text-white">
+                                    {usd(TotalUsd)}
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Asset cards */}
+                        <div className="mt-auto grid grid-cols-1 gap-2 text-[15px] sm:text-base">  {/* base size for the section */}
+                            {/* BTC */}
+                            <div className="group rounded-xl border border-gray-200/60 dark:border-white/10
+                  bg-white/70 dark:bg-[#0B1220]/80 backdrop-blur-sm p-4
+                  shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md">
+                                <div className="flex items-center justify-between">
+                                    <div className="flex items-center gap-4">
+                                        <div className="h-12 w-12 rounded-xl bg-gray-100 dark:bg-white/10 
+                        ring-1 ring-inset ring-black/5 dark:ring-white/10 
+                        flex items-center justify-center">
+                                            <SiBitcoin className="text-[#627EEA] w-6 h-6" />
+                                        </div>
+                                        <div>
+                                            <div className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white">
+                                                Bitcoin
+                                            </div>
+                                            <div className="text-sm text-gray-500 dark:text-gray-400">BTC</div>
+                                        </div>
+                                    </div>
+
+                                    <div className="text-right">
+                                        <div className="text-base sm:text-lg font-semibold tabular-nums text-gray-900 dark:text-white">
+                                            BTC {btcWallet?.balances?.[0]?.amount ?? "0"}
+                                        </div>
+                                        <div className="text-sm text-gray-500 dark:text-gray-400 tabular-nums">
+                                            {usd(btcWallet?.balances?.[0]?.usd ?? 0)}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* WalletBalanceCard pinned to bottom */}
+                        <div className="mt-auto">
+                            <WalletBalanceCard
+                                currentChain="BTC"
+                                walletsBySymbol={{
+                                    SOL: solanaWallet ? { id: solanaWallet.id, address: solanaWallet.address } : undefined,
+                                    TRX: tronWallet ? { id: tronWallet.id, address: tronWallet.address } : undefined,
+                                    ETH: ethWallet ? { id: ethWallet.id, address: ethWallet.address } : undefined,
+                                    BTC: btcWallet ? { id: btcWallet.id, address: btcWallet.address } : undefined,
+                                }}
+                            />
+                        </div>
+                    </div>
+                </aside>
             </div>
 
             <TransactionTable chain="BTC" />
-
         </div>
     );
 }

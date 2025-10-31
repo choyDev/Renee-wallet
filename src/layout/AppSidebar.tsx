@@ -39,9 +39,9 @@ const navItems: NavItem[] = [
     name: "My Wallet",
     path: "/wallet",
     subItems: [
-      { name: "Bitcoin (BTC)", path: "/wallet/btc" },
       { name: "Ethereum (ETH)", path: "/wallet/eth" },
       { name: "Solana (SOL)", path: "/wallet/sol" },
+      { name: "Bitcoin (BTC)", path: "/wallet/btc" },
       { name: "Tron (TRX)", path: "/wallet/trx" },
       { name: "XRP", path: "/wallet/xrp" },
       { name: "Monero (XMR)", path: "/wallet/xmr" },

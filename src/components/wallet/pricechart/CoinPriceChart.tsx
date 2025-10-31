@@ -144,7 +144,7 @@ async function fetchCoinGecko(asset: Asset, range: RangeKey, signal?: AbortSigna
   const days = rangeToDays(range);
   const base = (process.env.NEXT_PUBLIC_CG_PROXY_URL || "https://api.coingecko.com/api/v3") +
     `/coins/${asset.cgId}/market_chart?vs_currency=usd&days=${days}`;
-
+  // const base = `/api/prices/series?asset=${asset.cgId}&days=${days}`;
   const res = await fetchWithRetry(base, signal);
   const j = await res.json();
   const prices: [number, number][] = j.prices || [];
@@ -202,7 +202,7 @@ export default function CryptoPriceChart({
 }) {
   const initial = React.useMemo(() => assetFromKey(initialAsset || "") || ASSETS[0], [initialAsset]);
   const [asset, setAsset] = React.useState<Asset>(initial);
-  const [range, setRange] = React.useState<RangeKey>("1M");
+  const [range, setRange] = React.useState<RangeKey>("7D");
   const [data, setData] = React.useState<Point[] | null>(null);
   const [loading, setLoading] = React.useState(true);
   const [error, setError] = React.useState<string | null>(null);
@@ -273,9 +273,9 @@ export default function CryptoPriceChart({
         <div className="flex flex-wrap items-center justify-between gap-3 text-black/80 dark:text-white/80">
           <div>
             <CardTitle className="text-xl">{asset.name} price</CardTitle>
-            <CardDescription>
+            {/* <CardDescription>
               {asset.key} · Source: CoinGecko · USD{stale ? " · showing cached" : ""}
-            </CardDescription>
+            </CardDescription> */}
           </div>
           <div className="flex items-center gap-2">
             {!hideAssetTabs && (
@@ -297,14 +297,14 @@ export default function CryptoPriceChart({
                 ))}
               </div>
             )}
-            <div className="flex rounded-full bg-muted p-1">
+            <div className="flex rounded-full bg-black/10 dark:bg-black p-1">
               {(["1D", "7D", "1M", "3M", "6M", "1Y", "YTD", "ALL"] as RangeKey[]).map((r) => (
                 <Button
                   key={r}
                   size="sm"
                   variant={r === range ? "default" : "ghost"}
                   className={`h-8 rounded-full px-3 text-xs transition-all ${r === range
-                    ? "is-selected shadow ring-2 ring-offset-2 ring-offset-background ring-current hover:scale-[1.02] hover:shadow-lg"
+                    ? "is-selected shadow bg-brand-300 dark:bg-brand-500 hover:scale-[1.02] hover:shadow-lg"
                     : "hover:bg-muted/80"
                     }`}
                   onClick={() => setRange(r)}
@@ -364,7 +364,7 @@ export default function CryptoPriceChart({
                 }}
                 margin={{ top: 10, right: 12, left: 0, bottom: 0 }}
               >
-                <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
+                {/* <CartesianGrid strokeDasharray="3 3" className="stroke-muted" /> */}
                 <XAxis
                   dataKey={(d: Point) => d.date}
                   tickFormatter={(value) => formatXAxis(new Date(value), range)}
@@ -380,13 +380,19 @@ export default function CryptoPriceChart({
                   domain={["auto", "auto"]}
                 />
                 <Tooltip cursor={{ stroke: strokeColor, strokeOpacity: 0.6 }} content={<PriceTooltip />} />
+                <defs>
+                  <linearGradient id="chartGradient" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stopColor={strokeColor} stopOpacity={0.6} />
+                    <stop offset="100%" stopColor={strokeColor} stopOpacity={0} />
+                  </linearGradient>
+                </defs>
+
                 <Area
                   type="monotone"
                   dataKey="price"
                   strokeWidth={2}
-                  stroke="currentColor"
-                  fill="currentColor"
-                  fillOpacity={0.15}
+                  stroke={strokeColor}
+                  fill="url(#chartGradient)"
                   className={colorClass}
                   activeDot={{ r: 5, className: "fill-black dark:fill-white", stroke: "none" }}
                 />

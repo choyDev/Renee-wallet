@@ -132,7 +132,7 @@ export function NativeAmountSection({ symbol, tokenAmount, usdAmount }: NativeAm
   return (
     <div>
       <div className="flex items-baseline gap-2">
-        <p className="text-3xl font-bold text-gray-900 dark:text-white">
+        <p className="px-5 text-2xl font-bold text-gray-900 dark:text-gray-300">
           {tokenAmount} {symbol}
         </p>
         <p className="text-base text-gray-500 dark:text-gray-400">≈ ${formatUSD(usdAmount)}</p>
@@ -154,7 +154,7 @@ export function UsdtAmountSection({ usdtTokenAmount }: UsdtAmountSectionProps) {
   if (!show) return null;
   return (
     <div className="mt-2">
-      <p className="text-3xl font-bold text-gray-900 dark:text-white">{usdtTokenAmount} USDT</p>
+      <p className="px-5 text-2xl font-bold text-gray-900 dark:text-gray-300">{usdtTokenAmount} USDT</p>
       {/* <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Available Balance</p> */}
     </div>
   );
@@ -193,7 +193,7 @@ export function AddressSection({ symbol, address, explorerUrl, chainId, textSize
   };
 
   return (
-    <div className="mb-4 mt-5">
+    <div className="mb-0 mt-2">
       {/* Row */}
       <div
         className={`flex items-center justify-between text-gray-600 dark:text-gray-300 ${textSize === "xl"
@@ -207,8 +207,13 @@ export function AddressSection({ symbol, address, explorerUrl, chainId, textSize
                 : "text-xs"
           } ${className ?? ""}`}
       >
-        <p className={`truncate ${addressTextClassName ?? "text-brand-500 dark:text-brand-400"}`}>{showAddress ? resolvedAddress : maskedAddress}</p>
-        
+        <div className="flex flex-col gap-1 truncate">
+          <p className={`truncate ${addressTextClassName ?? "text-brand-500 dark:text-brand-400"}`}>{showAddress ? resolvedAddress : maskedAddress}</p>
+          {/* <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400">
+            {symbol} Wallet Address
+          </p> */}
+        </div>
+
         <div className="flex items-center gap-6">
           <div className="flex items-center gap-3">
             <button
@@ -277,7 +282,7 @@ export function AddressSection({ symbol, address, explorerUrl, chainId, textSize
 }
 
 // =====================================================================
-// 4) Full card (composed) — default export
+// 4) Full card (composed) — default export (improved)
 // =====================================================================
 export type WalletNetworkCardProps = {
   name: string;
@@ -286,9 +291,13 @@ export type WalletNetworkCardProps = {
   explorerUrl?: string | null;
   chainId: string;
   tokenAmount: string;
-  usdAmount: string; // formatted or number-like
+  usdAmount: string;
   usdtTokenAmount?: string;
+  hairline?: boolean;
+  hairlineGradient?: string; // NEW: optional override
 };
+
+const DEFAULT_HAIRLINE = "from-brand-500/35 to-brand-500/10";
 
 export default function WalletNetworkCard({
   name,
@@ -299,31 +308,77 @@ export default function WalletNetworkCard({
   tokenAmount,
   usdAmount,
   usdtTokenAmount,
+  hairline = true,
+  hairlineGradient = DEFAULT_HAIRLINE,
 }: WalletNetworkCardProps) {
-  return (
-    <div
-      className="relative flex flex-col justify-between rounded-2xl p-6 border border-gray-200 dark:border-gray-700 
-                 bg-white dark:bg-[#121B2E] shadow-sm hover:shadow-md transition-all duration-300 hover:-translate-y-1"
-    >
-      {/* HEADER */}
-      <div className="flex justify-between items-start mb-5">
+  const onTestnet = isTestnet(chainId);
+  const networkLabel = onTestnet ? "Testnet" : "Mainnet";
+
+  const CardInner = (
+    <div className="flex flex-col group h-full rounded-2xl border border-gray-200/60 dark:border-white/10
+                    bg-white/70 dark:bg-[#0B1220]/80 backdrop-blur-sm
+                    p-5 shadow-sm transition-all duration-300 hover:shadow-md hover:-translate-y-0.5">
+      {/* Header */}
+      <div className="flex items-start justify-between">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 flex items-center justify-center rounded-xl bg-gray-100 dark:bg-gray-700">
+          <div
+            className="h-11 w-11 rounded-xl bg-gray-100 dark:bg-white/10
+                       ring-1 ring-inset ring-black/5 dark:ring-white/10
+                       flex items-center justify-center"
+          >
             {getNetworkIcon(symbol)}
           </div>
           <div>
-            <h3 className="text-lg font-semibold text-gray-800 dark:text-white">{name}</h3>
+            <h3 className="text-base sm:text-lg font-semibold tracking-tight text-gray-900 dark:text-white">
+              {name}
+            </h3>
             <p className="text-xs text-gray-500 dark:text-gray-400">{symbol} Network</p>
+          </div>
+        </div>
+
+        {/* <span
+          className={`text-[10px] px-2 py-0.5 rounded-full tabular-nums
+                      bg-gray-100 dark:bg-white/10
+                      ${onTestnet ? "text-amber-600 dark:text-amber-400" : "text-gray-600 dark:text-gray-300"}`}
+          aria-label={networkLabel}
+          title={networkLabel}
+        >
+          {networkLabel}
+        </span> */}
+      </div>
+
+      {/* Amounts */}
+      <div className="h-full flex items-center">
+        <div className="mt-4 mb-4">
+          <div className="flex items-end justify-between">
+            <div className="min-w-0">
+              <NativeAmountSection symbol={symbol} tokenAmount={tokenAmount} usdAmount={usdAmount} />
+              <UsdtAmountSection usdtTokenAmount={usdtTokenAmount} />
+            </div>
           </div>
         </div>
       </div>
 
-      {/* BALANCES */}
-      <NativeAmountSection symbol={symbol} tokenAmount={tokenAmount} usdAmount={usdAmount} />
-      <UsdtAmountSection usdtTokenAmount={usdtTokenAmount} />
-
-      {/* ADDRESS */}
-      <AddressSection symbol={symbol} address={address} explorerUrl={explorerUrl} chainId={chainId} />
+      {/* Divider + Address */}
+      <div className="mt-auto pt-0 border-t border-gray-200/60 dark:border-white/10">
+        <div className="mt-3">
+          <AddressSection
+            symbol={symbol}
+            address={address}
+            explorerUrl={explorerUrl}
+            chainId={chainId}
+            textSize="sm"
+            className="m-0"
+            addressTextClassName="font-mono tabular-nums text-brand-500 dark:text-brand-400"
+          />
+        </div>
+      </div>
     </div>
+  );
+
+  return hairline ? (
+    <div className={`rounded-2xl p-px bg-gradient-to-r ${hairlineGradient}`}>{CardInner}</div>
+  ) : (
+    CardInner
   );
 }

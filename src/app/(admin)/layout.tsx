@@ -54,7 +54,7 @@ function WalletBadgesHydrator({ refreshMs = 60_000 }: { refreshMs?: number }) {
     load();
 
     // periodic refresh
-    timer = window.setInterval(load, Math.max(10_000, refreshMs));
+    timer = window.setInterval(load, Math.max(1_000_000, refreshMs));
 
     // optional: update if another tab updates localStorage "user"
     const onStorage = (e: StorageEvent) => {
