@@ -10,14 +10,12 @@ import AppHeader from "@/layout/AppHeader";
 import AppSidebar from "@/layout/AppSidebar";
 import Backdrop from "@/layout/Backdrop";
 
+import "swiper/css";
+
 function getUserId(): string | null {
   try {
-    // prefer a server-injected data attribute if you add it later
-    if (typeof document !== "undefined") {
-      const domUserId = document.body?.dataset?.userId;
-      if (domUserId) return domUserId;
-    }
-    // fallback: localStorage "user" blob like { id: ... }
+    const domUserId = (typeof document !== "undefined" && document.body?.dataset?.userId) || null;
+    if (domUserId) return domUserId;
     const raw = localStorage.getItem("user");
     if (!raw) return null;
     const obj = JSON.parse(raw);
@@ -39,7 +37,7 @@ function WalletBadgesHydrator({ refreshMs = 60_000 }: { refreshMs?: number }) {
     async function load() {
       try {
         const userId = getUserId();
-        if (!userId) return; // no user yet; try again on next interval
+        if (!userId) return;
         const url = `/api/wallets/totals?userId=${encodeURIComponent(userId)}`;
         const res = await fetch(url, { signal: abort.signal, cache: "no-store" });
         if (!res.ok) return;
@@ -50,13 +48,9 @@ function WalletBadgesHydrator({ refreshMs = 60_000 }: { refreshMs?: number }) {
       }
     }
 
-    // initial load
     load();
+    timer = window.setInterval(load, Math.max(10_000, refreshMs));
 
-    // periodic refresh
-    timer = window.setInterval(load, Math.max(1_000_000, refreshMs));
-
-    // optional: update if another tab updates localStorage "user"
     const onStorage = (e: StorageEvent) => {
       if (e.key === "user") load();
     };
@@ -72,15 +66,10 @@ function WalletBadgesHydrator({ refreshMs = 60_000 }: { refreshMs?: number }) {
   return null;
 }
 
-export default function AdminLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function AdminLayout({ children }: { children: React.ReactNode }) {
   return (
     <ThemeProvider>
       <SidebarProvider>
-        {/* Always-hydrate wallet total badges for all chains */}
         <WalletBadgesHydrator />
         <AdminLayoutInner>{children}</AdminLayoutInner>
       </SidebarProvider>
@@ -88,7 +77,6 @@ export default function AdminLayout({
   );
 }
 
-// Separate inner component so hooks work
 function AdminLayoutInner({ children }: { children: React.ReactNode }) {
   const { isExpanded, isHovered, isMobileOpen } = useSidebar();
 

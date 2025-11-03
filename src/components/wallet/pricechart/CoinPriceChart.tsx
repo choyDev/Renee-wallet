@@ -14,10 +14,10 @@ import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/com
 import { Button } from "@/components/wallet/pricechart/button";
 
 // --- Types
-export type RangeKey = "1D" | "7D" | "1M" | "3M" | "6M" | "1Y" | "YTD" | "ALL";
+export type RangeKey = "1D" | "7D" | "1M" | "3M" | "6M" | "1Y" | "YTD" | "MAX";
 export type AssetKey = "BTC" | "ETH" | "XMR" | "SOL" | "TRX" | "XRP" | "DOGE";
 
-type Point = { t: number; date: Date; price: number; volume?: number };
+type Point = { t: number; date: Date; price: number };
 
 type Asset = { key: AssetKey; name: string; cgId: string };
 
@@ -71,31 +71,17 @@ function formatXAxis(date: Date, range: RangeKey) {
   return date.toLocaleString(undefined, opts);
 }
 
-function getYTDLimitDays(): number {
-  const now = new Date();
-  const startOfYear = new Date(now.getFullYear(), 0, 1);
-  const diffDays = Math.max(1, Math.ceil((+now - +startOfYear) / (24 * 60 * 60 * 1000)));
-  return diffDays;
-}
-
 function rangeToDays(range: RangeKey) {
   switch (range) {
-    case "1D":
-      return 1;
-    case "7D":
-      return 7;
-    case "1M":
-      return 30;
-    case "3M":
-      return 90;
-    case "6M":
-      return 180;
-    case "1Y":
-      return 365;
-    case "YTD":
-      return getYTDLimitDays();
-    case "ALL":
-      return "max" as const;
+    case "1D": return "1";
+    case "7D": return "7";
+    case "1M": return "30";
+    case "3M": return "90";
+    case "6M": return "180";
+    case "1Y": return "365";
+    case "YTD": return "ytd";
+    case "MAX": return "max";
+    default: return "1";
   }
 }
 
@@ -142,15 +128,13 @@ async function fetchWithRetry(url: string, signal?: AbortSignal, tries = 3): Pro
 
 async function fetchCoinGecko(asset: Asset, range: RangeKey, signal?: AbortSignal): Promise<Point[]> {
   const days = rangeToDays(range);
-  const base = (process.env.NEXT_PUBLIC_CG_PROXY_URL || "https://api.coingecko.com/api/v3") +
-    `/coins/${asset.cgId}/market_chart?vs_currency=usd&days=${days}`;
-  // const base = `/api/prices/series?asset=${asset.cgId}&days=${days}`;
-  const res = await fetchWithRetry(base, signal);
+  const url = `/api/prices/series?asset=${asset.cgId}&days=${days}`;
+  const res = await fetchWithRetry(url, signal);
+  if (!res.ok) throw new Error(`series ${res.status}`);
   const j = await res.json();
-  const prices: [number, number][] = j.prices || [];
-  const volumes: [number, number][] = j.total_volumes || [];
-  const volMap = new Map(volumes.map(([t, v]) => [t, v] as const));
-  return prices.map(([t, p]) => ({ t, date: new Date(t), price: p, volume: volMap.get(t) }));
+  const prices: [number, number][] = Array.isArray(j.prices) ? j.prices : [];
+  if (!prices.length) throw new Error("series empty");
+  return prices.map(([t, p]) => ({ t, date: new Date(t), price: p }));
 }
 
 function percentChange(from: number, to: number) {
@@ -202,7 +186,7 @@ export default function CryptoPriceChart({
 }) {
   const initial = React.useMemo(() => assetFromKey(initialAsset || "") || ASSETS[0], [initialAsset]);
   const [asset, setAsset] = React.useState<Asset>(initial);
-  const [range, setRange] = React.useState<RangeKey>("7D");
+  const [range, setRange] = React.useState<RangeKey>("1D");
   const [data, setData] = React.useState<Point[] | null>(null);
   const [loading, setLoading] = React.useState(true);
   const [error, setError] = React.useState<string | null>(null);
@@ -298,7 +282,7 @@ export default function CryptoPriceChart({
               </div>
             )}
             <div className="flex rounded-full bg-black/10 dark:bg-black p-1">
-              {(["1D", "7D", "1M", "3M", "6M", "1Y", "YTD", "ALL"] as RangeKey[]).map((r) => (
+              {(["1D", "7D", "1M", "3M", "6M", "1Y", "YTD", "MAX"] as RangeKey[]).map((r) => (
                 <Button
                   key={r}
                   size="sm"

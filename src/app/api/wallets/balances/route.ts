@@ -41,24 +41,51 @@ const TRC20_ABI = [
 ];
 
 // ---- Prices (native + 1.0 for USDT) ----
-async function getUsdPrices(symbols: ("SOL"|"TRX"|"ETH"|"BTC")[]) {
+type Prices = { SOL:number; TRX:number; ETH:number; BTC:number; USDT:number };
+
+const PRICE_CACHE = new Map<string, { exp: number; data: Prices }>();
+const TTL_MS = 30_000; // 30s is fine for spot prices
+
+export async function getUsdPrices(symbols: ("SOL"|"TRX"|"ETH"|"BTC")[]): Promise<Prices> {
   const idMap: Record<string,string> = { SOL:"solana", TRX:"tron", ETH:"ethereum", BTC:"bitcoin" };
-  const ids = [...new Set(symbols.map(s => idMap[s]).filter(Boolean))].join(",");
-  if (!ids) return { SOL:0, TRX:0, ETH:0, BTC:0, USDT:1 };
+  const idsArr = [...new Set(symbols.map(s => idMap[s]).filter(Boolean))];
+  const key = idsArr.sort().join(",");
+  if (!key) return { SOL:0, TRX:0, ETH:0, BTC:0, USDT:1 };
+
+  const cached = PRICE_CACHE.get(key);
+  if (cached && cached.exp > Date.now()) return cached.data;
+
+  // 1) Try CoinGecko
   try {
-    const res = await fetch(`https://api.coingecko.com/api/v3/simple/price?ids=${ids}&vs_currencies=usd`, { cache: "no-store" });
-    // const res = await fetch(`/api/prices/simple?ids=${ids}&vs=usd`, { cache: "no-store" });
+    const url = `https://api.coingecko.com/api/v3/simple/price?ids=${encodeURIComponent(key)}&vs_currencies=usd`;
+    const headers: Record<string,string> = { accept: "application/json" };
+    if (process.env.CG_API_KEY) headers["x-cg-demo-api-key"] = process.env.CG_API_KEY!;
+    const res = await fetch(url, { cache: "no-store", headers });
+    if (!res.ok) throw new Error(`cg ${res.status}`);
     const j = await res.json();
-    return {
+    const out: Prices = {
       SOL: j.solana?.usd ?? 0,
       TRX: j.tron?.usd ?? 0,
       ETH: j.ethereum?.usd ?? 0,
       BTC: j.bitcoin?.usd ?? 0,
       USDT: 1,
     };
-  } catch {
-    return { SOL:0, TRX:0, ETH:0, BTC:0, USDT:1 };
-  }
+    PRICE_CACHE.set(key, { exp: Date.now() + TTL_MS, data: out });
+    return out;
+  } catch {}
+
+  // 2) Fallback to Binance spot (close) prices
+  const syms = { SOL:"SOLUSDT", TRX:"TRXUSDT", ETH:"ETHUSDT", BTC:"BTCUSDT" } as const;
+  const out: Prices = { SOL:0, TRX:0, ETH:0, BTC:0, USDT:1 };
+  await Promise.all((Object.keys(syms) as Array<keyof typeof syms>).map(async k => {
+    try {
+      const r = await fetch(`https://api.binance.com/api/v3/ticker/price?symbol=${syms[k]}`, { cache: "no-store" });
+      const j = await r.json();
+      out[k] = j?.price ? Number(j.price) : 0;
+    } catch {}
+  }));
+  PRICE_CACHE.set(key, { exp: Date.now() + TTL_MS, data: out });
+  return out;
 }
 
 // ---- Native balances ----

@@ -1,7 +1,7 @@
-
+/// components/dashboard/DashboardSummary.tsx
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useMemo, useState } from "react";
 import CryptoCard from "./CryptoCard";
 import {
   SiSolana,
@@ -13,6 +13,13 @@ import {
 } from "react-icons/si";
 import { FaMonero } from "react-icons/fa";
 import { useRouter } from "next/navigation";
+
+// Swiper
+import { Swiper, SwiperSlide } from "swiper/react";
+import { Autoplay } from "swiper/modules";
+
+const CARD_COLOR = "#3B82F6";        // shared hairline for card shells
+const CARD_ICON_BG = "bg-[#EEF2FF]"; // shared light chip background
 
 // Custom Tron Icon
 const TronIcon = ({ className = "text-[#FF4747] w-4 h-4" }) => (
@@ -31,12 +38,7 @@ interface WalletData {
 
 export default function DashboardSummary() {
   const [wallets, setWallets] = useState<WalletData[]>([]);
-
   const router = useRouter();
-
-  const handleNavigate = (path: string) => {
-    router.push(path);
-  };
 
   useEffect(() => {
     const fetchWallets = async () => {
@@ -58,130 +60,150 @@ export default function DashboardSummary() {
   }, []);
 
   const getWallet = (symbol: string) => wallets.find((w) => w.network.symbol === symbol);
-  const getAmount = (symbol: string) => getWallet(symbol)?.balances?.[0]?.amount ?? "0";
-  const getUsd = (symbol: string) => (getWallet(symbol)?.balances?.[0]?.usd ?? 0).toFixed(2);
+  const getNative = (symbol: string) => {
+    const w = getWallet(symbol);
+    const b = w?.balances?.[0];
+    return { amount: b?.amount ?? "0", usd: Number(b?.usd ?? 0) };
+  };
+  const getUsdtOnChain = (symbol: string) => {
+    const w = getWallet(symbol);
+    const b = w?.balances?.find((x) => x.token.symbol === "USDT");
+    return { amount: b?.amount ?? "0", usd: Number(b?.usd ?? 0) };
+  };
+  const fmtUSD = (n: number) => `$${n.toFixed(2)}`;
+
+  // Build all cards (values + sub with USDT line where present)
+  const cards = useMemo(() => {
+    const makeCard = (
+      key: string,
+      label: string,
+      icon: React.ReactNode,
+      color: string,
+      path?: string
+    ) => {
+      // native+USDT combined USD for native L1s, otherwise just native
+      const native = getNative(key);
+      const usdt = getUsdtOnChain(key);
+      const combinedUsd = native.usd + usdt.usd;
+      const value = fmtUSD(isNaN(combinedUsd) ? 0 : combinedUsd);
+      const sub =
+        Number(usdt.amount) > 0 ? `${native.amount} ${key}\n${usdt.amount} USDT` : `${native.amount} ${key}`;
+
+      return {
+        key,
+        title: `${key}-USD`,
+        subtitle: label,
+        value,
+        sub,
+        color, // sparkline
+        icon,
+        path,
+      };
+    };
+
+    return [
+      makeCard("TRX", "Tron", <TronIcon className="text-[#FF060A] size-6" />, "#FF060A", "/wallet/trx"),
+      makeCard("SOL", "Solana", <SiSolana className="text-[#14F195] size-6" />, "#14F195", "/wallet/sol"),
+      makeCard("ETH", "Ethereum", <SiEthereum className="text-[#627EEA] size-6" />, "#627EEA", "/wallet/eth"),
+      makeCard("BTC", "Bitcoin", <SiBitcoin className="text-[#F7931A] size-6" />, "#F7931A", "/wallet/btc"),
+      makeCard("XMR", "Monero", <FaMonero className="text-[#FF6600] size-6" />, "#FF6600"),
+      makeCard("XRP", "Ripple", <SiRipple className="text-[#006097] size-6" />, "#006097"),
+      makeCard("DOGE", "Dogecoin", <SiDogecoin className="text-[#C2A633] size-6" />, "#C2A633"),
+      // USDT standalone (no native)
+      // {
+      //   key: "USDT",
+      //   title: "USDT",
+      //   subtitle: "Tether",
+      //   value: fmtUSD(Number(getWallet("USDT")?.balances?.[0]?.usd ?? 0)),
+      //   sub: `${getWallet("USDT")?.balances?.[0]?.amount ?? "0"} USDT`,
+      //   color: "#26A17B",
+      //   icon: <SiTether className="text-[#26A17B] size-6" />,
+      //   path: undefined,
+      // },
+    ];
+  }, [wallets]);
+
+  const swiperRef = useRef<any>(null);
+  const [mounted, setMounted] = useState(false);
+
+  // Mount-only render to avoid SSR mismatch / FOUC
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  // After mount or when card count changes, force an update and restart autoplay
+  useEffect(() => {
+    if (!mounted) return;
+    const sw = swiperRef.current;
+    // small timeout helps when parent sizes settle
+    const t = setTimeout(() => {
+      sw?.update?.();
+      sw?.autoplay?.start?.();
+    }, 0);
+    return () => clearTimeout(t);
+  }, [mounted, cards.length]);
 
   return (
-    <div className="col-span-12 grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-6">
-      {/* TRON */}
-      <div onClick={() => handleNavigate("/wallet/trx")} className="cursor-pointer">
-        <CryptoCard
-          title="TRX-USD"
-          subtitle="Tron"
-          value={`$${getUsd("TRX")}`}
-          sub={`${getAmount("TRX")} TRX`}
-          change="-0.4%"
-          changeAbs="-0.25%"
-          color="#FF060A"
-          iconBg="bg-[#FFECEC]"
-          icon={<TronIcon className="text-[#FF060A] size-6" />}
-          data={[12, 18, 20, 16, 14, 12, 10]}
-        />
+    <div className="col-span-12">
+      {/* prevent flash by hiding until mounted */}
+      <div className={mounted ? "opacity-100 transition-opacity" : "opacity-0"}>
+        {mounted && (
+          <Swiper
+            modules={[Autoplay]}
+            onSwiper={(sw) => (swiperRef.current = sw)}
+            // --- Core behavior ---
+            slidesPerView={4}
+            slidesPerGroup={1}
+            spaceBetween={24}
+            speed={500}
+            // Keep sliding in ONE direction, one-by-one, forever
+            loop={true}
+            autoplay={{
+              delay: 1000,                             // 1s interval
+              disableOnInteraction: false,              // pause while user drags
+              stopOnLastSlide: false,
+              waitForTransition: true,
+              // pauseOnMouseEnter: false,
+            }}
+            // --- Drag / touch feel ---
+            allowTouchMove
+            simulateTouch
+            grabCursor
+            resistanceRatio={0.75}
+            threshold={6}
+            // --- Stability ---
+            observer
+            observeParents
+            updateOnWindowResize
+            // Resume autoplay after drag ends
+            onAutoplayStop={() => swiperRef.current?.autoplay?.start()}
+            className="w-full"
+          >
+            {cards.map((c) => (
+              <SwiperSlide key={`card-${c.key}`} className="!h-auto">
+                <div
+                  className={c.path ? "cursor-pointer h-full" : "h-full"}
+                  onClick={() => c.path && router.push(c.path!)}
+                >
+                  <CryptoCard
+                    title={c.title}
+                    subtitle={c.subtitle}
+                    value={c.value}
+                    sub={c.sub}                         // supports \n if you added whitespace-pre-line
+                    change="+0.00%"
+                    changeAbs="+0.00%"
+                    color={c.color}                     // per-coin graph color
+                    accentColor={CARD_COLOR}            // unified shell accent
+                    iconBg={CARD_ICON_BG}
+                    icon={c.icon}
+                    data={[8, 10, 12, 14, 16, 18, 20]}       // replace with real series if you have them
+                  />
+                </div>
+              </SwiperSlide>
+            ))}
+          </Swiper>
+        )}
       </div>
-
-      {/* SOLANA */}
-      <div onClick={() => handleNavigate("/wallet/sol")} className="cursor-pointer">
-        <CryptoCard
-          title="SOL-USD"
-          subtitle="Solana"
-          value={`$${getUsd("SOL")}`}
-          sub={`${getAmount("SOL")} SOL`}
-          change="+9.25%"
-          changeAbs="+182.10%"
-          color="#14F195"
-          iconBg="bg-[#E8FFF9]"
-          icon={<SiSolana className="text-[#14F195] size-6" />}
-          data={[10, 12, 15, 18, 21, 24, 26]}
-        />
-      </div>
-
-      {/* ETHEREUM */}
-      <div onClick={() => handleNavigate("/wallet/eth")} className="cursor-pointer">
-        <CryptoCard
-          title="ETH-USD"
-          subtitle="Ethereum"
-          value={`$${getUsd("ETH")}`}
-          sub={`${getAmount("ETH")} ETH`}
-          change="+5.12%"
-          changeAbs="+97.32%"
-          color="#627EEA"
-          iconBg="bg-[#EEF2FF]"
-          icon={<SiEthereum className="text-[#627EEA] size-6" />}
-          data={[8, 9, 10, 12, 13, 14, 15]}
-        />
-      </div>
-
-      {/* BITCOIN */}
-      <div onClick={() => handleNavigate("/wallet/btc")} className="cursor-pointer">
-        <CryptoCard
-          title="BTC-USD"
-          subtitle="Bitcoin"
-          value={`$${getUsd("BTC")}`}
-          sub={`${getAmount("BTC")} BTC`}
-          change="+3.84%"
-          changeAbs="+56.43%"
-          color="#F7931A"
-          iconBg="bg-[#FFF4E5]"
-          icon={<SiBitcoin className="text-[#F7931A] size-6" />}
-          data={[20, 22, 23, 25, 24, 23, 26]}
-        />
-      </div>
-
-      {/* MONERO */}
-      <CryptoCard
-        title="XMR-USD"
-        subtitle="Monero"
-        value={`$${getUsd("XMR")}`}
-        sub={`${getAmount("XMR")} XMR`}
-        change="+1.76%"
-        changeAbs="+14.22%"
-        color="#FF6600"
-        iconBg="bg-[#FFF1E6]"
-        icon={<FaMonero className="text-[#FF6600] size-6" />}
-        data={[6, 7, 8, 7, 8, 9, 10]}
-      />
-
-      {/* XRP */}
-      <CryptoCard
-        title="XRP-USD"
-        subtitle="Ripple"
-        value={`$${getUsd("XRP")}`}
-        sub={`${getAmount("XRP")} XRP`}
-        change="+2.58%"
-        changeAbs="+27.40%"
-        color="#006097"
-        iconBg="bg-[#E8F3F9]"
-        icon={<SiRipple className="text-[#006097] size-6" />}
-        data={[7, 9, 10, 9, 11, 12, 13]}
-      />
-
-      {/* DOGECOIN */}
-      <CryptoCard
-        title="DOGE-USD"
-        subtitle="Dogecoin"
-        value={`$${getUsd("DOGE")}`}
-        sub={`${getAmount("DOGE")} DOGE`}
-        change="+4.32%"
-        changeAbs="+33.22%"
-        color="#C2A633"
-        iconBg="bg-[#FFFBEA]"
-        icon={<SiDogecoin className="text-[#C2A633] size-6" />}
-        data={[5, 7, 8, 9, 11, 10, 12]}
-      />
-
-      {/* USDT */}
-      <CryptoCard
-        title="USDT"
-        subtitle="Tether"
-        value={`$${getUsd("USDT")}`}
-        sub={`${getAmount("USDT")} USDT`}
-        change="+0.00%"
-        changeAbs="+0.00%"
-        color="#26A17B"
-        iconBg="bg-[#E6F9F3]"
-        icon={<SiTether className="text-[#26A17B] size-6" />}
-        data={[8, 10, 12, 14, 16, 18, 20]}
-      />
     </div>
   );
 }

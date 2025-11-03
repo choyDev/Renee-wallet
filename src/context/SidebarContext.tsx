@@ -5,12 +5,13 @@ import React, {
   useState,
   useEffect,
   useCallback,
+  useRef,
 } from "react";
 
 type WalletBadges = Record<string, number>;
 
 type SidebarContextType = {
-  // UI state (from your first file)
+  // UI state
   isExpanded: boolean;
   isMobileOpen: boolean;
   isHovered: boolean;
@@ -22,7 +23,7 @@ type SidebarContextType = {
   setActiveItem: (item: string | null) => void;
   toggleSubmenu: (item: string) => void;
 
-  // Badges (from your second file)
+  // Badges
   walletBadges: WalletBadges;
   setWalletBadge: (path: string, value: number | null | undefined) => void;
   setWalletBadgesBulk: (entries: Record<string, number | null | undefined>) => void;
@@ -68,7 +69,33 @@ export function SidebarProvider({
     setOpenSubmenu((prev) => (prev === item ? null : item));
 
   // --- Badges state
+  // IMPORTANT: initialize from server-provided value only (SSR-safe)
   const [walletBadges, setWalletBadges] = useState<WalletBadges>(initialWalletBadges);
+  const mountedRef = useRef(false);
+
+  // After mount, merge cached localStorage (client-only) -> avoids hydration mismatch
+  useEffect(() => {
+    mountedRef.current = true;
+    try {
+      const cached = localStorage.getItem("wallet_badges");
+      if (cached) {
+        const parsed: WalletBadges = JSON.parse(cached);
+        // only update if different
+        setWalletBadges((prev) => ({ ...prev, ...parsed }));
+      }
+    } catch {}
+    return () => {
+      mountedRef.current = false;
+    };
+  }, []);
+
+  // Persist to localStorage after changes (client-only)
+  useEffect(() => {
+    if (!mountedRef.current) return;
+    try {
+      localStorage.setItem("wallet_badges", JSON.stringify(walletBadges));
+    } catch {}
+  }, [walletBadges]);
 
   const setWalletBadge = useCallback((path: string, value?: number | null) => {
     setWalletBadges((prev) => {
