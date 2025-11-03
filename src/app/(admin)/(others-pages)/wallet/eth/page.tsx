@@ -158,7 +158,7 @@ export default function WalletOverviewPage() {
                     <div className="h-12 w-12 rounded-xl bg-gray-100 dark:bg-white/10 
                         ring-1 ring-inset ring-black/5 dark:ring-white/10 
                         flex items-center justify-center">
-                      <SiEthereum className="w-7 h-7 text-[#14F195]" />
+                      <SiEthereum className="w-7 h-7 text-[#627EEA]" />
                     </div>
                     <div>
                       <div className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white">

@@ -54,11 +54,12 @@
     "recharts": "^3.3.0",
     "regenerator-runtime": "^0.14.1",
     "solc": "^0.8.30",
-    "swiper": "^11.2.0",
+    "swiper": "^11.2.10",
     "tailwind-merge": "^2.6.0",
     "tiny-secp256k1": "^2.2.4",
     "tronweb": "^5.3.4",
-    "wif": "^5.0.0"
+    "wif": "^5.0.0",
+    "zustand": "^5.0.8"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",

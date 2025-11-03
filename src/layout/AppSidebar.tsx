@@ -179,6 +179,7 @@ const AppSidebar: React.FC = () => {
                     <span
                       className={badgeClass(inWalletSection)}
                       title="Total USD across all chains"
+                      suppressHydrationWarning
                     >
                       {fmtUsdShort(parentWalletTotal)}
                     </span>
@@ -249,6 +250,7 @@ const AppSidebar: React.FC = () => {
                                 : "menu-dropdown-badge-inactive"
                                 } menu-dropdown-badge`}
                               title="Total USD (native + USDT)"
+                              suppressHydrationWarning
                             >
                               {fmtUsdShort(total!)}
                             </span>
