@@ -11,7 +11,7 @@ import {
   FaEye,
   FaEyeSlash,
 } from "react-icons/fa";
-import { SiSolana, SiTether, SiEthereum, SiBitcoin } from "react-icons/si";
+import { SiSolana, SiTether, SiEthereum, SiBitcoin, SiDogecoin, SiRipple, SiMonero } from "react-icons/si";
 
 //  Tron Icon
 export const TronIcon = ({ className = "text-[#FF4747] w-5 h-5" }) => (
@@ -20,7 +20,7 @@ export const TronIcon = ({ className = "text-[#FF4747] w-5 h-5" }) => (
   </svg>
 );
 
-export type ChainSym = "BTC" | "ETH" | "TRX" | "SOL";
+export type ChainSym = "BTC" | "ETH" | "TRX" | "SOL" | "DOGE" | "XRP" | "XMR";
 export type ChainIdLike = string | number | null | undefined;
 
 // ----------------------------
@@ -75,8 +75,6 @@ export function buildExplorerAddressUrl(opts: {
       const id = normalizeChainId(chainId);
       const base = /nile/i.test(id)
         ? "https://nile.tronscan.org/#/address"
-        : /shasta/i.test(id)
-          ? "https://shasta.tronscan.org/#/address"
           : isTestnet(id)
             ? "https://nile.tronscan.org/#/address"
             : "https://tronscan.org/#/address";
@@ -93,6 +91,28 @@ export function buildExplorerAddressUrl(opts: {
             : "";
       const base = "https://solscan.io/address";
       return `${base}/${address}${cluster ? `?cluster=${cluster}` : ""}`;
+    }
+    case "DOGE": {
+      const base = isTestnet(chainId)
+        ? "https://sochain.com/address/DOGETEST"
+        : "https://dogechain.info/address";
+      return `${base}/${address}`;
+    }
+
+    //  XRP Explorer
+    case "XRP": {
+      const base = isTestnet(chainId)
+        ? "https://testnet.xrpl.org/accounts"
+        : "https://xrpscan.com/account";
+      return `${base}/${address}`;
+    }
+
+    //  Monero Explorer
+    case "XMR": {
+      const base = isTestnet(chainId)
+        ? "https://stagenet.xmrchain.net/account"
+        : "https://xmrchain.net/account";
+      return `${base}/${address}`;
     }
   }
 }
@@ -116,6 +136,12 @@ function getNetworkIcon(symbol: ChainSym) {
       return <SiEthereum className="text-[#627EEA] w-6 h-6" />;
     case "BTC":
       return <SiBitcoin className="text-[#F7931A] w-6 h-6" />;
+    case "DOGE":
+      return <SiDogecoin className="text-[#C2A633] w-6 h-6" />;
+    case "XRP":
+      return <SiRipple className="text-[#0A74E6] w-6 h-6" />;
+    case "XMR":
+      return <SiMonero className="text-[#FF6600] w-6 h-6" />;
   }
 }
 
