@@ -55,22 +55,15 @@
     "react-qr-code": "^2.0.18",
     "recharts": "^3.3.0",
     "regenerator-runtime": "^0.14.1",
-<<<<<<< HEAD
-    "solc": "^0.5.0",
-    "swiper": "^11.2.0",
-=======
     "solc": "^0.8.30",
     "swiper": "^11.2.10",
->>>>>>> 47e6b9c815ed6078ae7f7fceea4f1f4a07b70078
     "tailwind-merge": "^2.6.0",
     "tiny-secp256k1": "^2.2.4",
     "tronweb": "^5.3.4",
     "wif": "^5.0.0",
-<<<<<<< HEAD
-    "xrpl": "^4.4.2"
-=======
+    "xrpl": "^4.4.2",
     "zustand": "^5.0.8"
->>>>>>> 47e6b9c815ed6078ae7f7fceea4f1f4a07b70078
+
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
