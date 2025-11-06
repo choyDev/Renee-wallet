@@ -65,12 +65,12 @@ const DOGE_NET = {
   chainId: CHAIN_ENV === "testnet" ? "doge-testnet" : "doge-mainnet",
   rpcUrl:
     CHAIN_ENV === "testnet"
-      ? "https://sochain.com/api/v2" // testnet API
-      : "https://sochain.com/api/v2", // mainnet API
+      ? "https://doge-electrs-testnet-demo.qed.me" // testnet API
+      : "https://dogechain.info", // mainnet API
   symbol: "DOGE",
   explorerUrl:
     CHAIN_ENV === "testnet"
-      ? "https://sochain.com/testnet/doge/address"
+      ? "https://doge-testnet-explorer.qed.me/address"
       : "https://dogechain.info/address",
 };
 
@@ -88,6 +88,21 @@ const XRP_NET = {
       ? "https://testnet.xrpl.org"
       : "https://xrpscan.com",
 };
+
+const XMR_NET = {
+  name: CHAIN_ENV === "testnet" ? "Monero (Testnet)" : "Monero",
+  chainId: CHAIN_ENV === "testnet" ? "xmr-testnet" : "xmr-mainnet",
+  rpcUrl:
+    CHAIN_ENV === "testnet"
+      ? process.env.MONERO_RPC_TESTNET || "http://127.0.0.1:18082/json_rpc"
+      : process.env.MONERO_RPC_MAINNET || "http://127.0.0.1:18082/json_rpc",
+  symbol: "XMR",
+  explorerUrl:
+    CHAIN_ENV === "testnet"
+      ? "https://testnet.xmrchain.net"
+      : "https://xmrchain.net",
+};
+
 
 
 // ----------------------
@@ -121,6 +136,19 @@ export function decryptPrivateKey(ciphertext: string): string {
   const decrypted = Buffer.concat([decipher.update(Buffer.from(encHex, "hex")), decipher.final()]);
   return decrypted.toString("utf8"); // base64 secretKey for Solana, hex for Tron
 }
+
+async function callMoneroRpc(method: string, params = {}, rpcUrl?: string) {
+  const url = rpcUrl || XMR_NET.rpcUrl;
+  const res = await fetch(url, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ jsonrpc: "2.0", id: "0", method, params }),
+  });
+  const j = await res.json();
+  if (j.error) throw new Error(j.error.message);
+  return j.result;
+}
+
 
 // ----------------------
 // Create Solana + Tron wallets if missing
@@ -220,6 +248,23 @@ export async function ensureWalletsForUser(userId: number) {
     });
   }
 
+  if (!xmrNet) {
+    xmrNet = await prisma.network.create({
+      data: {
+        name: XMR_NET.name,
+        chainId: XMR_NET.chainId,
+        rpcUrl: XMR_NET.rpcUrl,
+        symbol: XMR_NET.symbol,
+        explorerUrl: XMR_NET.explorerUrl,
+      },
+    });
+  } else if (xmrNet.rpcUrl !== XMR_NET.rpcUrl) {
+    xmrNet = await prisma.network.update({
+      where: { id: xmrNet.id },
+      data: { rpcUrl: XMR_NET.rpcUrl, explorerUrl: XMR_NET.explorerUrl },
+    });
+  }
+
   const walletsToCreate: any[] = [];
 
   // ETH wallet (hex private key)
@@ -314,10 +359,53 @@ export async function ensureWalletsForUser(userId: number) {
     });
   }
 
-
-  if (walletsToCreate.length) {
-    await prisma.wallet.createMany({ data: walletsToCreate, skipDuplicates: true });
+  // XMR (Monero) wallet via RPC
+  
+  if (!existingNetworks.has(xmrNet.id)) {
+    try {
+      const filename = `wallet_${userId}_${Date.now()}`;
+      const password = crypto.randomBytes(8).toString("hex");
+  
+      // Close any open wallet
+      try {
+        await callMoneroRpc("close_wallet");
+        await new Promise((r) => setTimeout(r, 1500));
+      } catch {}
+  
+      // Create new wallet
+      await callMoneroRpc("create_wallet", {
+        filename,
+        password,
+        language: "English",
+      });
+  
+      // 💤 wait to release .keys.lock (Windows-specific)
+      await new Promise((r) => setTimeout(r, 5000));
+  
+      // No need to re-open; get address directly
+      const addrRes = await callMoneroRpc("get_address", { account_index: 0 });
+      const address = addrRes.address;
+  
+      const enc = encryptPrivateKey(password);
+      walletsToCreate.push({
+        userId,
+        networkId: xmrNet.id,
+        address,
+        privateKeyEnc: enc,
+        meta: filename,
+      });
+  
+      await callMoneroRpc("close_wallet");
+      await new Promise((r) => setTimeout(r, 1500));
+    } catch (err: any) {
+      console.error("❌ Monero wallet creation failed:", err.message);
+    }
   }
+  
 
-  return prisma.wallet.findMany({ where: { userId }, include: { network: true } });
-}
+    if (walletsToCreate.length) {
+      await prisma.wallet.createMany({ data: walletsToCreate, skipDuplicates: true });
+    }
+
+    return prisma.wallet.findMany({ where: { userId }, include: { network: true } });
+  }

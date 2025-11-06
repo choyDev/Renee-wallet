@@ -54,7 +54,10 @@ export default function WalletOverviewPage() {
   const [solanaWallet, setSolanaWallet] = useState<WalletData | null>(null);
   const [ethWallet, setEthWallet] = useState<WalletData | null>(null);
   const [btcWallet, setBtcWallet] = useState<WalletData | null>(null);
-
+  const [xrpWallet, setXrpWallet] = useState<WalletData | null>(null);
+  const [xmrWallet, setXmrWallet] = useState<WalletData | null>(null);
+  const [dogeWallet, setDogeWallet] = useState<WalletData | null>(null);
+  
   const { setWalletBadgesBulk } = useSidebar() as any;
 
   useEffect(() => {
@@ -82,11 +85,17 @@ export default function WalletOverviewPage() {
         const sol = wallets.find((w) => w.network.symbol === "SOL") || null;
         const eth = wallets.find((w) => w.network.symbol === "ETH") || null;
         const btc = wallets.find((w) => w.network.symbol === "BTC") || null;
+        const xrp = wallets.find((w) => w.network.symbol === "XRP") || null;
+        const xmr = wallets.find((w) => w.network.symbol === "XMR") || null;
+        const doge = wallets.find((w) => w.network.symbol === "DOGE") || null;
 
         setTronWallet(tron);
         setSolanaWallet(sol);
         setEthWallet(eth);
         setBtcWallet(btc);
+        setXrpWallet(xrp);
+        setXmrWallet(xmr);
+        setDogeWallet(doge);
 
         // ⬇️ compute & push per-chain totals immediately
         const entries: Record<string, number> = {};
@@ -145,7 +154,7 @@ export default function WalletOverviewPage() {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-2 gap-6 items-stretch">
-        <div className="h-full cursor-pointer" onClick={() => handleNavigate("/wallet/btc")}>
+        <div className="h-full cursor-pointer" onClick={() => handleNavigate("/wallet/etH")}>
           <WalletNetworkCard
             name="Ethereum"
             symbol="ETH"
@@ -197,29 +206,39 @@ export default function WalletOverviewPage() {
         </div>
 
         {/* duplicates kept as in your snippet; remove if not needed */}
-        <div onClick={() => handleNavigate("/wallet/sol")} className="cursor-pointer">
+        <div onClick={() => handleNavigate("/wallet/xrp")} className="cursor-pointer">
           <WalletNetworkCard
-            name="Solana"
-            symbol="SOL"
-            tokenAmount={solanaWallet?.balances?.[0]?.amount ?? "0"}
-            usdAmount={(solanaWallet?.balances?.[0]?.usd ?? 0).toFixed(2)}
-            usdtTokenAmount={solUSDT}
-            address={solanaWallet?.address}
-            explorerUrl={solanaWallet?.network.explorerUrl}
-            chainId={solanaWallet?.network.chainId ?? ""}
+            name="XRP Ledger"
+            symbol="XRP"
+            tokenAmount={xrpWallet?.balances?.[0]?.amount ?? "0"}
+            usdAmount={(xrpWallet?.balances?.[0]?.usd ?? 0).toFixed(2)}
+            address={xrpWallet?.address}
+            explorerUrl={xrpWallet?.network.explorerUrl}
+            chainId={xrpWallet?.network.chainId ?? ""}
           />
         </div>
 
-        <div onClick={() => handleNavigate("/wallet/trx")} className="cursor-pointer">
+        <div onClick={() => handleNavigate("/wallet/xmr")} className="cursor-pointer">
           <WalletNetworkCard
-            name="Tron"
-            symbol="TRX"
-            tokenAmount={tronWallet?.balances?.[0]?.amount ?? "0"}
-            usdAmount={(tronWallet?.balances?.[0]?.usd ?? 0).toFixed(2)}
-            usdtTokenAmount={tronUSDT}
-            address={tronWallet?.address}
-            explorerUrl={tronWallet?.network.explorerUrl}
-            chainId={tronWallet?.network.chainId ?? ""}
+            name="Monero"
+            symbol="XMR"
+            tokenAmount={xmrWallet?.balances?.[0]?.amount ?? "0"}
+            usdAmount={(xmrWallet?.balances?.[0]?.usd ?? 0).toFixed(2)}
+            address={xmrWallet?.address}
+            explorerUrl={xmrWallet?.network.explorerUrl}
+            chainId={xmrWallet?.network.chainId ?? ""}
+          />
+        </div>
+
+        <div onClick={() => handleNavigate("/wallet/doge")} className="cursor-pointer">
+          <WalletNetworkCard
+            name="Dogecoin"
+            symbol="DOGE"
+            tokenAmount={dogeWallet?.balances?.[0]?.amount ?? "0"}
+            usdAmount={(dogeWallet?.balances?.[0]?.usd ?? 0).toFixed(2)}
+            address={dogeWallet?.address}
+            explorerUrl={dogeWallet?.network.explorerUrl}
+            chainId={dogeWallet?.network.chainId ?? ""}
           />
         </div>
       </div>

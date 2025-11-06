@@ -3,14 +3,11 @@
 import React, { useEffect, useState } from "react";
 import WalletBalanceCard from "@/components/wallet/WalletBalanceCard";
 import {
-  NativeAmountSection,
-  UsdtAmountSection,
   AddressSection,
-  TronIcon
 } from "@/components/wallet/WalletNetworkCard";
 import CryptoPriceChart from "@/components/wallet/pricechart/CoinPriceChart";
 import TransactionTable from "@/components/transaction/transaction";
-import { SiTether } from "react-icons/si";
+import { SiRipple } from "react-icons/si";
 
 interface WalletData {
   id: number;
@@ -29,10 +26,7 @@ interface WalletData {
 }
 
 export default function WalletOverviewPage() {
-  const [tronWallet, setTronWallet] = useState<WalletData | null>(null);
-  const [solanaWallet, setSolanaWallet] = useState<WalletData | null>(null);
-  const [ethWallet, setEthWallet] = useState<WalletData | null>(null);
-  const [btcWallet, setBtcWallet] = useState<WalletData | null>(null);
+ 
   const [xrpWallet, setXrpWallet] = useState<WalletData | null>(null);
 
   useEffect(() => {
@@ -60,16 +54,9 @@ export default function WalletOverviewPage() {
         }
 
         const wallets: WalletData[] = data.wallets || [];
-        const tron = wallets.find((w) => w.network.symbol === "TRX") || null;
-        const sol = wallets.find((w) => w.network.symbol === "SOL") || null;
-        const eth = wallets.find(w => w.network.symbol === "ETH") || null;
-        const btc = wallets.find(w => w.network.symbol === "BTC") || null;
+      
         const xrp = wallets.find(w => w.network.symbol === "XRP") || null;
 
-        setTronWallet(tron);
-        setSolanaWallet(sol);
-        setEthWallet(eth);
-        setBtcWallet(btc);
         setXrpWallet(xrp);
       } catch (err) {
         console.error("Error fetching wallet data:", err);
@@ -157,7 +144,7 @@ export default function WalletOverviewPage() {
                     <div className="h-12 w-12 rounded-xl bg-gray-100 dark:bg-white/10 
                         ring-1 ring-inset ring-black/5 dark:ring-white/10 
                         flex items-center justify-center">
-                      <TronIcon/>
+                       <SiRipple className="w-7 h-7 text-[#0A74E6]" />
                     </div>
                     <div>
                       <div className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white">
@@ -169,7 +156,7 @@ export default function WalletOverviewPage() {
 
                   <div className="text-right">
                     <div className="text-base sm:text-lg font-semibold tabular-nums text-gray-900 dark:text-white">
-                      XRP {tronWallet?.balances?.[0]?.amount ?? "0"}
+                      XRP {xrpWallet?.balances?.[0]?.amount ?? "0"}
                     </div>
                     <div className="text-sm text-gray-500 dark:text-gray-400 tabular-nums">
                       {usd(xrpWallet?.balances?.[0]?.usd ?? 0)}
@@ -184,10 +171,6 @@ export default function WalletOverviewPage() {
               <WalletBalanceCard
                 currentChain="XRP"
                 walletsBySymbol={{
-                  SOL: solanaWallet ? { id: solanaWallet.id, address: solanaWallet.address } : undefined,
-                  TRX: tronWallet ? { id: tronWallet.id, address: tronWallet.address } : undefined,
-                  ETH: ethWallet ? { id: ethWallet.id, address: ethWallet.address } : undefined,
-                  BTC: btcWallet ? { id: btcWallet.id, address: btcWallet.address } : undefined,
                   XRP: xrpWallet ? { id: xrpWallet.id, address: xrpWallet.address } : undefined,
                 }}
               />

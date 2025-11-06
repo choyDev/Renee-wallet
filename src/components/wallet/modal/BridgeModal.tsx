@@ -263,13 +263,21 @@ export default function BridgeModal({
               <span className="ml-2">{fromNetwork.name}</span>
             </div>
             <label className="text-sm text-gray-400 mt-2">From Token</label>
-            <TokenDropdown
-              open={openFromToken}
-              setOpen={setOpenFromToken}
-              tokens={fromNetwork.tokens}
-              current={fromToken}
-              onSelect={setFromToken}
-            />
+           
+            {fromNetwork.tokens.length > 1 ? (
+              <TokenDropdown
+                open={openFromToken}
+                setOpen={setOpenFromToken}
+                tokens={fromNetwork.tokens}
+                current={fromToken}
+                onSelect={setFromToken}
+              />
+            ) : (
+              <div className="flex items-center gap-2 bg-white/5 border border-white/10 rounded-xl px-4 py-3 mt-2 text-white text-sm font-medium">
+                {getTokenIcon(fromNetwork.tokens[0])}
+                <span>{fromNetwork.tokens[0]}</span>
+              </div>
+            )}
           </div>
 
           {/* TO */}
@@ -283,13 +291,21 @@ export default function BridgeModal({
               current={toNetwork}
             />
             <label className="text-sm text-gray-400 mt-2">To Token</label>
-            <TokenDropdown
-              open={openToToken}
-              setOpen={setOpenToToken}
-              tokens={toNetwork.tokens}
-              current={toToken}
-              onSelect={setToToken}
-            />
+           
+            {toNetwork.tokens.length > 1 ? (
+              <TokenDropdown
+                open={openToToken}
+                setOpen={setOpenToToken}
+                tokens={toNetwork.tokens}
+                current={toToken}
+                onSelect={setToToken}
+              />
+            ) : (
+              <div className="flex items-center gap-2 bg-white/5 border border-white/10 rounded-xl px-4 py-3 mt-2 text-white text-sm font-medium">
+                {getTokenIcon(toNetwork.tokens[0])}
+                <span>{toNetwork.tokens[0]}</span>
+              </div>
+            )}
           </div>
 
           {/* AMOUNT */}

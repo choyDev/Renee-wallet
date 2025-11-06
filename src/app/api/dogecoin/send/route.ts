@@ -1,181 +1,215 @@
-// /pages/api/dogecoin/send.ts or /app/api/dogecoin/send/route.ts
-
-import * as bitcoin from "bitcoinjs-lib";
+import { NextResponse } from "next/server";
+import { prisma } from "@/lib/prisma";
+import { Prisma } from "@prisma/client";
+import { decryptPrivateKey } from "@/lib/wallet";
+import * as dogecoin from "@dogiwallet/dogecoinjs-lib";
 import * as ecc from "tiny-secp256k1";
 import { ECPairFactory } from "ecpair";
-import { decryptPrivateKey } from "@/lib/wallet"; // Import your decrypt function
-import { prisma } from "@/lib/prisma"; // Import your prisma client
+import axios from "axios";
 
-bitcoin.initEccLib(ecc);
 const ECPair = ECPairFactory(ecc);
 
-// --- Dogecoin Network Configuration (must match your wallet creation logic) ---
-const DOGE_NET_CONFIG =
-  process.env.CHAIN_ENV === "testnet"
-    ? {
-        // Testnet
-        messagePrefix: "\x19Dogecoin Signed Message:\n",
-        bech32: "tdge",
-        bip32: { public: 0x043587cf, private: 0x04358394 },
-        pubKeyHash: 0x71, // D
-        scriptHash: 0xc4, // A or B
-        wif: 0xf1, // 9
-        sochainChain: "DOGETEST", // SoChain code for Dogecoin Testnet
-      }
-    : {
-        // Mainnet
-        messagePrefix: "\x19Dogecoin Signed Message:\n",
-        bech32: "doge",
-        bip32: { public: 0x02facafd, private: 0x02fac398 },
-        pubKeyHash: 0x1e, // D
-        scriptHash: 0x16, // A or 9
-        wif: 0x9e, // 6
-        sochainChain: "DOGE", // SoChain code for Dogecoin Mainnet
-      };
+export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
 
-// --- Transaction Constants ---
-// Dogecoin (like BTC) uses SATOSHIS for calculations, but the unit is DOGE.
-const DOGE_TO_SATOSHIS = 100000000;
-const DUST_LIMIT = 100000; // 0.001 DOGE (Commonly accepted safe minimum)
-const FEE_PER_BYTE = 50000; // 0.0005 DOGE/byte (Standard/fast Dogecoin fee rate, adjust as needed)
+/* -------------------------------------------------------
+   Dogecoin network definitions (fixed for WIF prefixes)
+-------------------------------------------------------- */
+const DOGE_NETWORKS = {
+  testnet: {
+    messagePrefix: "\x19Dogecoin Signed Message:\n",
+    bech32: "tdge",
+    bip32: { public: 0x043587cf, private: 0x04358394 },
+    pubKeyHash: 0x71,
+    scriptHash: 0xc4,
+    wif: 0xf1, // ✅ correct testnet WIF prefix
+  },
+  mainnet: {
+    messagePrefix: "\x19Dogecoin Signed Message:\n",
+    bech32: "doge",
+    bip32: { public: 0x02facafd, private: 0x02fac398 },
+    pubKeyHash: 0x1e,
+    scriptHash: 0x16,
+    wif: 0x9e, // ✅ correct mainnet WIF prefix
+  },
+};
 
-
-async function getUtxos(address: string, chain: string) {
-  const url = `https://sochain.com/api/v2/get_tx_unspent/${chain}/${address}`;
-  const res = await fetch(url);
-  const data = await res.json();
-  
-  if (data.status !== 'success') {
-    throw new Error(`SoChain UTXO fetch failed: ${data.data.error || 'Unknown error'}`);
-  }
-  
-  return data.data.txs.map((tx: any) => ({
-    txid: tx.txid,
-    vout: tx.output_no,
-    value: Math.floor(parseFloat(tx.value) * DOGE_TO_SATOSHIS), // Value in Satoshis
-    script: tx.script_hex,
-  }));
+/* -------------------------------------------------------
+   Helpers
+-------------------------------------------------------- */
+function envs() {
+  const isTest = process.env.CHAIN_ENV === "testnet";
+  const apiBase = isTest
+    ? "https://doge-electrs-testnet-demo.qed.me"
+    : "https://dogechain.info/api";
+  const explorer = isTest
+    ? "https://doge-testnet-explorer.qed.me"
+    : "https://dogechain.info";
+  const net = isTest ? DOGE_NETWORKS.testnet : DOGE_NETWORKS.mainnet;
+  return { isTest, apiBase, explorer, net };
 }
 
-async function broadcastTx(chain: string, signedTxHex: string) {
-  const url = `https://sochain.com/api/v2/send_tx/${chain}`;
-  const res = await fetch(url, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ tx_hex: signedTxHex }),
-  });
-  
-  const data = await res.json();
-  if (data.status !== 'success') {
-    throw new Error(`SoChain broadcast failed: ${data.data.error || 'Unknown error'}`);
-  }
-  
-  return data.data.txid;
+function estimateFee(inputs: number, outputs: number, rate: number) {
+  const txSize = 10 + inputs * 148 + outputs * 34;
+  return txSize * rate;
 }
 
-
-export default async function dogecoinSendApi(req: any, res: any) {
-  if (req.method !== "POST") return res.status(405).json({ error: "Method Not Allowed" });
-
+/* -------------------------------------------------------
+   POST /api/dogecoin/send
+-------------------------------------------------------- */
+export async function POST(req: Request) {
   try {
-    const { fromWalletId, to, amountDoge } = req.body; // amountDoge is in DOGE unit
+    const body = await req.json().catch(() => ({}));
+    const { fromWalletId, to, amountDoge } = body as {
+      fromWalletId: number;
+      to: string;
+      amountDoge: string | number;
+    };
 
-    if (!fromWalletId || !to || !amountDoge) {
-      return res.status(400).json({ error: "Missing parameters" });
+    if (!fromWalletId || !to || amountDoge === undefined) {
+      return NextResponse.json(
+        { error: "fromWalletId, to, amountDoge required" },
+        { status: 400 }
+      );
     }
 
-    const amountSatoshis = Math.floor(amountDoge * DOGE_TO_SATOSHIS);
+    const { apiBase, explorer, net } = envs();
 
-    const fromWallet = await prisma.wallet.findUnique({
-      where: { id: fromWalletId },
+    // Get wallet from DB
+    const wallet = await prisma.wallet.findUnique({
+      where: { id: Number(fromWalletId) },
       include: { network: true },
     });
+    if (!wallet)
+      return NextResponse.json({ error: "Wallet not found" }, { status: 404 });
+    if (!wallet.network || wallet.network.symbol !== "DOGE")
+      return NextResponse.json({ error: "Wallet is not Dogecoin" }, { status: 400 });
 
-    if (!fromWallet || fromWallet.network?.symbol !== "DOGE") {
-      return res.status(404).json({ error: "Dogecoin wallet not found" });
-    }
-    
-    // 1. Decrypt Private Key (WIF format)
-    const wif = decryptPrivateKey(fromWallet.privateKeyEnc);
-    const keyPair = ECPair.fromWIF(wif, DOGE_NET_CONFIG);
+    const fromAddress = wallet.address;
+    if (!fromAddress)
+      return NextResponse.json({ error: "Invalid Dogecoin address" }, { status: 400 });
 
-    // 2. Fetch UTXOs
-    const utxos = await getUtxos(fromWallet.address, DOGE_NET_CONFIG.sochainChain);
-    
-    if (utxos.length === 0) {
-      throw new Error("Wallet has no unspent funds (UTXOs)");
+    /* -------------------------------------------
+       Decrypt and verify WIF private key
+    ------------------------------------------- */
+    const wif = decryptPrivateKey(wallet.privateKeyEnc!);
+    const keyPair = ECPair.fromWIF(wif, net);
+
+    const p2pkh = dogecoin.payments.p2pkh({
+      pubkey: Buffer.from(keyPair.publicKey),
+      network: net,
+    });
+
+    if (!p2pkh.address || p2pkh.address !== fromAddress)
+      return NextResponse.json({ error: "Private key/address mismatch" }, { status: 400 });
+
+    /* -------------------------------------------
+       Fetch UTXOs
+    ------------------------------------------- */
+    const utxoRes = await axios.get(`${apiBase}/address/${fromAddress}/utxo`);
+    const utxos = utxoRes.data;
+    if (!Array.isArray(utxos) || !utxos.length)
+      return NextResponse.json({ error: "No UTXOs to spend" }, { status: 400 });
+
+    const sendValue = Math.round(Number(amountDoge) * 1e8);
+    if (!Number.isFinite(sendValue) || sendValue <= 0)
+      return NextResponse.json({ error: "amountDoge must be > 0" }, { status: 400 });
+
+    /* -------------------------------------------
+       Fee + coin selection
+    ------------------------------------------- */
+    const feeRate = 1000; // sat/vB (approx)
+    const inputs: any[] = [];
+    let inValue = 0;
+    const outCount = 2;
+    let fee = estimateFee(1, outCount, feeRate);
+
+    for (const utxo of utxos) {
+      inputs.push(utxo);
+      inValue += utxo.value;
+      fee = estimateFee(inputs.length, outCount, feeRate);
+      if (inValue >= sendValue + fee) break;
     }
-    
-    // 3. Select UTXOs and Calculate Total Input Value
-    const txb = new bitcoin.Psbt({ network: DOGE_NET_CONFIG });
-    let inputAmount = 0;
-    
-    const selectedUtxos = utxos.sort((a: any, b: any) => b.value - a.value); // Use largest first
-    
-    for (const utxo of selectedUtxos) {
-      txb.addInput({
+    if (inValue < sendValue + fee)
+      return NextResponse.json({ error: "Insufficient DOGE balance" }, { status: 400 });
+
+    const changeValue = inValue - sendValue - fee;
+
+    /* -------------------------------------------
+       Build PSBT
+    ------------------------------------------- */
+    const psbt = new dogecoin.Psbt({ network: net });
+    for (const utxo of inputs) {
+      const txHexRes = await axios.get(`${apiBase}/tx/${utxo.txid}/hex`);
+      psbt.addInput({
         hash: utxo.txid,
         index: utxo.vout,
-        // Since Doge uses P2PKH, we need to provide the P2PKH output script (redeemScript is for P2SH)
-        // We use the full P2PKH output: <OP_DUP> <OP_HASH160> <PubKeyHash> <OP_EQUALVERIFY> <OP_CHECKSIG>
-        nonWitnessUtxo: Buffer.from(utxo.script, 'hex'), // SoChain provides script_hex in UTXO fetch
+        nonWitnessUtxo: Buffer.from(txHexRes.data, "hex"),
       });
-      inputAmount += utxo.value;
-      
-      // Stop adding UTXOs once we have enough + a buffer for fees
-      // We don't know the exact fee yet, so we over-estimate for now.
-      if (inputAmount > amountSatoshis + 2 * DOGE_TO_SATOSHIS) break; 
     }
 
-    if (inputAmount < amountSatoshis) {
-      throw new Error("Insufficient DOGE balance to cover amount");
-    }
+    psbt.addOutput({ address: to, value: sendValue });
+    if (changeValue > 0)
+      psbt.addOutput({ address: fromAddress, value: changeValue });
 
-    // 4. Determine Fee and Change
-    // Add outputs for the recipient and potential change.
-    txb.addOutput({ address: to, value: BigInt(amountSatoshis) });
-    
-    const initialTxSize = txb.toBuffer().length + (utxos.length * 107) + 34 * 2; // Estimate size (bytes)
-    const initialFee = initialTxSize * FEE_PER_BYTE;
+    const signer: dogecoin.Signer = {
+      publicKey: Buffer.from(keyPair.publicKey),
+      sign: (hash: Buffer) => Buffer.from(keyPair.sign(hash)),
+    };
 
-    const changeAmount = inputAmount - amountSatoshis - initialFee;
+    psbt.signAllInputs(signer);
+    psbt.finalizeAllInputs();
+    const rawHex = psbt.extractTransaction().toHex();
 
-    if (changeAmount < 0) {
-        throw new Error("Insufficient DOGE balance to cover amount and fees");
-    }
+    /* -------------------------------------------
+       Broadcast
+    ------------------------------------------- */
+    const broadcast = await axios.post(`${apiBase}/tx`, rawHex, {
+      headers: { "Content-Type": "text/plain" },
+    });
+    const txid = typeof broadcast.data === "string" ? broadcast.data : broadcast.data?.txid;
+    if (!txid) throw new Error("Broadcast failed: no txid returned");
 
-    // Add change output if greater than dust limit
-    if (changeAmount >= DUST_LIMIT) {
-        txb.addOutput({ address: fromWallet.address, value: BigInt(changeAmount) });
-    } else if (changeAmount > 0) {
-        // Change is less than dust limit, so it's added to the fee
-        // We need to re-calculate the fee to be precise before signing.
-        // For simplicity, we just include it as a higher fee for this implementation.
-        console.warn(`Change amount (${changeAmount}) below dust limit, absorbing into fee.`);
-    }
+    const explorerTx = `${explorer}/tx/${txid}`;
+    console.log(`✅ DOGE TX broadcasted: ${explorerTx}`);
 
-    // Final fee calculation (optional but good practice for precise fee)
-    // You would sign, get the size, then rebuild with the correct fee.
-    // However, for this example using Psbt with nonWitnessUtxo, the size is harder to predict precisely 
-    // without actually signing/finalizing, so the initial fee estimate is often used.
-    
-    // 5. Sign the Transaction
-    for (let i = 0; i < txb.txInputs.length; i++) {
-        txb.signInput(i, keyPair);
-    }
-    
-    // Finalize all inputs (creates the final scriptSig)
-    txb.finalizeAllInputs();
-    
-    // 6. Extract and Broadcast
-    const rawTxHex = txb.extractTransaction().toHex();
-    
-    const txid = await broadcastTx(DOGE_NET_CONFIG.sochainChain, rawTxHex);
-    
-    return res.status(200).json({ txid });
+    /* -------------------------------------------
+       Save transaction to DB
+    ------------------------------------------- */
+    await prisma.transaction.create({
+      data: {
+        userId: wallet.userId,
+        walletId: wallet.id,
+        tokenId: null,
+        type: "TRANSFER",
+        amount: new Prisma.Decimal(Number(amountDoge)),
+        usdValue: new Prisma.Decimal(0),
+        fee: new Prisma.Decimal(fee / 1e8),
+        txHash: txid,
+        explorerUrl: explorerTx,
+        status: "CONFIRMED",
+        fromAddress,
+        toAddress: to,
+        direction: "SENT",
+      },
+    });
 
-  } catch (err: any) {
-    console.error("Dogecoin Send Error:", err);
-    res.status(500).json({ error: err.message || "Failed to create or broadcast Dogecoin transaction" });
+    return NextResponse.json({
+      ok: true,
+      txid,
+      explorerTx,
+      from: fromAddress,
+      to,
+      amountDoge: Number(amountDoge),
+      feeSats: fee,
+      inputs: inputs.length,
+    });
+  } catch (e: any) {
+    console.error("DOGE send failed:", e);
+    return NextResponse.json(
+      { error: e?.message || "Internal error" },
+      { status: 500 }
+    );
   }
 }

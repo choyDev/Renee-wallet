@@ -2,6 +2,8 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { Connection, PublicKey, LAMPORTS_PER_SOL } from "@solana/web3.js";
 import { ethers, Contract } from "ethers";
+import { Client } from "xrpl";
+import { decryptPrivateKey } from "@/lib/wallet";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -10,7 +12,7 @@ export const revalidate = 0;
 // ───────────────────────────────────────────────────────────────────────────────
 // Types
 // ───────────────────────────────────────────────────────────────────────────────
-type ChainSym = "SOL" | "TRX" | "ETH" | "BTC";
+type ChainSym = "SOL" | "TRX" | "ETH" | "BTC" | "DOGE" | "XRP" | "XMR";
 type TokenSym = ChainSym | "USDT" | "USDC";
 
 type BalanceRow = {
@@ -41,16 +43,16 @@ const TRC20_ABI = [
 ];
 
 // ---- Prices (native + 1.0 for USDT) ----
-type Prices = { SOL:number; TRX:number; ETH:number; BTC:number; USDT:number };
+type Prices = { SOL:number; TRX:number; ETH:number; BTC:number; DOGE:number; XRP:number; XMR:number; USDT:number };
 
 const PRICE_CACHE = new Map<string, { exp: number; data: Prices }>();
 const TTL_MS = 30_000; // 30s is fine for spot prices
 
-export async function getUsdPrices(symbols: ("SOL"|"TRX"|"ETH"|"BTC")[]): Promise<Prices> {
-  const idMap: Record<string,string> = { SOL:"solana", TRX:"tron", ETH:"ethereum", BTC:"bitcoin" };
+export async function getUsdPrices(symbols: ("SOL"|"TRX"|"ETH"|"BTC"|"DOGE"|"XRP"|"XMR")[]): Promise<Prices> {
+  const idMap: Record<string,string> = { SOL:"solana", TRX:"tron", ETH:"ethereum", BTC:"bitcoin", DOGE: "dogecoin", XRP:"ripple", XMR:"monero",};
   const idsArr = [...new Set(symbols.map(s => idMap[s]).filter(Boolean))];
   const key = idsArr.sort().join(",");
-  if (!key) return { SOL:0, TRX:0, ETH:0, BTC:0, USDT:1 };
+  if (!key) return { SOL:0, TRX:0, ETH:0, BTC:0, DOGE:0, XRP:0, XMR:0, USDT:1 };
 
   const cached = PRICE_CACHE.get(key);
   if (cached && cached.exp > Date.now()) return cached.data;
@@ -68,6 +70,9 @@ export async function getUsdPrices(symbols: ("SOL"|"TRX"|"ETH"|"BTC")[]): Promis
       TRX: j.tron?.usd ?? 0,
       ETH: j.ethereum?.usd ?? 0,
       BTC: j.bitcoin?.usd ?? 0,
+      DOGE: j.dogecoin?.usd ?? 0,
+      XRP: j.ripple?.usd ?? 0,
+      XMR: j.monero?.usd ?? 0,
       USDT: 1,
     };
     PRICE_CACHE.set(key, { exp: Date.now() + TTL_MS, data: out });
@@ -76,7 +81,7 @@ export async function getUsdPrices(symbols: ("SOL"|"TRX"|"ETH"|"BTC")[]): Promis
 
   // 2) Fallback to Binance spot (close) prices
   const syms = { SOL:"SOLUSDT", TRX:"TRXUSDT", ETH:"ETHUSDT", BTC:"BTCUSDT" } as const;
-  const out: Prices = { SOL:0, TRX:0, ETH:0, BTC:0, USDT:1 };
+  const out: Prices = { SOL:0, TRX:0, ETH:0, BTC:0, DOGE:0, XRP:0, XMR:0, USDT:1 };
   await Promise.all((Object.keys(syms) as Array<keyof typeof syms>).map(async k => {
     try {
       const r = await fetch(`https://api.binance.com/api/v3/ticker/price?symbol=${syms[k]}`, { cache: "no-store" });
@@ -184,6 +189,122 @@ async function getSplTokenBalance(rpcUrl: string, owner: string, mint: string) {
   return Number(val);
 }
 
+// ---- DOGE balance ----
+async function getDogeBalance(address: string) {
+  const base =
+    CHAIN_ENV === "testnet"
+      ? "https://doge-electrs-testnet-demo.qed.me"
+      : "https://dogechain.info/api";
+
+  try {
+    // Fetch address info
+    const res = await fetch(`${base}/address/${address}`, { cache: "no-store" });
+    if (!res.ok) throw new Error(`Fetch failed ${res.status}`);
+    const data = await res.json();
+
+    // Electrs-style API
+    if (data.chain_stats) {
+      const { funded_txo_sum = 0, spent_txo_sum = 0 } = data.chain_stats;
+      return (funded_txo_sum - spent_txo_sum) / 1e8;
+    }
+
+    // Legacy Dogechain.info API fallback
+    if (data.balance) return Number(data.balance);
+
+    return 0;
+  } catch (e) {
+    console.error("DOGE balance fetch error:", e);
+    return 0;
+  }
+}
+
+async function getXrpBalance(address: string) {
+  const rpc = CHAIN_ENV === "testnet"
+    ? "wss://s.altnet.rippletest.net:51233"
+    : "wss://xrplcluster.com";
+  const client = new Client(rpc);
+  await client.connect();
+  const res = await client.request({ command: "account_info", account: address });
+  await client.disconnect();
+  return Number(res.result.account_data.Balance ?? 0) / 1_000_000;
+}
+
+async function getXmrBalance(rpcUrl: string, walletFile: string, encPassword: string) {
+
+  const password = decryptPrivateKey(encPassword);
+  console.log("password: ", password);
+  const filename = walletFile;
+  
+  try {
+    // Close any previously opened wallet (safety)
+    try {
+      await fetch(rpcUrl, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          jsonrpc: "2.0",
+          id: "0",
+          method: "close_wallet",
+        }),
+      });
+      await new Promise((r) => setTimeout(r, 1000));
+    } catch {}
+
+    // Open the user's wallet
+    const openRes = await fetch(rpcUrl, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        jsonrpc: "2.0",
+        id: "0",
+        method: "open_wallet",
+        params: { filename, password },
+      }),
+    });
+    const openJson = await openRes.json();
+    if (openJson.error) throw new Error(openJson.error.message);
+
+    await new Promise((r) => setTimeout(r, 1000));
+
+    // Get balance
+    const balRes = await fetch(rpcUrl, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        jsonrpc: "2.0",
+        id: "0",
+        method: "get_balance",
+        params: { account_index: 0 },
+      }),
+    });
+    const j = await balRes.json();
+    console.log(j);
+    if (j.error) throw new Error(j.error.message);
+
+    // 4️⃣ Close wallet to free file lock
+    await fetch(rpcUrl, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        jsonrpc: "2.0",
+        id: "0",
+        method: "close_wallet",
+      }),
+    });
+
+    // 5️⃣ Convert atomic units (1 XMR = 1e12)
+    const total = (j.result?.balance ?? 0) / 1e12;
+    const unlocked = (j.result?.unlocked_balance ?? 0) / 1e12;
+    return unlocked > 0 ? unlocked : total;
+  } catch (err: any) {
+    console.error("XMR balance fetch error:", err.message);
+    return 0;
+  }
+}
+
+
+
+
 // ---- API handler ----
 export async function GET(req: Request) {
   try {
@@ -223,6 +344,18 @@ export async function GET(req: Request) {
           } else if (net === "BTC") {
             native = await getBtcBalance(w.address);
             usdt = 0; // none on BTC
+          } else if (net === "DOGE") {
+            native = await getDogeBalance(w.address);
+          } else if (net === "XRP") {
+            native = await getXrpBalance(w.address);
+          } else if (net === "XMR") {
+            const filename = w.meta;
+            if (filename) {
+              native = await getXmrBalance(w.network.rpcUrl, filename, w.privateKeyEnc);
+            } else {
+              console.warn(`⚠️ No filename found for Monero wallet of user ${userId}`);
+              native = 0;
+            }
           }
         } catch (e: any) {
           console.error("Balance fetch error", {

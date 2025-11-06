@@ -94,7 +94,7 @@ export function buildExplorerAddressUrl(opts: {
     }
     case "DOGE": {
       const base = isTestnet(chainId)
-        ? "https://sochain.com/address/DOGETEST"
+        ? "https://doge-testnet-explorer.qed.me/address"
         : "https://dogechain.info/address";
       return `${base}/${address}`;
     }
@@ -110,9 +110,9 @@ export function buildExplorerAddressUrl(opts: {
     //  Monero Explorer
     case "XMR": {
       const base = isTestnet(chainId)
-        ? "https://stagenet.xmrchain.net/account"
+        ? "https://testnet.xmrchain.net/search?value="
         : "https://xmrchain.net/account";
-      return `${base}/${address}`;
+      return `${base}${address}`;
     }
   }
 }

@@ -3,10 +3,7 @@
 import React, { useEffect, useState } from "react";
 import WalletBalanceCard from "@/components/wallet/WalletBalanceCard";
 import {
-  NativeAmountSection,
-  UsdtAmountSection,
   AddressSection,
-  TronIcon
 } from "@/components/wallet/WalletNetworkCard";
 import CryptoPriceChart from "@/components/wallet/pricechart/CoinPriceChart";
 import TransactionTable from "@/components/transaction/transaction";
@@ -29,10 +26,6 @@ interface WalletData {
 }
 
 export default function WalletOverviewPage() {
-  const [tronWallet, setTronWallet] = useState<WalletData | null>(null);
-  const [solanaWallet, setSolanaWallet] = useState<WalletData | null>(null);
-  const [ethWallet, setEthWallet] = useState<WalletData | null>(null);
-  const [btcWallet, setBtcWallet] = useState<WalletData | null>(null);
   const [dogeWallet, setDogeWallet] = useState<WalletData | null>(null);
 
   useEffect(() => {
@@ -60,16 +53,9 @@ export default function WalletOverviewPage() {
         }
 
         const wallets: WalletData[] = data.wallets || [];
-        const tron = wallets.find((w) => w.network.symbol === "TRX") || null;
-        const sol = wallets.find((w) => w.network.symbol === "SOL") || null;
-        const eth = wallets.find(w => w.network.symbol === "ETH") || null;
-        const btc = wallets.find(w => w.network.symbol === "BTC") || null;
-        const doge = wallets.find(w => w.network.symbol === "DOGE") || null;
       
-        setTronWallet(tron);
-        setSolanaWallet(sol);
-        setEthWallet(eth);
-        setBtcWallet(btc);
+        const doge = wallets.find(w => w.network.symbol === "DOGE") || null;
+    
         setDogeWallet(doge);
       } catch (err) {
         console.error("Error fetching wallet data:", err);
@@ -184,10 +170,6 @@ export default function WalletOverviewPage() {
               <WalletBalanceCard
                 currentChain="DOGE"
                 walletsBySymbol={{
-                  SOL: solanaWallet ? { id: solanaWallet.id, address: solanaWallet.address } : undefined,
-                  TRX: tronWallet ? { id: tronWallet.id, address: tronWallet.address } : undefined,
-                  ETH: ethWallet ? { id: ethWallet.id, address: ethWallet.address } : undefined,
-                  BTC: btcWallet ? { id: btcWallet.id, address: btcWallet.address } : undefined,
                   DOGE: dogeWallet ? { id: dogeWallet.id, address: dogeWallet.address } : undefined,
                 }}
               />

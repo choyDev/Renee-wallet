@@ -57,13 +57,32 @@ export default function SendReceiveModal({
   };
 
   // token options per chain
-  const tokensForNetwork: { code: TokenCode; label: string }[] =
-    selectedSym === "BTC" || "DOGE" || "XMR" || "XRP"
-      ? [{ code: "NATIVE", label: selectedSym }]
-      : [
-          { code: "NATIVE", label: selectedSym },
-          { code: "USDT", label: "USDT" },
-        ];
+  const tokensForNetwork: { code: TokenCode; label: string }[] = (() => {
+    // networks without USDT
+    if (["BTC", "DOGE", "XMR", "XRP"].includes(selectedSym)) {
+      return [{ code: "NATIVE", label: selectedSym }];
+    }
+
+    // Determine correct USDT label based on chain
+    let usdtLabel = "USDT";
+    switch (selectedSym) {
+      case "TRX":
+        usdtLabel = "USDT (TRC-20)";
+        break;
+      case "ETH":
+        usdtLabel = "USDT (ERC-20)";
+        break;
+      case "SOL":
+        usdtLabel = "USDT (SPL)";
+        break;
+    }
+
+    return [
+      { code: "NATIVE", label: selectedSym },
+      { code: "USDT", label: usdtLabel },
+    ];
+  })();
+
 
   /* ------------------ SEND FUNCTIONS ------------------ */
   async function sendNative(): Promise<SendResult> {
@@ -240,7 +259,9 @@ export default function SendReceiveModal({
                 />
               </div>
 
-              {/* Token Selector (Custom Styled) */}
+              {/* Token Selector or Static Label */}
+              {tokensForNetwork.length > 1 ? (
+                /* --- Multi-token chains: show dropdown --- */
                 <div>
                   <label className="block text-sm text-gray-400 mb-1">Select Token</label>
                   <div className="relative">
@@ -257,7 +278,9 @@ export default function SendReceiveModal({
                         ) : (
                           networkIcons[selectedSym]
                         )}
-                        <span>{selectedToken === "USDT" ? "USDT" : selectedSym}</span>
+                        <span>
+                          {tokensForNetwork.find((t) => t.code === selectedToken)?.label}
+                        </span>
                       </div>
                       <svg
                         className={`w-4 h-4 text-gray-300 transition-transform ${
@@ -272,11 +295,8 @@ export default function SendReceiveModal({
                       </svg>
                     </button>
 
-                    {/* Dropdown List */}
                     {showTokenDropdown && (
-                      <div
-                        className="absolute mt-2 w-full bg-[#1e293b]/95 border border-white/10 rounded-xl shadow-lg z-10 backdrop-blur-md"
-                      >
+                      <div className="absolute mt-2 w-full bg-[#1e293b]/95 border border-white/10 rounded-xl shadow-lg z-10 backdrop-blur-md">
                         {tokensForNetwork.map((t) => (
                           <button
                             key={t.code}
@@ -298,6 +318,15 @@ export default function SendReceiveModal({
                     )}
                   </div>
                 </div>
+              ) : (
+                /* --- Single-token chains: show simple label --- */
+                <div className="flex items-center justify-start gap-2 bg-white/5 border border-white/10 px-4 py-3 rounded-xl text-white text-sm font-medium">
+                  {networkIcons[selectedSym]}
+                  <span>{tokensForNetwork[0]?.label}</span>
+                </div>
+              )}
+
+
               <div>
                 <label className="block text-sm text-gray-400 mb-1">
                   Amount ({selectedToken === "NATIVE" ? selectedSym : "USDT"})

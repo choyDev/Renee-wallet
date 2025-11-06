@@ -2,159 +2,132 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { Prisma } from "@prisma/client";
 import { decryptPrivateKey } from "@/lib/wallet";
-import { Client, Wallet, Payment } from "xrpl";
+import { Client, Wallet } from "xrpl";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
-/* ---------------------------
-   Network Configuration
---------------------------- */
-const CHAIN_ENV = process.env.CHAIN_ENV === "testnet" ? "testnet" : "mainnet";
+function envs() {
+  const isTest = process.env.CHAIN_ENV === "testnet";
+  const rpcUrl = isTest
+    ? "wss://s.altnet.rippletest.net:51233"
+    : "wss://xrplcluster.com";
+  const explorer = isTest
+    ? "https://testnet.xrpl.org"
+    : "https://xrpscan.com";
+  return { isTest, rpcUrl, explorer };
+}
 
-const XRP_NET = {
-  name: CHAIN_ENV === "testnet" ? "XRP (Testnet)" : "XRP",
-  rpcUrl:
-    CHAIN_ENV === "testnet"
-      ? "wss://s.altnet.rippletest.net:51233"
-      : "wss://xrplcluster.com",
-  symbol: "XRP",
-  explorerUrl:
-    CHAIN_ENV === "testnet"
-      ? "https://testnet.xrpl.org/transactions"
-      : "https://xrpscan.com/tx",
-};
-
-/* ===========================================================
-   MAIN SEND HANDLER
-=========================================================== */
 export async function POST(req: Request) {
-  const body = await req.json().catch(() => ({}));
-  const { fromWalletId, to, amountXrp, memo } = body as {
-    fromWalletId: number;
-    to: string;
-    amountXrp: number | string;
-    memo?: string;
-  };
-
-  if (!fromWalletId || !to || !amountXrp) {
-    return NextResponse.json(
-      { error: "fromWalletId, to, amountXrp required" },
-      { status: 400 }
-    );
-  }
-
-  let client: Client | null = null;
-
   try {
-    // 1️⃣ Fetch wallet
-    const walletRecord = await prisma.wallet.findUnique({
-      where: { id: Number(fromWalletId) },
-      include: { network: true },
-    });
+    const body = await req.json().catch(() => ({}));
+    const { fromWalletId, to, amountXrp, memo } = body as {
+      fromWalletId: number;
+      to: string;
+      amountXrp: string | number;
+      memo?: string;
+    };
 
-    if (!walletRecord)
-      return NextResponse.json({ error: "Wallet not found" }, { status: 404 });
-    if (walletRecord.network.symbol !== "XRP")
-      return NextResponse.json({ error: "Not an XRP wallet" }, { status: 400 });
-
-    const secret = decryptPrivateKey(walletRecord.privateKeyEnc!);
-    const wallet = Wallet.fromSeed(secret);
-
-    // 2️⃣ Connect to network
-    client = new Client(XRP_NET.rpcUrl);
-    await client.connect();
-
-    // 3️⃣ Check balance
-    const balanceDrops = await client.getXrpBalance(wallet.classicAddress);
-    const sendDrops = Math.round(Number(amountXrp) * 1_000_000); // XRP → drops
-    const feeDrops = 12; // 0.000012 XRP
-    const currentBalanceDrops = Math.round(Number(balanceDrops) * 1_000_000);
-
-    if (sendDrops <= 0)
-      return NextResponse.json({ error: "Amount must be > 0" }, { status: 400 });
-    if (currentBalanceDrops < sendDrops + feeDrops)
+    if (!fromWalletId || !to || amountXrp === undefined)
       return NextResponse.json(
-        { error: "Insufficient XRP balance" },
+        { error: "fromWalletId, to, amountXrp required" },
         { status: 400 }
       );
 
-    // 4️⃣ Build transaction (typed as Payment)
-    const baseTx: Payment = {
+    const { rpcUrl, explorer } = envs();
+
+    // Load wallet
+    const wallet = await prisma.wallet.findUnique({
+      where: { id: Number(fromWalletId) },
+      include: { network: true },
+    });
+    if (!wallet)
+      return NextResponse.json({ error: "Wallet not found" }, { status: 404 });
+    if (wallet.network?.symbol !== "XRP")
+      return NextResponse.json({ error: "Wallet is not XRP" }, { status: 400 });
+
+    const fromAddress = wallet.address;
+    const secret = decryptPrivateKey(wallet.privateKeyEnc!);
+
+    // Connect to XRPL node
+    const client = new Client(rpcUrl);
+    await client.connect();
+
+    const accInfo = await client.request({
+      command: "account_info",
+      account: fromAddress,
+    });
+
+    const serverInfo = await client.request({ command: "server_info" });
+    const baseFeeXrp =
+      serverInfo.result.info?.validated_ledger?.base_fee_xrp ?? 0.00001;
+
+    const sequence = accInfo.result.account_data.Sequence;
+    const ledgerIndex = accInfo.result.ledger_current_index ?? 0;
+
+
+    // Build TX
+    const tx: any = {
       TransactionType: "Payment",
-      Account: wallet.classicAddress,
-      Amount: sendDrops.toString(),
+      Account: fromAddress,
       Destination: to,
-      Memos: memo
-        ? [
-            {
-              Memo: {
-                MemoData: Buffer.from(memo, "utf8").toString("hex"),
-              },
-            },
-          ]
-        : undefined,
+      Amount: (Number(amountXrp) * 1_000_000).toString(), // drops
+      Fee: (Number(baseFeeXrp) * 1_000_000).toString(),
+      Sequence: sequence,
+      LastLedgerSequence: ledgerIndex + 10,
     };
 
-    const prepared = (await client.autofill(baseTx)) as any;
-    prepared.LastLedgerSequence = (prepared.LastLedgerSequence ?? 0) + 20;
-
-    // 5️⃣ Sign and submit (with retry on tefMAX_LEDGER)
-    const signed = wallet.sign(prepared);
-
-    const submitTx = async () => {
-      const res = (await client!.submitAndWait(signed.tx_blob)) as any;
-      if (res.result.engine_result === "tefMAX_LEDGER") {
-        console.warn("Transaction expired (tefMAX_LEDGER), retrying...");
-        const retryPrepared = (await client!.autofill(baseTx)) as any;
-        retryPrepared.LastLedgerSequence =
-          (retryPrepared.LastLedgerSequence ?? 0) + 20;
-        const retrySigned = wallet.sign(retryPrepared);
-        return (await client!.submitAndWait(retrySigned.tx_blob)) as any;
-      }
-      return res;
-    };
-
-    const result = await submitTx();
-    const txid: string = result.result.hash;
-    const engineResult: string = result.result.engine_result;
-    const engineMsg: string = result.result.engine_result_message;
-
-    if (engineResult !== "tesSUCCESS") {
-      throw new Error(`XRP send failed: ${engineResult} (${engineMsg})`);
+    if (memo) {
+      tx.Memos = [
+        {
+          Memo: { MemoData: Buffer.from(memo, "utf8").toString("hex") },
+        },
+      ];
     }
 
-    const explorerTx = `${XRP_NET.explorerUrl}/${txid}`;
+    // Sign & broadcast
+    const walletXrp = Wallet.fromSeed(secret);
+    const signed = walletXrp.sign(tx);
+    const submit = await client.submitAndWait(signed.tx_blob);
+    await client.disconnect();
 
-    // 6️⃣ Log transaction
+    const result = submit.result;
+    const txHash = result.hash;
+    const txMeta =
+      result.meta && typeof result.meta === "object" ? (result.meta as any) : null;
+    const txResult = txMeta?.TransactionResult ?? "UNKNOWN";
+    const explorerTx = `${explorer}/transactions/${txHash}`;
+
+    // Save DB record
     await prisma.transaction.create({
       data: {
-        userId: walletRecord.userId,
-        walletId: walletRecord.id,
+        userId: wallet.userId,
+        walletId: wallet.id,
         tokenId: null,
         type: "TRANSFER",
         amount: new Prisma.Decimal(Number(amountXrp)),
         usdValue: new Prisma.Decimal(0),
-        fee: new Prisma.Decimal(feeDrops / 1_000_000),
-        txHash: txid,
+        fee: new Prisma.Decimal(Number(baseFeeXrp)),
+        txHash,
         explorerUrl: explorerTx,
-        status: "CONFIRMED",
-        fromAddress: wallet.classicAddress,
+        status: txResult === "tesSUCCESS" ? "CONFIRMED" : "PENDING",
+        fromAddress,
         toAddress: to,
         direction: "SENT",
       },
     });
 
-    // 7️⃣ Respond
+    // Respond
     return NextResponse.json({
       ok: true,
-      txid,
+      txid: txHash,
       explorerTx,
-      from: wallet.classicAddress,
+      from: fromAddress,
       to,
       amountXrp: Number(amountXrp),
-      feeXrp: feeDrops / 1_000_000,
+      feeXrp: Number(baseFeeXrp),
+      result: txResult,
     });
   } catch (e: any) {
     console.error("XRP send failed:", e);
@@ -162,7 +135,5 @@ export async function POST(req: Request) {
       { error: e?.message || "Internal error" },
       { status: 500 }
     );
-  } finally {
-    if (client) await client.disconnect();
   }
 }

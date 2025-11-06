@@ -3,8 +3,6 @@
 import React, { useEffect, useState } from "react";
 import WalletBalanceCard from "@/components/wallet/WalletBalanceCard";
 import {
-  NativeAmountSection,
-  UsdtAmountSection,
   AddressSection,
   TronIcon
 } from "@/components/wallet/WalletNetworkCard";
@@ -30,10 +28,7 @@ interface WalletData {
 
 export default function WalletOverviewPage() {
   const [tronWallet, setTronWallet] = useState<WalletData | null>(null);
-  const [solanaWallet, setSolanaWallet] = useState<WalletData | null>(null);
-  const [ethWallet, setEthWallet] = useState<WalletData | null>(null);
-  const [btcWallet, setBtcWallet] = useState<WalletData | null>(null);
-
+ 
   useEffect(() => {
     const fetchWallets = async () => {
       try {
@@ -60,14 +55,9 @@ export default function WalletOverviewPage() {
 
         const wallets: WalletData[] = data.wallets || [];
         const tron = wallets.find((w) => w.network.symbol === "TRX") || null;
-        const sol = wallets.find((w) => w.network.symbol === "SOL") || null;
-        const eth = wallets.find(w => w.network.symbol === "ETH") || null;
-        const btc = wallets.find(w => w.network.symbol === "BTC") || null;
-
+      
         setTronWallet(tron);
-        setSolanaWallet(sol);
-        setEthWallet(eth);
-        setBtcWallet(btc);
+  
       } catch (err) {
         console.error("Error fetching wallet data:", err);
         // optional: show a toast/UI hint
@@ -209,10 +199,7 @@ export default function WalletOverviewPage() {
               <WalletBalanceCard
                 currentChain="TRX"
                 walletsBySymbol={{
-                  SOL: solanaWallet ? { id: solanaWallet.id, address: solanaWallet.address } : undefined,
                   TRX: tronWallet ? { id: tronWallet.id, address: tronWallet.address } : undefined,
-                  ETH: ethWallet ? { id: ethWallet.id, address: ethWallet.address } : undefined,
-                  BTC: btcWallet ? { id: btcWallet.id, address: btcWallet.address } : undefined,
                 }}
               />
             </div>

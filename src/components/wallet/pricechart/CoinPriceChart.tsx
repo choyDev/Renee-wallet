@@ -46,6 +46,7 @@ export const COLOR_CLASS: Record<AssetKey, string> = {
 const usd = new Intl.NumberFormat(undefined, {
   style: "currency",
   currency: "USD",
+  currencyDisplay: "narrowSymbol",
   maximumFractionDigits: 2,
 });
 
@@ -55,6 +56,7 @@ function formatCompactUSD(n: number) {
     notation: "compact",
     style: "currency",
     currency: "USD",
+    currencyDisplay: "narrowSymbol",
     maximumFractionDigits: 2,
   }).format(n);
 }

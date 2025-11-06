@@ -61,10 +61,10 @@ model token {
   contractAddr      String?
   decimals          Int
   isStablecoin      Boolean             @default(false)
+  bridgetransaction bridgetransaction[]
   network           network             @relation(fields: [networkId], references: [id], map: "Token_networkId_fkey")
   tokenbalance      tokenbalance[]
   transaction       transaction[]
-  bridgetransaction bridgetransaction[]
 
   @@index([networkId], map: "Token_networkId_fkey")
 }
@@ -112,29 +112,29 @@ model user {
   email             String              @unique(map: "User_email_key")
   password_hash     String
   createdAt         DateTime            @default(now())
-  updatedAt         DateTime            @default(now())
-  full_name         String?
+  updatedAt         DateTime?           @default(now())
+  full_name         String
+  bridgetransaction bridgetransaction[]
   fiatdeposit       fiatdeposit?
   kycverification   kycverification[]
   transaction       transaction[]
   wallet            wallet[]
-  bridgetransaction bridgetransaction[]
 }
 
 model wallet {
-  id            Int            @id @default(autoincrement())
+  id            Int                 @id @default(autoincrement())
   userId        Int
   networkId     Int
-  address       String         @unique(map: "Wallet_address_key")
-  privateKeyEnc String         @db.Text
-  createdAt     DateTime       @default(now())
+  address       String              @unique(map: "Wallet_address_key")
+  privateKeyEnc String              @db.Text
+  meta          String?             @db.Text
+  createdAt     DateTime            @default(now())
+  bridgeFrom    bridgetransaction[] @relation("BridgeFromWallet")
+  bridgeTo      bridgetransaction[] @relation("BridgeToWallet")
   tokenbalance  tokenbalance[]
   transaction   transaction[]
-  network       network        @relation(fields: [networkId], references: [id], map: "Wallet_networkId_fkey")
-  user          user           @relation(fields: [userId], references: [id], map: "Wallet_userId_fkey")
-
-  bridgeFrom bridgetransaction[] @relation("BridgeFromWallet")
-  bridgeTo   bridgetransaction[] @relation("BridgeToWallet")
+  network       network             @relation(fields: [networkId], references: [id], map: "Wallet_networkId_fkey")
+  user          user                @relation(fields: [userId], references: [id], map: "Wallet_userId_fkey")
 
   @@index([networkId], map: "Wallet_networkId_fkey")
   @@index([userId], map: "Wallet_userId_fkey")
@@ -148,23 +148,22 @@ model bridgetransaction {
   tokenId         Int
   fromChain       String
   toChain         String
-  amount          Decimal       @db.Decimal(36, 18) // Add precision for crypto amounts
-  bridgeFee       Decimal?      @db.Decimal(36, 18) // Track bridge fees
-  estimatedTime   Int? // Estimated completion time in seconds
+  amount          Decimal       @db.Decimal(36, 18)
   status          bridge_status @default(INITIATED)
   fromTxHash      String?       @db.VarChar(255)
   toTxHash        String?       @db.VarChar(255)
   explorerUrlFrom String?       @db.Text
   explorerUrlTo   String?       @db.Text
-  errorMessage    String?       @db.Text // For failed transactions
-  completedAt     DateTime? // Track when bridge completed
   createdAt       DateTime      @default(now())
   updatedAt       DateTime      @updatedAt
-
-  user       user   @relation(fields: [userId], references: [id], onDelete: Cascade)
-  fromWallet wallet @relation("BridgeFromWallet", fields: [fromWalletId], references: [id], onDelete: Restrict)
-  toWallet   wallet @relation("BridgeToWallet", fields: [toWalletId], references: [id], onDelete: Restrict)
-  token      token  @relation(fields: [tokenId], references: [id], onDelete: Restrict)
+  bridgeFee       Decimal?      @db.Decimal(36, 18)
+  completedAt     DateTime?
+  errorMessage    String?       @db.Text
+  estimatedTime   Int?
+  fromWallet      wallet        @relation("BridgeFromWallet", fields: [fromWalletId], references: [id])
+  toWallet        wallet        @relation("BridgeToWallet", fields: [toWalletId], references: [id])
+  token           token         @relation(fields: [tokenId], references: [id])
+  user            user          @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
   @@index([fromWalletId])
