@@ -9,6 +9,26 @@ import { IS_TEST } from "@/lib/swap-constants";
 
 export const runtime = "nodejs";
 
+async function pxBinanceTRX() {
+    const r = await withTimeout(fetch("https://api.binance.com/api/v3/ticker/price?symbol=TRXUSDT", { cache: "no-store" }));
+    const j = await r.json(); const v = Number(j?.price); if (!Number.isFinite(v)) throw 0; return v;
+}
+async function pxCoingeckoTRX() {
+    const r = await withTimeout(fetch("https://api.coingecko.com/api/v3/simple/price?ids=tron&vs_currencies=usd", { cache: "no-store" }));
+    const j = await r.json(); const v = Number(j?.tron?.usd); if (!Number.isFinite(v)) throw 0; return v;
+}
+
+let _px = { t: 0, v: 0 };
+async function getTrxUsd(): Promise<number> {
+    const now = Date.now();
+    if (now - _px.t < 30_000 && _px.v > 0) return _px.v;
+    const out = await Promise.allSettled([pxBinanceTRX(), pxCoingeckoTRX()]);
+    const vals: number[] = out.filter(r => r.status === "fulfilled").map((r: any) => r.value);
+    if (!vals.length) throw new Error("No TRX price");
+    _px = { t: now, v: median(vals) };
+    return _px.v;
+}
+
 type Body = {
     chain: "ETH" | "SOL" | "TRX";
     side: "USDT->NATIVE" | "NATIVE->USDT";
@@ -62,6 +82,77 @@ async function jupQuote({
     const r = await fetch(url, { cache: "no-store" });
     const text = await r.text();
     return { ok: r.ok, text, url };
+}
+
+// ---- Robust SOL/USD spot price (median of multiple providers) ----
+async function withTimeout<T>(p: Promise<T>, ms = 2500): Promise<T> {
+    const ctrl = new AbortController();
+    const t = setTimeout(() => ctrl.abort(), ms);
+    try {
+        // @ts-ignore
+        return await p;
+    } finally {
+        clearTimeout(t);
+    }
+}
+
+async function fetchJupiter(): Promise<number> {
+    const r = await withTimeout(fetch("https://price.jup.ag/v6/price?ids=SOL", { cache: "no-store" }));
+    if (!r.ok) throw new Error("jup http");
+    const j = await r.json();
+    const v = Number(j?.data?.SOL?.price);
+    if (!Number.isFinite(v) || v <= 0) throw new Error("jup parse");
+    return v;
+}
+
+async function fetchCoinGecko(): Promise<number> {
+    const r = await withTimeout(fetch(
+        "https://api.coingecko.com/api/v3/simple/price?ids=solana&vs_currencies=usd",
+        { cache: "no-store" }
+    ));
+    if (!r.ok) throw new Error("cg http");
+    const j = await r.json();
+    const v = Number(j?.solana?.usd);
+    if (!Number.isFinite(v) || v <= 0) throw new Error("cg parse");
+    return v;
+}
+
+async function fetchBinance(): Promise<number> {
+    const r = await withTimeout(fetch(
+        "https://api.binance.com/api/v3/ticker/price?symbol=SOLUSDT",
+        { cache: "no-store" }
+    ));
+    if (!r.ok) throw new Error("binance http");
+    const j = await r.json();
+    const v = Number(j?.price);
+    if (!Number.isFinite(v) || v <= 0) throw new Error("binance parse");
+    return v;
+}
+
+function median(nums: number[]): number {
+    const a = nums.slice().sort((x, y) => x - y);
+    const m = Math.floor(a.length / 2);
+    return a.length % 2 ? a[m] : (a[m - 1] + a[m]) / 2;
+}
+
+// Cache to reduce provider load & rate limits
+let _solCache = { t: 0, v: 0 };
+const PRICE_TTL_MS = 30_000;
+
+async function getSolPriceUSDStrict(): Promise<number> {
+    const now = Date.now();
+    if (now - _solCache.t < PRICE_TTL_MS && _solCache.v > 0) return _solCache.v;
+
+    const results: number[] = [];
+    const tasks = [fetchJupiter(), fetchCoinGecko(), fetchBinance()];
+    await Promise.allSettled(tasks).then((arr) => {
+        for (const r of arr) if (r.status === "fulfilled" && Number.isFinite(r.value)) results.push(r.value);
+    });
+
+    if (!results.length) throw new Error("No price sources available");
+    const v = median(results);
+    _solCache = { t: now, v };
+    return v;
 }
 
 export async function POST(req: Request) {
@@ -128,10 +219,40 @@ export async function POST(req: Request) {
             }
 
             if (!resp || !usedStable) {
-                console.warn("[JUP devnet] trying stable", DEVNET_STABLES);
+                if (IS_TEST) {
+                    const ui = Number(amount);
+                    if (!Number.isFinite(ui) || ui <= 0) {
+                        return NextResponse.json({ error: "Invalid amount" }, { status: 400 });
+                    }
+
+                    // Always fetch a real price (median of Jupiter / CoinGecko / Binance).
+                    const solUsd = await getSolPriceUSDStrict();
+
+                    const out =
+                        side === "NATIVE->USDT"
+                            ? ui * solUsd           // SOL → USDT
+                            : ui / solUsd;          // USDT → SOL
+
+                    const slip = (slippageBps ?? 50) / 10_000;
+                    const decs = side === "NATIVE->USDT" ? 6 : 9;
+
+                    return NextResponse.json({
+                        ok: true,
+                        chain: "SOL",
+                        side,
+                        amountIn: String(amount),
+                        amountOut: out.toFixed(decs),
+                        minOut: (out * (1 - slip)).toFixed(decs),
+                        route: null,              // signals demo quote to /api/swap/sol
+                        mode: "demo-quote",
+                        priceSource: "median(jupiter,coingecko,binance)"
+                    });
+                }
+
+                // mainnet: still fail (we shouldn't fake quotes on mainnet)
                 return NextResponse.json(
-                    { error: "No tradable stable found on devnet right now. Try again later or switch to mainnet." },
-                    { status: 400 }
+                    { error: "No tradable stable found on mainnet route." },
+                    { status: 503 }
                 );
             }
 
@@ -153,35 +274,40 @@ export async function POST(req: Request) {
             });
         }
 
+        // inside POST, replace the TRX branch
         if (chain === "TRX") {
-            if (!TRON.ROUTER || !TRON.USDT) {
-                return NextResponse.json({ error: "TRX swap disabled on testnet (no SunSwap liquidity)" }, { status: 400 });
+            const amt = Number(amount);
+            if (!Number.isFinite(amt) || amt <= 0) {
+                return NextResponse.json({ error: "amount required" }, { status: 400 });
             }
-            const tronWeb = new TronWeb({ fullHost: TRON.RPC }); // no pk needed for view calls
+
+            // TESTNET: price-based demo quote
+            if (IS_TEST) {
+                const px = await getTrxUsd(); // USDT per TRX
+                const amountOut = side === "NATIVE->USDT" ? amt * px : amt / px;
+                const minOut = amountOut * (1 - (slippageBps / 10_000));
+                return NextResponse.json({
+                    ok: true,
+                    chain: "TRX",
+                    side,
+                    amountIn: amount,
+                    amountOut: amountOut.toFixed(6),
+                    minOut: minOut.toFixed(6),
+                    slippageBps
+                });
+            }
+
+            // MAINNET: use router (your existing SunSwap code)
+            const tronWeb = new TronWeb({ fullHost: TRON.RPC });
             const router = await tronWeb.contract(SUNSWAP_V2_ROUTER_ABI, TRON.ROUTER);
-            const WTRX = await router.WETH().call(); // base58 string
-
-            const amtNum = Number(amount || "0");
-            if (!amtNum || amtNum <= 0) return NextResponse.json({ error: "amount required" }, { status: 400 });
-
-            // Units: TRX uses "sun" (1e6); USDT has 6 decimals
+            const WTRX = await router.WETH().call();
             const path = side === "USDT->NATIVE" ? [TRON.USDT, WTRX] : [WTRX, TRON.USDT];
-            const inRaw = side === "USDT->NATIVE"
-                ? tronWeb.toBigNumber(Math.round(amtNum * 1e6))   // USDT 6dp
-                : tronWeb.toBigNumber(Math.round(amtNum * 1e6));  // TRX  6dp (sun)
-
+            const inRaw = tronWeb.toBigNumber(Math.round(amt * 1e6));
             const amounts = await router.getAmountsOut(inRaw, path).call();
             const outRaw = tronWeb.toBigNumber(amounts[amounts.length - 1]);
             const minRaw = outRaw.minus(outRaw.times(slippageBps).div(10_000));
-
-            const amountOut = side === "USDT->NATIVE"
-                ? (Number(outRaw.toString()) / 1e6).toString() // TRX
-                : (Number(outRaw.toString()) / 1e6).toString(); // USDT
-
-            const minOut = side === "USDT->NATIVE"
-                ? (Number(minRaw.toString()) / 1e6).toString()
-                : (Number(minRaw.toString()) / 1e6).toString();
-
+            const amountOut = Number(outRaw.toString()) / 1e6;
+            const minOut = Number(minRaw.toString()) / 1e6;
             return NextResponse.json({ ok: true, chain: "TRX", side, amountIn: amount, amountOut, minOut, slippageBps });
         }
 

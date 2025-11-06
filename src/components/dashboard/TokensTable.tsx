@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import { FaEthereum } from "react-icons/fa";
-import { SiSolana, SiTether, SiBitcoin, SiBinance, SiRipple, SiDogecoin, SiCardano } from "react-icons/si";
+import { SiSolana, SiTether, SiBitcoin, SiBinance, SiXrp, SiDogecoin, SiCardano } from "react-icons/si";
 
 const TronIcon = ({ className = "text-[#FF4747] w-4 h-4" }) => (
   <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24" className={className}>
@@ -27,7 +27,7 @@ function Icon({ symbol, id }: { symbol: string; id: string }) {
     case "SOL": return <SiSolana className="text-[#14F195] text-xl" />;
     case "USDT": return <SiTether className="text-[#26A17B] text-xl" />;
     case "BNB": return <SiBinance className="text-[#F0B90B] text-xl" />;
-    case "XRP": return <SiRipple className="text-[#006097] text-xl" />;
+    case "XRP": return <SiXrp className="text-[#25A768] text-xl" />;
     case "DOGE": return <SiDogecoin className="text-[#C2A633] text-xl" />;
     case "ADA": return <SiCardano className="text-[#0033AD] text-xl" />;
     case "TRX": return <TronIcon className="w-5 h-5 text-[#FF060A]" />;

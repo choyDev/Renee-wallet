@@ -97,7 +97,7 @@ export default function WalletOverviewPage() {
         setWalletBadgesBulk(entries);
         try {
           localStorage.setItem("wallet_badges", JSON.stringify(entries));
-        } catch {}
+        } catch { }
       } catch (err) {
         console.error("Error fetching wallet data:", err);
       }
@@ -128,24 +128,44 @@ export default function WalletOverviewPage() {
 
   return (
     <div>
-      <div className="mb-5 mt-2 text-lg font-semibold text-gray-800 dark:text-white/90 flex justify-between items-center px-6">
-        <p className="mt-3 font-semibold text-brand-500 dark:text-brand-400">
+      <div className="relative flex flex-col sm:flex-row sm:justify-between sm:items-center mb-2 mt-0 text-lg font-semibold text-gray-800 dark:text-white/90 px-6 sm:px-9 pt-1">
+        {/* Wallet Overview (Left / Top on mobile) */}
+        <p className="mb-4 sm:mb-0 sm:mt-8 font-semibold text-brand-500 dark:text-brand-400 text-center sm:text-left">
           Wallet Overview
         </p>
-        <div className="rounded-xl p-px bg-gradient-to-r from-brand-500/50 to-cyan-500/40">
-          <div className="rounded-xl border border-gray-200/60 dark:border-white/10 bg-white/80 dark:bg-[#0B1220]/80 px-3 py-1.5 tabular-nums">
-            <span className="text-sm text-gray-500 dark:text-gray-400 mr-2">
-              Total Balance
-            </span>
-            <span className="text-base font-semibold text-gray-900 dark:text-white">
-              {usd(totalUsd)}
-            </span>
+
+        {/* Total Balance (Centered) */}
+        <div className="sm:absolute sm:left-1/2 sm:-translate-x-1/2 w-full sm:w-auto flex justify-center sm:justify-normal">
+          <div className="rounded-xl p-[8px] bg-gradient-to-r from-brand-500/50 to-cyan-500/40 w-[90%] sm:w-auto">
+            <div className="flex flex-col sm:flex-row items-center justify-center rounded-xl border border-gray-200/60 dark:border-white/10 bg-white/80 dark:bg-[#0B1220]/80 px-6 sm:px-10 py-2.5 tabular-nums">
+              <span className="text-base sm:text-xl text-gray-500 dark:text-gray-400">
+                Total Balance
+              </span>
+              <span className="mt-1 sm:mt-0 sm:ml-3 text-lg sm:text-2xl font-semibold text-gray-900 dark:text-white">
+                {usd(totalUsd)}
+              </span>
+            </div>
           </div>
         </div>
+        {/* <div className="h-full rounded-2xl p-px bg-gradient-to-r from-brand-500/50 to-cyan-500/40 w-1/4">
+          <div className="h-full flex flex-col rounded-2xl border border-gray-200/60 dark:border-white/10 
+                            bg-white/70 dark:bg-[#0B1220]/80 backdrop-blur-sm p-4 sm:p-5 
+                            shadow-sm transition-all duration-300 hover:shadow-md">
+            <div className="flex items-center justify-between">
+              <span className="text-sm text-gray-500 dark:text-gray-400">Total Balance</span>
+              <span className="text-[10px] px-2 py-0.5 rounded-full bg-gray-100 dark:bg-white/10 text-gray-600 dark:text-gray-300">
+                USD
+              </span>
+            </div>
+            <div className="h-full flex items-center mt-2 text-2xl sm:text-3xl font-semibold tabular-nums tracking-tight text-gray-900 dark:text-white">
+              {usd(totalUsd)}
+            </div>
+          </div>
+        </div> */}
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-2 gap-6 items-stretch">
-        <div className="h-full cursor-pointer" onClick={() => handleNavigate("/wallet/btc")}>
+      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-2 gap-6 items-stretch p-2">
+        <div className="h-full cursor-pointer" onClick={() => handleNavigate("/wallet/eth")}>
           <WalletNetworkCard
             name="Ethereum"
             symbol="ETH"

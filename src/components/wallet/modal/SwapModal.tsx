@@ -48,8 +48,8 @@ export default function SwapModal({ onClose, currentChain, walletsBySymbol }: Pr
     currentChain === "SOL"
       ? "USDT(SPL)"
       : currentChain === "TRX"
-      ? "USDT(TRC20)"
-      : "USDT(ERC20)";
+        ? "USDT(TRC20)"
+        : "USDT(ERC20)";
 
   const fromLabel = side === "USDT->NATIVE" ? "USDT" : nativeSymbol;
   const toLabel = side === "USDT->NATIVE" ? nativeSymbol : "USDT";
@@ -128,8 +128,8 @@ export default function SwapModal({ onClose, currentChain, walletsBySymbol }: Pr
         currentChain === "ETH"
           ? "/api/swap/eth"
           : currentChain === "SOL"
-          ? "/api/swap/sol"
-          : "/api/swap/trx";
+            ? "/api/swap/sol"
+            : "/api/swap/trx";
 
       const payload: any = {
         fromWalletId: fromWallet.id,
@@ -157,6 +157,9 @@ export default function SwapModal({ onClose, currentChain, walletsBySymbol }: Pr
       setToAmount("");
       setQuoteRoute(null);
       setMinOut(null);
+
+      // auto-close after a short beat (so toast renders)
+      setTimeout(() => onClose(), 800);
     } catch (e: any) {
       setErr(e?.message || "Swap failed");
     } finally {
@@ -263,10 +266,10 @@ export default function SwapModal({ onClose, currentChain, walletsBySymbol }: Pr
                     {minOut && side === "USDT->NATIVE" && (
                       <>
                         {" "}
-                        • Min receive:{" "}
-                        <span className="text-gray-300">
+                        {/* • Min receive:{" "} */}
+                        {/* <span className="text-gray-300">
                           {minOut} {toLabel}
-                        </span>
+                        </span> */}
                       </>
                     )}
                   </span>
