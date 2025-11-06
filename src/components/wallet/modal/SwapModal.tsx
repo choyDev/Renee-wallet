@@ -16,7 +16,7 @@ const TronIcon = ({ className = "w-4 h-4 text-[#FF4747]" }) => (
   </svg>
 );
 
-type ChainCode = "SOL" | "TRX" | "ETH" | "BTC";
+type ChainCode = "SOL" | "TRX" | "ETH" | "BTC" | "DOGE" | "XMR" | "XRP";
 type WalletBrief = { id: number; address: string };
 
 interface Props {
@@ -40,7 +40,7 @@ export default function SwapModal({ onClose, currentChain, walletsBySymbol }: Pr
   const [quoteRoute, setQuoteRoute] = useState<any>(null);
 
   // Detect if Bitcoin → swap disabled
-  const isBitcoin = currentChain === "BTC";
+  const swapUnsupported = ["BTC", "DOGE", "XMR", "XRP"].includes(currentChain || "");
   const fromWallet = walletsBySymbol?.[currentChain!];
 
   const nativeSymbol = currentChain === "SOL" ? "SOL" : currentChain === "TRX" ? "TRX" : "ETH";
@@ -56,7 +56,7 @@ export default function SwapModal({ onClose, currentChain, walletsBySymbol }: Pr
 
   // ----------- QUOTE LOGIC -----------
   useEffect(() => {
-    if (isBitcoin) return; // no swaps for BTC
+    if (swapUnsupported) return; // no swaps for BTC
 
     let cancelled = false;
 
@@ -112,8 +112,8 @@ export default function SwapModal({ onClose, currentChain, walletsBySymbol }: Pr
   // ----------- EXECUTE SWAP -----------
   async function onSwap() {
     try {
-      if (isBitcoin) {
-        toast.error("Bitcoin swap is not supported");
+      if (swapUnsupported) {
+        toast.error("{currentChain} swap is not supported");
         return;
       }
       setSubmitting(true);
@@ -195,9 +195,9 @@ export default function SwapModal({ onClose, currentChain, walletsBySymbol }: Pr
             <FaExchangeAlt className="text-blue-500" /> Swap Tokens
           </h2>
 
-          {isBitcoin ? (
+          {swapUnsupported ? (
             <div className="bg-red-500/10 border border-red-500/30 text-red-300 rounded-xl py-4 text-center font-medium">
-              ⚠️ Swapping is not available for Bitcoin. Only native BTC supported.
+              ⚠️ Swapping is not available for {currentChain}. Only native BTC supported.
             </div>
           ) : (
             <>

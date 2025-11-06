@@ -7,6 +7,8 @@ import { ethers } from "ethers";
 import * as bitcoin from "bitcoinjs-lib";
 import * as ecc from "tiny-secp256k1";
 import { ECPairFactory } from "ecpair";
+import { Wallet as XrpWallet } from "xrpl";
+
 bitcoin.initEccLib(ecc);
 const ECPair = ECPairFactory(ecc);
 
@@ -53,6 +55,40 @@ const BTC_NET = {
       ? process.env.BTC_EXPLORER_TESTNET
       : process.env.BTC_EXPLORER_MAINNET,
 };
+
+// ----------------------
+// DOGE, XMR, XRP Networks
+// ----------------------
+
+const DOGE_NET = {
+  name: CHAIN_ENV === "testnet" ? "Dogecoin (Testnet)" : "Dogecoin",
+  chainId: CHAIN_ENV === "testnet" ? "doge-testnet" : "doge-mainnet",
+  rpcUrl:
+    CHAIN_ENV === "testnet"
+      ? "https://sochain.com/api/v2" // testnet API
+      : "https://sochain.com/api/v2", // mainnet API
+  symbol: "DOGE",
+  explorerUrl:
+    CHAIN_ENV === "testnet"
+      ? "https://sochain.com/testnet/doge/address"
+      : "https://dogechain.info/address",
+};
+
+
+const XRP_NET = {
+  name: CHAIN_ENV === "testnet" ? "XRP (Testnet)" : "XRP",
+  chainId: CHAIN_ENV === "testnet" ? "xrp-testnet" : "xrp-mainnet",
+  rpcUrl:
+    CHAIN_ENV === "testnet"
+      ? "wss://s.altnet.rippletest.net:51233"
+      : "wss://xrplcluster.com",
+  symbol: "XRP",
+  explorerUrl:
+    CHAIN_ENV === "testnet"
+      ? "https://testnet.xrpl.org"
+      : "https://xrpscan.com",
+};
+
 
 // ----------------------
 // Encrypt private key
@@ -102,6 +138,9 @@ export async function ensureWalletsForUser(userId: number) {
   let tronNet   = await prisma.network.findFirst({ where: { symbol: "TRX" } });
   let ethNet    = await prisma.network.findFirst({ where: { symbol: "ETH" } });
   let btcNet    = await prisma.network.findFirst({ where: { symbol: "BTC" } });
+  let dogeNet = await prisma.network.findFirst({ where: { symbol: "DOGE" } });
+  let xmrNet  = await prisma.network.findFirst({ where: { symbol: "XMR" } });
+  let xrpNet  = await prisma.network.findFirst({ where: { symbol: "XRP" } });
 
 
   if (!solanaNet) {
@@ -143,6 +182,42 @@ export async function ensureWalletsForUser(userId: number) {
     });
   } else if (btcNet.rpcUrl !== BTC_NET.rpcUrl) {
     btcNet = await prisma.network.update({ where: { id: btcNet.id }, data: { rpcUrl: BTC_NET.rpcUrl, explorerUrl: BTC_NET.explorerUrl || null } });
+  }
+
+  // DOGE
+    if (!dogeNet) {
+      dogeNet = await prisma.network.create({
+        data: {
+          name: DOGE_NET.name,
+          chainId: DOGE_NET.chainId,
+          rpcUrl: DOGE_NET.rpcUrl,
+          symbol: DOGE_NET.symbol,
+          explorerUrl: DOGE_NET.explorerUrl,
+        },
+      });
+    } else if (dogeNet.rpcUrl !== DOGE_NET.rpcUrl) {
+      dogeNet = await prisma.network.update({
+        where: { id: dogeNet.id },
+        data: { rpcUrl: DOGE_NET.rpcUrl, explorerUrl: DOGE_NET.explorerUrl },
+      });
+    }
+
+  // XRP
+  if (!xrpNet) {
+    xrpNet = await prisma.network.create({
+      data: {
+        name: XRP_NET.name,
+        chainId: XRP_NET.chainId,
+        rpcUrl: XRP_NET.rpcUrl,
+        symbol: XRP_NET.symbol,
+        explorerUrl: XRP_NET.explorerUrl,
+      },
+    });
+  } else if (xrpNet.rpcUrl !== XRP_NET.rpcUrl) {
+    xrpNet = await prisma.network.update({
+      where: { id: xrpNet.id },
+      data: { rpcUrl: XRP_NET.rpcUrl, explorerUrl: XRP_NET.explorerUrl },
+    });
   }
 
   const walletsToCreate: any[] = [];
@@ -188,6 +263,57 @@ export async function ensureWalletsForUser(userId: number) {
       userId, networkId: tronNet.id, address, privateKeyEnc: encKey,
     });
   }
+
+  // DOGE wallet (P2PKH address + WIF)
+  if (!existingNetworks.has(dogeNet.id)) {
+    const net =
+      CHAIN_ENV === "testnet"
+        ? {
+            messagePrefix: "\x19Dogecoin Signed Message:\n",
+            bech32: "tdge",
+            bip32: { public: 0x043587cf, private: 0x04358394 },
+            pubKeyHash: 0x71,
+            scriptHash: 0xc4,
+            wif: 0xf1,
+          }
+        : {
+            messagePrefix: "\x19Dogecoin Signed Message:\n",
+            bech32: "doge",
+            bip32: { public: 0x02facafd, private: 0x02fac398 },
+            pubKeyHash: 0x1e,
+            scriptHash: 0x16,
+            wif: 0x9e,
+          };
+
+    const keyPair = ECPair.makeRandom({ network: net });
+    const { address } = bitcoin.payments.p2pkh({
+      pubkey: keyPair.publicKey,
+      network: net,
+    });
+    if (!address) throw new Error("Dogecoin address generation failed");
+    const wif = keyPair.toWIF();
+    const enc = encryptPrivateKey(wif);
+    walletsToCreate.push({
+      userId,
+      networkId: dogeNet.id,
+      address,
+      privateKeyEnc: enc,
+    });
+  }
+
+  if (!existingNetworks.has(xrpNet.id)) {
+    const wallet = XrpWallet.generate();
+    const address = wallet.classicAddress;
+    const secret = wallet.seed!;
+    const enc = encryptPrivateKey(secret);
+    walletsToCreate.push({
+      userId,
+      networkId: xrpNet.id,
+      address,
+      privateKeyEnc: enc,
+    });
+  }
+
 
   if (walletsToCreate.length) {
     await prisma.wallet.createMany({ data: walletsToCreate, skipDuplicates: true });

@@ -5,7 +5,7 @@ import React, { useState, useEffect, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { FiX, FiLoader, FiChevronDown, FiArrowRight } from "react-icons/fi";
 import { FaExchangeAlt, FaEthereum, FaBitcoin } from "react-icons/fa";
-import { SiSolana, SiTether } from "react-icons/si";
+import { SiSolana, SiTether, SiDogecoin, SiMonero, SiRipple } from "react-icons/si";
 import toast from "react-hot-toast";
 import { walletEventBus } from "@/lib/events";
 
@@ -22,6 +22,9 @@ const NETWORKS = [
   { name: "Tron", symbol: "TRX", Icon: TronIcon, color: "#FF4747", tokens: ["TRX", "USDT(TRC20)"] },
   { name: "Solana", symbol: "SOL", Icon: SiSolana, color: "#14F195", tokens: ["SOL", "USDT(SPL)"] },
   { name: "Bitcoin", symbol: "BTC", Icon: FaBitcoin, color: "#F7931A", tokens: ["BTC"] },
+  { name: "Dogecoin", symbol: "DOGE", Icon: SiDogecoin, color: "#C2A633", tokens: ["DOGE"] },
+  { name: "Monero", symbol: "XMR", Icon: SiMonero, color: "#FF6600", tokens: ["XMR"] },
+  { name: "XRP", symbol: "XRP", Icon: SiRipple, color: "#0A74E6", tokens: ["XRP"] },
 ];
 
 /* ---------- Token Icons ---------- */
@@ -31,6 +34,9 @@ const getTokenIcon = (token: string) => {
   if (token.startsWith("SOL")) return <SiSolana className="text-[#14F195] w-5 h-5" />;
   if (token.startsWith("ETH")) return <FaEthereum className="text-[#627EEA] w-5 h-5" />;
   if (token.startsWith("BTC")) return <FaBitcoin className="text-[#F7931A] w-5 h-5" />;
+  if (token.startsWith("DOGE")) return <SiDogecoin className="text-[#C2A633] w-5 h-5" />;
+  if (token.startsWith("XMR")) return <SiMonero className="text-[#FF6600] w-5 h-5" />;
+  if (token.startsWith("XRP")) return <SiRipple className="text-[#0A74E6] w-5 h-5" />;
   return null;
 };
 
@@ -42,7 +48,7 @@ export default function BridgeModal({
   currentChain,
 }: {
   onClose: () => void;
-  currentChain?: "TRX" | "SOL" | "ETH" | "BTC";
+  currentChain?: "TRX" | "SOL" | "ETH" | "BTC" | "DOGE" | "XMR" | "XRP";
 }) {
   const initialFrom = NETWORKS.find((n) => n.symbol === currentChain)!;
   const [fromNetwork] = useState(initialFrom);

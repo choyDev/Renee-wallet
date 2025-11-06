@@ -4,7 +4,7 @@
 import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { FiX, FiCopy, FiLoader } from "react-icons/fi";
-import { SiSolana, SiEthereum, SiBitcoin, SiTether } from "react-icons/si";
+import { SiSolana, SiEthereum, SiBitcoin, SiTether, SiDogecoin, SiRipple, SiMonero } from "react-icons/si";
 import QRCode from "react-qr-code";
 import toast from "react-hot-toast";
 import { walletEventBus } from "@/lib/events";
@@ -15,7 +15,7 @@ const TronIcon = ({ className = "w-4 h-4 text-[#FF4747]" }) => (
   </svg>
 );
 
-type SymbolCode = "SOL" | "TRX" | "ETH" | "BTC";
+type SymbolCode = "SOL" | "TRX" | "ETH" | "BTC" | "DOGE" | "XMR" | "XRP";
 type TokenCode = "NATIVE" | "USDT";
 type WalletBrief = { id: number; address: string };
 type SendResult = { id: string; link?: string };
@@ -51,12 +51,15 @@ export default function SendReceiveModal({
     TRX: <TronIcon />,
     ETH: <SiEthereum className="text-[#627EEA] text-lg" />,
     BTC: <SiBitcoin className="text-[#F7931A] text-lg" />,
+    DOGE:<SiDogecoin className="text-[#C2A633] text-lg" />,
+    XMR: <SiMonero className="text-[#FF6600] text-lg" />,
+    XRP: <SiRipple className="text-[#0A74E6] text-lg" />,
   };
 
   // token options per chain
   const tokensForNetwork: { code: TokenCode; label: string }[] =
-    selectedSym === "BTC"
-      ? [{ code: "NATIVE", label: "BTC" }]
+    selectedSym === "BTC" || "DOGE" || "XMR" || "XRP"
+      ? [{ code: "NATIVE", label: selectedSym }]
       : [
           { code: "NATIVE", label: selectedSym },
           { code: "USDT", label: "USDT" },
@@ -85,6 +88,20 @@ export default function SendReceiveModal({
         endpoint = "/api/bitcoin/send";
         body = { fromWalletId: currentWallet!.id, to, amountBtc: amt };
         break;
+        case "DOGE":
+          endpoint = "/api/dogecoin/send";
+          body = { fromWalletId: currentWallet!.id, to, amountDoge: amt };
+          break;
+
+        case "XRP":
+          endpoint = "/api/xrp/send";
+          body = { fromWalletId: currentWallet!.id, to, amountXrp: amt, memo: memo || undefined };
+          break;
+    
+        case "XMR":
+          endpoint = "/api/monero/send";
+          body = { fromWalletId: currentWallet!.id, to, amountXmr: amt, paymentId: memo || undefined };
+          break;
       default:
         throw new Error("Unsupported chain");
     }

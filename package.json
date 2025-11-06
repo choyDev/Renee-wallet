@@ -37,6 +37,8 @@
     "jose": "^6.1.0",
     "jsonwebtoken": "^9.0.2",
     "lucide-react": "^0.545.0",
+    "monero-javascript": "^0.8.4",
+    "monero-ts": "^0.11.6",
     "next": "^15.5.5",
     "next-auth": "^4.24.12",
     "next-themes": "^0.2.1",
@@ -59,7 +61,9 @@
     "tiny-secp256k1": "^2.2.4",
     "tronweb": "^5.3.4",
     "wif": "^5.0.0",
+    "xrpl": "^4.4.2",
     "zustand": "^5.0.8"
+
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",

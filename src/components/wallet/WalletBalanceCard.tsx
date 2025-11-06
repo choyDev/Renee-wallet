@@ -109,7 +109,7 @@ import SendReceiveModal from "./modal/SendReceiveModal";
 import SwapModal from "./modal/SwapModal";
 import BridgeModal from "./modal/BridgeModal";
 
-type SymbolCode = "SOL" | "TRX" | "ETH" | "BTC";
+type SymbolCode = "SOL" | "TRX" | "ETH" | "BTC" | "DOGE" | "XMR" | "XRP";
 type WalletBrief = { id: number; address: string };
 
 export default function WalletBalanceCard({
@@ -133,6 +133,12 @@ export default function WalletBalanceCard({
         return "#8B5CF6";
       case "BTC":
         return "#F59E0B";
+      case "DOGE": 
+        return "#C2A633";
+      case "XMR": 
+        return "#FF6600";
+      case "XRP": 
+        return "#0A74E6";
       default:
         return "#3B82F6"; // fallback blue
     }
