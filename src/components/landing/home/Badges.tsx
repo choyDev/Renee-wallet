@@ -1,13 +1,13 @@
 export default function Badges() {
   return (
     <section className="container max-w-7xl px-6 pb-6 flex justify-center">
-        <div className="flex flex-wrap gap-3 text-xs">
-            <Badge>Custodial (server keys)</Badge>
-            <Badge>TRON (TRC-20) & Solana (SPL)</Badge>
-            <Badge>Auto conversion</Badge>
-            <Badge>KYC personal & corporate</Badge>
-            <Badge>On-ramp inside wallet</Badge>
-        </div>
+      <div className="flex flex-wrap gap-3 text-xs">
+        <Badge>Wallet + Payments</Badge>
+        <Badge>7 coins supported</Badge>
+        <Badge>USDT on ERC-20 / TRC-20 / SPL</Badge>
+        <Badge>Crypto-only (no fiat)</Badge>
+        <Badge>Merchant APIs & Webhooks</Badge>
+      </div>
     </section>
   );
 }
@@ -19,4 +19,3 @@ function Badge({ children }: { children: React.ReactNode }) {
     </span>
   );
 }
-

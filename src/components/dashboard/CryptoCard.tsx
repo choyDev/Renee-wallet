@@ -67,12 +67,12 @@ export default function CryptoCard({
           </div>
 
           {/* values */}
-          <div className="mt-5">
-            <h3 className="text-3xl sm:text-4xl font-semibold tabular-nums tracking-tight text-gray-900 dark:text-white">
+          <div className="mt-3.5">
+            <h3 className="text-2xl sm:text-3xl font-semibold tabular-nums tracking-tight text-gray-900 dark:text-white">
               {value}
             </h3>
             {/* Reserve up to 2 lines of ~19px each (tailwind text-[15px]) */}
-            <div className="mt-1.5 min-h-[40px]">
+            <div className="mt-1.5 min-h-[40px] px-3">
               <p className="text-[15px] text-gray-600 dark:text-gray-400 tabular-nums whitespace-pre-line">
                 {sub}
               </p>
@@ -80,7 +80,7 @@ export default function CryptoCard({
           </div>
 
 
-          <div className="mt-5 flex items-center justify-between">
+          <div className="mt-2.5 flex items-center justify-between">
             <span className={`text-sm font-medium ${positive ? "text-green-500" : "text-red-500"}`}>{changeAbs}</span>
             <span className={`px-2.5 py-0.5 rounded-full text-xs font-semibold tabular-nums
                               ${positive ? "bg-green-500/10 text-green-600 dark:text-green-400"
@@ -89,8 +89,8 @@ export default function CryptoCard({
             </span>
           </div>
 
-          <div className="h-[70px] w-full mt-5 pb-2 pointer-events-none">
-            <ReactApexChart options={options} series={series} type="area" height={72} />
+          <div className="h-[100px] w-full mt-1.5 pb-2 pointer-events-none">
+            <ReactApexChart options={options} series={series} type="area" height={110} />
           </div>
         </div>
       </div>

@@ -42,11 +42,11 @@ export default function SupportPage() {
           <div className="flex items-center justify-between">
             <div>
               <h1 className="text-2xl font-semibold tracking-tight">Support</h1>
-              <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
+              {/* <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
                 Get help with KYC, deposits, conversions, payouts, and account access.
-              </p>
+              </p> */}
             </div>
-            <Badge color="indigo">Avg. response: 2–6h</Badge>
+            {/* <Badge color="indigo">Avg. response: 2–6h</Badge> */}
           </div>
         </div>
       </div>
@@ -59,9 +59,9 @@ export default function SupportPage() {
             <SectionHeader title="Open a ticket" subtitle="Tell us what happened. Add your deposit reference or tx hash for faster triage." />
             <form onSubmit={submitTicket} className="mt-6 space-y-4">
               <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                <Field label="Subject"><Input value={subject} onChange={(e)=>setSubject(e.target.value)} placeholder="Unable to see my USDT after conversion" required/></Field>
-                <Field label="Category">
-                  <Select value={category} onChange={(e)=>setCategory(e.target.value)}>
+                <Field label="Subject"><Input value={subject} onChange={(e) => setSubject(e.target.value)} placeholder="Unable to see my USDT after conversion" required /></Field>
+                {/* <Field label="Category">
+                  <Select value={category} onChange={(e) => setCategory(e.target.value)}>
                     <option value="kyc">KYC / Verification</option>
                     <option value="deposit">TRY Deposit</option>
                     <option value="conversion">TRY → USDT Conversion</option>
@@ -70,25 +70,25 @@ export default function SupportPage() {
                     <option value="api">API / Webhooks</option>
                     <option value="other">Other</option>
                   </Select>
-                </Field>
-                <Field label="Priority">
-                  <Select value={priority} onChange={(e)=>setPriority(e.target.value)}>
+                </Field> */}
+                {/* <Field label="Priority">
+                  <Select value={priority} onChange={(e) => setPriority(e.target.value)}>
                     <option value="low">Low</option>
                     <option value="normal">Normal</option>
                     <option value="high">High</option>
                   </Select>
-                </Field>
-                <Field label="Contact email"><Input type="email" value={email} onChange={(e)=>setEmail(e.target.value)} placeholder="you@domain.com" required/></Field>
+                </Field> */}
+                <Field label="Contact email"><Input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="you@domain.com" required /></Field>
               </div>
 
-              <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
-                <Field label="Deposit ref / payment id (optional)"><Input value={refCode} onChange={(e)=>setRefCode(e.target.value)} placeholder="e.g. PYM-2F9A..." /></Field>
-                <Field label="Wallet address (optional)"><Input value={address} onChange={(e)=>setAddress(e.target.value)} placeholder="TRON or Solana address" /></Field>
-                <Field label="Tx hash (optional)"><Input value={txHash} onChange={(e)=>setTxHash(e.target.value)} placeholder="Blockchain tx id" /></Field>
-              </div>
+              {/* <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+                <Field label="Deposit ref / payment id (optional)"><Input value={refCode} onChange={(e) => setRefCode(e.target.value)} placeholder="e.g. PYM-2F9A..." /></Field>
+                <Field label="Wallet address (optional)"><Input value={address} onChange={(e) => setAddress(e.target.value)} placeholder="TRON or Solana address" /></Field>
+                <Field label="Tx hash (optional)"><Input value={txHash} onChange={(e) => setTxHash(e.target.value)} placeholder="Blockchain tx id" /></Field>
+              </div> */}
 
               <Field label="Describe the issue">
-                <Textarea value={message} onChange={(e)=>setMessage(e.target.value)} rows={6} placeholder="What did you try? What did you expect? When did it occur? Include amounts and exact times if possible." required/>
+                <Textarea value={message} onChange={(e) => setMessage(e.target.value)} rows={6} placeholder="What did you try? What did you expect? When did it occur? Include amounts and exact times if possible." required />
               </Field>
 
               <div className="flex items-center justify-between gap-4">
@@ -103,7 +103,10 @@ export default function SupportPage() {
               </div>
             </form>
           </Card>
+        </div>
 
+        {/* Right column */}
+        <div className="space-y-6 lg:col-span-4">
           <Card>
             <SectionHeader title="FAQs" subtitle="Quick answers for common issues" />
             <div className="mt-6 divide-y divide-slate-200 dark:divide-slate-800/80">
@@ -114,11 +117,7 @@ export default function SupportPage() {
               <Faq q="Which networks are supported?" a="TRON (USDT-TRC20) and Solana (USDT-SPL). Make sure your address matches the selected chain." />
             </div>
           </Card>
-        </div>
-
-        {/* Right column */}
-        <div className="space-y-6 lg:col-span-4">
-          <Card>
+          {/* <Card>
             <SectionHeader title="Contact options" subtitle="Reach us through any of these channels" />
             <div className="mt-6 grid grid-cols-1 gap-3">
               <Row>
@@ -164,7 +163,7 @@ export default function SupportPage() {
               <li>For on-chain questions, provide the address and tx hash.</li>
               <li>Screenshots of errors or bank confirmation speed things up.</li>
             </ul>
-          </Card>
+          </Card> */}
         </div>
       </div>
     </div>

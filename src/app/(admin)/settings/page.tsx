@@ -70,9 +70,9 @@ export default function SettingsPage() {
           <div className="flex items-center justify-between">
             <div>
               <h1 className="text-2xl font-semibold tracking-tight">Settings</h1>
-              <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
+              {/* <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
                 Manage your account, security, notifications, and wallet preferences.
-              </p>
+              </p> */}
             </div>
             <Badge color="emerald">KYC: Approved</Badge>
           </div>
@@ -84,7 +84,7 @@ export default function SettingsPage() {
         {/* Left column */}
         <div className="space-y-6 lg:col-span-8">
           {/* Profile */}
-          <Card>
+          {/* <Card>
             <SectionHeader title="Profile" subtitle="Basic information visible to support and in receipts." />
             <form onSubmit={handleSaveProfile} className="mt-6 grid grid-cols-1 gap-4 md:grid-cols-2">
               <Field label="Name">
@@ -100,7 +100,7 @@ export default function SettingsPage() {
                 <Button type="submit">Save changes</Button>
               </div>
             </form>
-          </Card>
+          </Card> */}
 
           {/* Security */}
           <Card>
@@ -131,7 +131,7 @@ export default function SettingsPage() {
           </Card>
 
           {/* Notifications */}
-          <Card>
+          {/* <Card>
             <SectionHeader title="Notifications" subtitle="Choose when we should alert you." />
             <div className="mt-6 space-y-3">
               <Row>
@@ -163,10 +163,10 @@ export default function SettingsPage() {
                 <Toggle checked={notifyMarketing} onChange={setNotifyMarketing} />
               </Row>
             </div>
-          </Card>
+          </Card> */}
 
           {/* API Access */}
-          <Card>
+          {/* <Card>
             <SectionHeader title="API access" subtitle="Create or revoke a personal API key for programmatic access." />
             <div className="mt-6 flex items-center justify-between gap-4">
               <div>
@@ -186,12 +186,11 @@ export default function SettingsPage() {
                 {apiKey ? <DangerButton onClick={revokeApiKey}>Revoke</DangerButton> : <Button onClick={createApiKey}>Create key</Button>}
               </div>
             </div>
-          </Card>
+          </Card> */}
         </div>
 
         {/* Right column */}
-        <div className="space-y-6 lg:col-span-4">
-          {/* Preferences */}
+        {/* <div className="space-y-6 lg:col-span-4">
           <Card>
             <SectionHeader title="Preferences" subtitle="Localization and display options." />
             <form onSubmit={handleSavePrefs} className="mt-6 space-y-4">
@@ -219,7 +218,6 @@ export default function SettingsPage() {
             </form>
           </Card>
 
-          {/* Wallet preferences */}
           <Card>
             <SectionHeader title="Wallet preferences" subtitle="Default chain for payouts and address display." />
             <div className="mt-6 space-y-4">
@@ -249,7 +247,6 @@ export default function SettingsPage() {
             </div>
           </Card>
 
-          {/* Danger zone */}
           <Card>
             <SectionHeader title="Danger zone" subtitle="Operational guards to protect user funds." />
             <div className="mt-6 space-y-4">
@@ -265,7 +262,7 @@ export default function SettingsPage() {
               <DangerButton onClick={() => toast("Account scheduled for deletion (mock)")}>Delete account</DangerButton>
             </div>
           </Card>
-        </div>
+        </div> */}
       </div>
     </div>
   );

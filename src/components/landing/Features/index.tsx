@@ -4,23 +4,20 @@ import featuresData from "./featuresData";
 
 const Features = () => {
   return (
-    <>
-      <section id="features" className="py-16 md:py-20 lg:py-28">
-        <div className="container">
-          <SectionTitle
-            title="Main Features"
-            paragraph="There are many variations of passages of Lorem Ipsum available but the majority have suffered alteration in some form."
-            center
-          />
-
-          <div className="grid grid-cols-1 gap-x-8 gap-y-14 md:grid-cols-2 lg:grid-cols-2">
-            {featuresData.map((feature) => (
-              <SingleFeature key={feature.id} feature={feature} />
-            ))}
-          </div>
+    <section id="features" className="py-16 md:py-20 lg:py-28">
+      <div className="container">
+        <SectionTitle
+          title="Main Features"
+          paragraph="Custodial wallet plus a lightweight crypto payment system. Accept on-chain payments, generate invoices and checkout links, track settlements, and optionally swap/bridge inside the wallet. No fiat rails."
+          center
+        />
+        <div className="grid grid-cols-1 gap-x-8 gap-y-14 md:grid-cols-2 lg:grid-cols-2">
+          {featuresData.map((feature) => (
+            <SingleFeature key={feature.id} feature={feature} />
+          ))}
         </div>
-      </section>
-    </>
+      </div>
+    </section>
   );
 };
 

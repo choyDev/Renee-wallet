@@ -28,50 +28,36 @@ export default function HowItWorks() {
     <SectionShell id="how-it-works" className="scroll-mt-24 md:scroll-mt-28">
       <SectionTitle
         title="How it works"
-        paragraph="Sign up and complete KYC to activate your wallet. Deposit Turkish Lira using your unique reference code—we’ll automatically convert it to USDT at the best available rate and credit your TRON or Solana address. Fees are shown upfront; withdrawals are disabled."
+        paragraph="Create payment requests, let payers choose a supported coin, and we track confirmations on-chain. Funds arrive to your custodial wallet; optional swap/bridge is available inside the app. No fiat."
         center
       />
       <div className="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-4">
         <BlockCard
-            title="Sign up & verify (KYC)"
-            icon={
-                <svg viewBox="0 0 24 24" className="h-4 w-4 text-white/85">
-                    <path fill="currentColor" d="M3 7a3 3 0 0 1 3-3h11a1 1 0 1 1 0 2H6a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h12a1 1 0 1 1 0 2H6a3 3 0 0 1-3-3V7z" />
-                </svg>
-            }
+          title="1. Create account"
+          icon={<svg viewBox="0 0 24 24" className="h-4 w-4 text-white/85"><path fill="currentColor" d="M3 7a3 3 0 0 1 3-3h11a1 1 0 1 1 0 2H6a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h12a1 1 0 1 1 0 2H6a3 3 0 0 1-3-3V7z"/></svg>}
         >
-            <span className="font-medium text-slate-900 dark:text-white">Create your account</span> and complete personal or corporate KYC to activate wallet services.
+          Get custodial wallets for TRX, ETH, XMR, SOL, BTC, XRP, DOGE. USDT supported on ERC-20 / TRC-20 / SPL.
         </BlockCard>
 
         <BlockCard
-            title="Wallets issued: TRON & Solana"
-            icon={
-                <svg viewBox="0 0 24 24" className="h-4 w-4 text-white/85">
-                    <path fill="currentColor" d="M7 7h10v2H7V7zm0 4h10v2H7v-2zm0 4h6v2H7v-2z" />
-                </svg>
-            }
+          title="2. Generate request/invoice"
+          icon={<svg viewBox="0 0 24 24" className="h-4 w-4 text-white/85"><path fill="currentColor" d="M7 7h10v2H7V7zm0 4h10v2H7v-2zm0 4h6v2H7v-2z"/></svg>}
         >
-            On approval, secure custodial addresses are generated for TRC-20 (TRON) and SPL (Solana).
+          Create a checkout link with amount, memo, and allowed coins—or let the payer pick.
         </BlockCard>
 
-        <BlockCard title="Deposit TRY with your reference"
-            icon={
-                <svg viewBox="0 0 24 24" className="h-4 w-4 text-white/85">
-                    <path fill="currentColor" d="M4 12a8 8 0 1 1 16 0a8 8 0 0 1-16 0zm7-4h2v8h-2V8z" />
-                </svg>
-            }
+        <BlockCard
+          title="3. Payer sends on-chain"
+          icon={<svg viewBox="0 0 24 24" className="h-4 w-4 text-white/85"><path fill="currentColor" d="M4 12a8 8 0 1 1 16 0a8 8 0 0 1-16 0zm7-4h2v8h-2V8z"/></svg>}
         >
-            Send Turkish Lira to the bank account shown in your dashboard using your unique reference code.
+          We detect the payment and track confirmations per network; status updates via webhook.
         </BlockCard>
 
-        <BlockCard title="Auto-convert to USDT & credit"
-            icon={
-                <svg viewBox="0 0 24 24" className="h-4 w-4 text-white/85">
-                    <path fill="currentColor" d="M12 12a4 4 0 1 0-4-4a4 4 0 0 0 4 4Zm0 2c-4.418 0-8 2.239-8 5v1h16v-1c0-2.761-3.582-5-8-5Z" />
-                </svg>
-            }
+        <BlockCard
+          title="4. Settle & manage"
+          icon={<svg viewBox="0 0 24 24" className="h-4 w-4 text-white/85"><path fill="currentColor" d="M12 12a4 4 0 1 0-4-4a4 4 0 0 0 4 4Zm0 2c-4.418 0-8 2.239-8 5v1h16v-1c0-2.761-3.582-5-8-5Z"/></svg>}
         >
-            We execute the best-rate conversion to USDT and credit your chosen chain. Fees are shown upfront. (Withdrawals are disabled.)
+          Funds sit in your wallet. Optionally swap/bridge inside the app. No fiat off-ramp.
         </BlockCard>
       </div>
     </SectionShell>

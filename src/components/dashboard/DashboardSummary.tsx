@@ -8,7 +8,7 @@ import {
   SiTether,
   SiEthereum,
   SiBitcoin,
-  SiRipple,
+  SiXrp,
   SiDogecoin,
 } from "react-icons/si";
 import { FaMonero } from "react-icons/fa";
@@ -17,6 +17,7 @@ import { useRouter } from "next/navigation";
 // Swiper
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Autoplay } from "swiper/modules";
+import "swiper/css"; // ← ensure Swiper base styles are loaded
 
 const CARD_COLOR = "#3B82F6";        // shared hairline for card shells
 const CARD_ICON_BG = "bg-[#EEF2FF]"; // shared light chip background
@@ -35,6 +36,18 @@ interface WalletData {
   network: { name: string; symbol: string };
   balances: { token: { symbol: string; name: string }; amount: string; usd: number }[];
 }
+
+/** ------- NEW: market data for change %, change $ and sparkline ------- */
+type MarketRow = { pct: number; abs: number; spark: number[] };
+const SYMBOL_TO_ID: Record<string, string> = {
+  BTC: "bitcoin",
+  ETH: "ethereum",
+  SOL: "solana",
+  TRX: "tron",
+  XRP: "ripple",
+  XMR: "monero",
+  DOGE: "dogecoin",
+};
 
 export default function DashboardSummary() {
   const [wallets, setWallets] = useState<WalletData[]>([]);
@@ -71,6 +84,51 @@ export default function DashboardSummary() {
     return { amount: b?.amount ?? "0", usd: Number(b?.usd ?? 0) };
   };
   const fmtUSD = (n: number) => `$${n.toFixed(2)}`;
+  const fmtAbsUSD = (n: number) => `${n >= 0 ? "+" : "-"}$${Math.abs(n).toFixed(2)}`;
+
+  /** ------- NEW: fetch market data (CoinGecko) for change%/abs and sparkline ------- */
+  const [market, setMarket] = useState<Record<string, MarketRow>>({});
+
+  useEffect(() => {
+    let abort = new AbortController();
+
+    async function loadMarket() {
+      try {
+        const ids = Object.values(SYMBOL_TO_ID).join(",");
+        const url =
+          `https://api.coingecko.com/api/v3/coins/markets` +
+          `?vs_currency=usd&ids=${ids}` +
+          `&sparkline=true&price_change_percentage=24h&precision=full`;
+        const res = await fetch(url, { signal: abort.signal, cache: "no-store" });
+        if (!res.ok) return;
+
+        const json = await res.json();
+        // json[i]: { id, current_price, price_change_24h, price_change_percentage_24h, sparkline_in_7d: { price: [] } }
+        const symById = Object.fromEntries(Object.entries(SYMBOL_TO_ID).map(([sym, id]) => [id, sym]));
+        const next: Record<string, MarketRow> = {};
+        for (const row of json as any[]) {
+          const sym = symById[row.id];
+          if (!sym) continue;
+          next[sym] = {
+            pct: Number(row.price_change_percentage_24h ?? 0),
+            abs: Number(row.price_change_24h ?? 0),
+            spark: Array.isArray(row.sparkline_in_7d?.price) ? row.sparkline_in_7d.price : [],
+          };
+        }
+        setMarket(next);
+      } catch (e) {
+        // ignore transient errors/rate limits
+      }
+    }
+
+    loadMarket();
+    const t = window.setInterval(loadMarket, 45_000); // refresh every 45s
+
+    return () => {
+      abort.abort();
+      window.clearInterval(t);
+    };
+  }, []);
 
   // Build all cards (values + sub with USDT line where present)
   const cards = useMemo(() => {
@@ -89,15 +147,25 @@ export default function DashboardSummary() {
       const sub =
         Number(usdt.amount) > 0 ? `${native.amount} ${key}\n${usdt.amount} USDT` : `${native.amount} ${key}`;
 
+      // ------- NEW: real change%, change$, and sparkline data -------
+      const m = market[key];
+      const changePct = m?.pct ?? 0;
+      const changeAbs = m?.abs ?? 0;
+      const series = m?.spark && m.spark.length ? m.spark : [0, 0, 0, 0, 0, 0, 0];
+
       return {
         key,
         title: `${key}-USD`,
         subtitle: label,
         value,
         sub,
-        color, // sparkline
+        color, // sparkline color
         icon,
         path,
+        // only these three fields changed to real market data:
+        change: `${changePct >= 0 ? "+" : ""}${changePct.toFixed(2)}%`,
+        changeAbs: fmtAbsUSD(changeAbs),
+        data: series,
       };
     };
 
@@ -107,21 +175,11 @@ export default function DashboardSummary() {
       makeCard("ETH", "Ethereum", <SiEthereum className="text-[#627EEA] size-6" />, "#627EEA", "/wallet/eth"),
       makeCard("BTC", "Bitcoin", <SiBitcoin className="text-[#F7931A] size-6" />, "#F7931A", "/wallet/btc"),
       makeCard("XMR", "Monero", <FaMonero className="text-[#FF6600] size-6" />, "#FF6600"),
-      makeCard("XRP", "Ripple", <SiRipple className="text-[#006097] size-6" />, "#006097"),
+      makeCard("XRP", "XRP", <SiXrp className="text-[#25A768] size-6" />, "#25A768"),
       makeCard("DOGE", "Dogecoin", <SiDogecoin className="text-[#C2A633] size-6" />, "#C2A633"),
-      // USDT standalone (no native)
-      // {
-      //   key: "USDT",
-      //   title: "USDT",
-      //   subtitle: "Tether",
-      //   value: fmtUSD(Number(getWallet("USDT")?.balances?.[0]?.usd ?? 0)),
-      //   sub: `${getWallet("USDT")?.balances?.[0]?.amount ?? "0"} USDT`,
-      //   color: "#26A17B",
-      //   icon: <SiTether className="text-[#26A17B] size-6" />,
-      //   path: undefined,
-      // },
+      // USDT standalone (no native) — still commented as in your code
     ];
-  }, [wallets]);
+  }, [wallets, market]); // ← include market so cards update when new data arrives
 
   const swiperRef = useRef<any>(null);
   const [mounted, setMounted] = useState(false);
@@ -135,7 +193,6 @@ export default function DashboardSummary() {
   useEffect(() => {
     if (!mounted) return;
     const sw = swiperRef.current;
-    // small timeout helps when parent sizes settle
     const t = setTimeout(() => {
       sw?.update?.();
       sw?.autoplay?.start?.();
@@ -156,14 +213,12 @@ export default function DashboardSummary() {
             slidesPerGroup={1}
             spaceBetween={24}
             speed={500}
-            // Keep sliding in ONE direction, one-by-one, forever
             loop={true}
             autoplay={{
-              delay: 1000,                             // 1s interval
-              disableOnInteraction: false,              // pause while user drags
+              delay: 1000,
+              disableOnInteraction: false,
               stopOnLastSlide: false,
               waitForTransition: true,
-              // pauseOnMouseEnter: false,
             }}
             // --- Drag / touch feel ---
             allowTouchMove
@@ -189,14 +244,14 @@ export default function DashboardSummary() {
                     title={c.title}
                     subtitle={c.subtitle}
                     value={c.value}
-                    sub={c.sub}                         // supports \n if you added whitespace-pre-line
-                    change="+0.00%"
-                    changeAbs="+0.00%"
-                    color={c.color}                     // per-coin graph color
-                    accentColor={CARD_COLOR}            // unified shell accent
+                    sub={c.sub}
+                    change={c.change}         
+                    changeAbs={c.changeAbs}  
+                    color={c.color}         
+                    accentColor={CARD_COLOR}
                     iconBg={CARD_ICON_BG}
                     icon={c.icon}
-                    data={[8, 10, 12, 14, 16, 18, 20]}       // replace with real series if you have them
+                    data={c.data}         
                   />
                 </div>
               </SwiperSlide>
