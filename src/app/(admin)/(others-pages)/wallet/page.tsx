@@ -173,13 +173,8 @@ export default function WalletOverviewPage() {
         </div> */}
       </div>
 
-<<<<<<< HEAD
-      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-2 gap-6 items-stretch">
-        <div className="h-full cursor-pointer" onClick={() => handleNavigate("/wallet/etH")}>
-=======
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-2 gap-6 items-stretch p-2">
         <div className="h-full cursor-pointer" onClick={() => handleNavigate("/wallet/eth")}>
->>>>>>> 5e9bf6a93cc4981181a169151fa12756b42df6ee
           <WalletNetworkCard
             name="Ethereum"
             symbol="ETH"
