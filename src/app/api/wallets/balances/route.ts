@@ -319,7 +319,7 @@ export async function GET(req: Request) {
       new Set(wallets.map((w) => w.network.symbol as ChainSym))
     );
     const prices = await getUsdPrices(chainSymbols);
-    console.log("Fetched prices:", prices);
+    // console.log("Fetched prices:", prices);
 
     const enriched = await Promise.all(
       wallets.map(async (w) => {

@@ -336,7 +336,9 @@ export async function ensureWalletsForUser(userId: number) {
       network: net,
     });
     if (!address) throw new Error("Dogecoin address generation failed");
+    
     const wif = keyPair.toWIF();
+
     const enc = encryptPrivateKey(wif);
     walletsToCreate.push({
       userId,

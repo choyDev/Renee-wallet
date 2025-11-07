@@ -5,7 +5,6 @@ import React, { useEffect, useRef, useMemo, useState } from "react";
 import CryptoCard from "./CryptoCard";
 import {
   SiSolana,
-  SiTether,
   SiEthereum,
   SiBitcoin,
   SiXrp,
@@ -175,7 +174,7 @@ export default function DashboardSummary() {
       makeCard("ETH", "Ethereum", <SiEthereum className="text-[#627EEA] size-6" />, "#627EEA", "/wallet/eth"),
       makeCard("BTC", "Bitcoin", <SiBitcoin className="text-[#F7931A] size-6" />, "#F7931A", "/wallet/btc"),
       makeCard("XMR", "Monero", <FaMonero className="text-[#FF6600] size-6" />, "#FF6600"),
-      makeCard("XRP", "XRP", <SiXrp className="text-[#25A768] size-6" />, "#25A768"),
+      makeCard("XRP", "XRP", <SiXrp className="text-[#0A74E6] size-6" />, "#0A74E6"),
       makeCard("DOGE", "Dogecoin", <SiDogecoin className="text-[#C2A633] size-6" />, "#C2A633"),
       // USDT standalone (no native) — still commented as in your code
     ];

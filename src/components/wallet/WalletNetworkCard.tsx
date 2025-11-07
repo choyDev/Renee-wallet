@@ -11,7 +11,7 @@ import {
   FaEye,
   FaEyeSlash,
 } from "react-icons/fa";
-import { SiSolana, SiTether, SiEthereum, SiBitcoin, SiDogecoin, SiRipple, SiMonero } from "react-icons/si";
+import { SiSolana, SiEthereum, SiBitcoin, SiDogecoin, SiXrp, SiMonero } from "react-icons/si";
 
 //  Tron Icon
 export const TronIcon = ({ className = "text-[#FF4747] w-5 h-5" }) => (
@@ -139,7 +139,7 @@ function getNetworkIcon(symbol: ChainSym) {
     case "DOGE":
       return <SiDogecoin className="text-[#C2A633] w-6 h-6" />;
     case "XRP":
-      return <SiRipple className="text-[#0A74E6] w-6 h-6" />;
+      return <SiXrp className="text-[#0A74E6] w-6 h-6" />;
     case "XMR":
       return <SiMonero className="text-[#FF6600] w-6 h-6" />;
   }

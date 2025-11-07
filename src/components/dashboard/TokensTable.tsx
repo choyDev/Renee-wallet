@@ -27,7 +27,7 @@ function Icon({ symbol, id }: { symbol: string; id: string }) {
     case "SOL": return <SiSolana className="text-[#14F195] text-xl" />;
     case "USDT": return <SiTether className="text-[#26A17B] text-xl" />;
     case "BNB": return <SiBinance className="text-[#F0B90B] text-xl" />;
-    case "XRP": return <SiXrp className="text-[#25A768] text-xl" />;
+    case "XRP": return <SiXrp className="text-[#0A74E6] text-xl" />;
     case "DOGE": return <SiDogecoin className="text-[#C2A633] text-xl" />;
     case "ADA": return <SiCardano className="text-[#0033AD] text-xl" />;
     case "TRX": return <TronIcon className="w-5 h-5 text-[#FF060A]" />;

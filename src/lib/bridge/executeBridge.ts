@@ -31,6 +31,36 @@ import { bridgeSOLToTRC20 } from "./solToTrc20";
 import { bridgeSOLToERC20 } from "./solToERC20";
 import { bridgeETHToTRC20 } from "./ethToTRC20";
 import { bridgeETHToSPL } from "./ethToSPL";
+import { bridgeTRXToDOGE  } from "./trxToDoge";
+import { bridgeDogeToTrx } from "./dogeToTrx";
+import { bridgeDogeToTrc20 } from "./dogeToTrc20";
+import { bridgeTrc20ToDoge } from "./trc20ToDoge";
+import { bridgeTrxToXrp } from "./trxToXrp";
+import { bridgeXrpToTrx } from "./xrpToTrx";
+import { bridgeXrpToTrc20 } from "./xrpToTrc20";
+import { bridgeTrc20ToXrp } from "./trc20ToXrp";
+import { bridgeDogeToSol } from "./dogeToSol";
+import { bridgeSolToDoge } from "./solToDoge";
+import { bridgeSPLToDoge } from "./splToDoge";
+import { bridgeDogeToSPL } from "./dogeToSPL";
+import { bridgeSolToXrp } from "./solToXrp";
+import { bridgeXrpToSol } from "./xrpToSol";
+import { bridgeXrpToSpl} from "./xrpToSPL";
+import { bridgeSplToXrp } from "./splToXrp";
+import { bridgeEthereumToDoge } from "./ethToDoge";
+import { bridgeDogeToEthereum } from "./dogeToETH";
+import { bridgeDogeToERC20 } from "./dogeToErc20";
+import { bridgeERC20ToDoge } from "./erc20ToDoge";
+import { bridgeEthToXrp } from "./ethToXrp";
+import { bridgeXrpToEth } from "./xrpToEth";
+import { bridgeXrpToERC20 } from "./xrpToErc20";
+import { bridgeERC20ToXrp } from "./erc20ToXrp";
+import { bridgeBtcToDoge } from "./btcToDoge";
+import { bridgeDogeToBtc } from "./dogeToBtc";
+import { bridgeBtcToXrp } from "./btcToXrp";
+import { bridgeXrpToBtc } from "./xrpToBtc";
+import { bridgeDogeToXrp } from "./dogeToXrp";
+import { bridgeXrpToDoge } from "./xrpToDoge";
 import { convertRate, SymbolKey } from "./rate";
 import type { BridgeResult } from "./types";
 
@@ -329,8 +359,529 @@ export async function executeBridge({
       if (result.status === "failed") throw new Error(result.error);
       fromTx = { txHash: result.fromTxHash || "" };
       toTx = { txHash: result.toTxHash || "" };
-    }
+    } else if (fromChain === "TRX" && toChain === "DOGE" && fromToken === "TRX" && toToken === "DOGE") {
+      const result = await bridgeTRXToDOGE({
+        tronPrivateKey: fromPriv,
+        tronVaultAddress: process.env.TRX_BRIDGE_VAULT!,
+        dogeBridgeWif: process.env.DOGE_BRIDGE_WIF!,
+        dogeToAddress: toWallet.address,
+        amountTrx: amt,
+        amountDoge: toAmount,
+      });
+      if (result.status === "failed") throw new Error(result.error);
+      fromTx = { txHash: result.fromTxHash };
+      toTx = { txHash: result.toTxHash };
+    } else if (fromChain === "DOGE" && toChain === "TRX" && fromToken === "DOGE" && toToken === "TRX") {
+      const result = await bridgeDogeToTrx({
+        dogePrivateKeyWIF: fromPriv,                      
+        dogeVault: process.env.DOGE_BRIDGE_VAULT!,        
+        trxPrivateKey: process.env.TRX_BRIDGE_PRIVATE_KEY!, 
+        trxToAddress: toWallet.address,                 
+        dogeAmount: amt,
+        trxAmount: toAmount,
+      });
     
+      if (result.status === "failed") throw new Error(result.error);
+    
+      fromTx = { txHash: result.fromTxHash || "" };
+      toTx = { txHash: result.toTxHash || "" };
+    } else if (fromChain === "DOGE" && toChain === "TRX" && fromToken === "DOGE" && toToken === "USDT") {
+      const result = await bridgeDogeToTrc20({
+        dogePrivateKeyWIF: fromPriv,
+        dogeVault: process.env.DOGE_BRIDGE_VAULT!,
+        tronBridgePrivateKey: process.env.TRX_BRIDGE_PRIVATE_KEY!,
+        tronToAddress: toWallet.address,
+        dogeAmount: amt,
+        trc20Amount: toAmount,
+      });
+      if (result.status === "failed") throw new Error(result.error);
+      fromTx = { txHash: result.fromTxHash || "" };
+      toTx = { txHash: result.toTxHash || "" };
+    } else if (fromChain === "TRX" && toChain === "DOGE" && fromToken === "USDT" && toToken === "DOGE") {
+      const result = await bridgeTrc20ToDoge({
+        tronPrivateKey: fromPriv,
+        tronVaultAddress: process.env.TRON_USDT_VAULT!,
+        dogeBridgeWif: process.env.DOGE_BRIDGE_WIF!,
+        dogeToAddress: toWallet.address,
+        amountUsdt: amt,
+        amountDoge: toAmount,
+      });
+    
+      if (result.status === "failed") throw new Error(result.error);
+    
+      fromTx = { txHash: result.fromTxHash || "" };
+      toTx = { txHash: result.toTxHash || "" };
+    } else if (fromChain === "TRX" && toChain === "XRP" && fromToken === "TRX" && toToken === "XRP") {
+      const result = await bridgeTrxToXrp({
+        tronPrivateKey: fromPriv,
+        tronVaultAddress: process.env.TRX_BRIDGE_VAULT!,
+        xrpBridgeSeed: process.env.XRP_BRIDGE_PRIVATE_KEY!,
+        xrpToAddress: toWallet.address,
+        amountTrx: amt,
+        amountXrp: toAmount,
+      });
+    
+      if (result.status === "failed") throw new Error(result.error);
+    
+      fromTx = { txHash: result.fromTxHash || "" };
+      toTx = { txHash: result.toTxHash || "" };
+    } else if (fromChain === "XRP" && toChain === "TRX" && fromToken === "XRP" && toToken === "TRX") {
+      const result = await bridgeXrpToTrx({
+        xrpUserSeed: fromPriv,
+        xrpVaultAddress: process.env.XRP_BRIDGE_VAULT!,
+        tronBridgePrivateKey: process.env.TRX_BRIDGE_PRIVATE_KEY!,
+        trxToAddress: toWallet.address,
+        amountXrp: amt,
+        amountTrx: toAmount,
+      });
+    
+      if (result.status === "failed") throw new Error(result.error);
+    
+      fromTx = { txHash: result.fromTxHash || "" };
+      toTx = { txHash: result.toTxHash || "" };
+    } else if (fromChain === "XRP" && toChain === "TRX" && fromToken === "XRP" && toToken === "USDT") {
+      const result = await bridgeXrpToTrc20({
+        xrpUserSeed: fromPriv,
+        xrpVaultAddress: process.env.XRP_BRIDGE_VAULT!,
+        tronBridgePrivateKey: process.env.TRX_BRIDGE_PRIVATE_KEY!,
+        tronToAddress: toWallet.address,
+        amountXrp: amt,
+        amountUsdt: toAmount,
+      });
+    
+      if (result.status === "failed") throw new Error(result.error);
+    
+      fromTx = { txHash: result.fromTxHash || "" };
+      toTx = { txHash: result.toTxHash || "" };
+    } else if (fromChain === "TRX" && toChain === "XRP" && fromToken === "USDT" && toToken === "XRP") {
+      const result = await bridgeTrc20ToXrp({
+        tronPrivateKey: fromPriv,
+        tronVaultAddress: process.env.TRX_BRIDGE_VAULT!,
+        xrpBridgeSeed: process.env.XRP_BRIDGE_PRIVATE_KEY!,
+        xrpToAddress: toWallet.address,
+        amountUsdt: amt,
+        amountXrp: toAmount,
+      });
+    
+      if (result.status === "failed") throw new Error(result.error);
+    
+      fromTx = { txHash: result.fromTxHash || "" };
+      toTx = { txHash: result.toTxHash || "" };
+    } else if (fromChain === "DOGE" && toChain === "SOL" && fromToken === "DOGE" && toToken === "SOL") {
+      const result = await bridgeDogeToSol({
+        dogePrivateKeyWIF: fromPriv,
+        dogeVault: process.env.DOGE_BRIDGE_VAULT!,
+        solBridgePrivateKeyBase58: process.env.SOL_BRIDGE_PRIVATE_KEY_BASE58!,
+        solToAddress: toWallet.address,
+        dogeAmount: amt,
+        solAmount: toAmount,
+      });
+    
+      if (result.status === "failed") throw new Error(result.error);
+    
+      fromTx = { txHash: result.fromTxHash || "" };
+      toTx = { txHash: result.toTxHash || "" };
+    } else if (
+      fromChain === "SOL" &&
+      toChain === "DOGE" &&
+      fromToken === "SOL" &&
+      toToken === "DOGE"
+    ) {
+      const result = await bridgeSolToDoge({
+        solPrivateKey: fromPriv,
+        solVaultAddress: process.env.SOL_BRIDGE_VAULT!,
+        dogeBridgeWif: process.env.DOGE_BRIDGE_WIF!,
+        dogeToAddress: toWallet.address,
+        solAmount: amt,
+        dogeAmount: toAmount,
+      });
+    
+      if (result.status === "failed") throw new Error(result.error);
+    
+      fromTx = { txHash: result.fromTxHash || "" };
+      toTx = { txHash: result.toTxHash || "" };
+    } else if (
+      fromChain === "SOL" &&
+      toChain === "DOGE" &&
+      fromToken === "USDT" &&
+      toToken === "DOGE"
+    ) {
+      const result = await bridgeSPLToDoge({
+        solPrivateKey: fromPriv,
+        solVault: process.env.SOL_BRIDGE_VAULT!,
+        dogeBridgeWif: process.env.DOGE_BRIDGE_WIF!,
+        dogeToAddress: toWallet.address,
+        amountSolUsdt: amt,
+        amountDoge: toAmount,
+      });
+    
+      if (result.status === "failed") throw new Error(result.error);
+    
+      fromTx = { txHash: result.fromTxHash || "" };
+      toTx = { txHash: result.toTxHash || "" };
+    } else if (
+      fromChain === "DOGE" &&
+      toChain === "SOL" &&
+      fromToken === "DOGE" &&
+      toToken === "USDT"
+    ) {
+      const result = await bridgeDogeToSPL({
+        dogeUserWif: fromPriv,
+        dogeVaultAddress: process.env.DOGE_BRIDGE_VAULT!,
+        solBridgePrivateKeyBase58: process.env.SOL_BRIDGE_PRIVATE_KEY_BASE58!,
+        solToAddress: toWallet.address,
+        amountDoge: amt,
+        amountUsdt: toAmount,
+      });
+    
+      if (result.status === "failed") throw new Error(result.error);
+    
+      fromTx = { txHash: result.fromTxHash || "" };
+      toTx = { txHash: result.toTxHash || "" };
+    } else if (
+      fromChain === "SOL" &&
+      toChain === "XRP" &&
+      fromToken === "SOL" &&
+      toToken === "XRP"
+    ) {
+      const result = await bridgeSolToXrp({
+        solPrivateKey: fromPriv,
+        solVaultAddress: process.env.SOL_BRIDGE_VAULT!,
+        xrpBridgeSeed: process.env.XRP_BRIDGE_PRIVATE_KEY!,
+        xrpToAddress: toWallet.address,
+        amountSol: amt,
+        amountXrp: toAmount,
+      });
+    
+      if (result.status === "failed") throw new Error(result.error);
+    
+      fromTx = { txHash: result.fromTxHash || "" };
+      toTx = { txHash: result.toTxHash || "" };
+    } else if (
+      fromChain === "XRP" &&
+      toChain === "SOL" &&
+      fromToken === "XRP" &&
+      toToken === "SOL"
+    ) {
+      const result = await bridgeXrpToSol({
+        xrpUserSeed: fromPriv,
+        xrpVaultAddress: process.env.XRP_BRIDGE_VAULT!,
+        solBridgePrivateKeyBase58: process.env.SOL_BRIDGE_PRIVATE_KEY_BASE58!,
+        solToAddress: toWallet.address,
+        amountXrp: amt,
+        amountSol: toAmount,
+      });
+    
+      if (result.status === "failed") throw new Error(result.error);
+    
+      fromTx = { txHash: result.fromTxHash || "" };
+      toTx = { txHash: result.toTxHash || "" };
+    } else if (
+      fromChain === "XRP" &&
+      toChain === "SOL" &&
+      fromToken === "XRP" &&
+      toToken === "USDT"
+    ) {
+      const result = await bridgeXrpToSpl({
+        xrpUserSeed: fromPriv,
+        xrpVaultAddress: process.env.XRP_BRIDGE_VAULT!,
+        solBridgePrivateKeyBase58: process.env.SOL_BRIDGE_PRIVATE_KEY_BASE58!,
+        solToAddress: toWallet.address,
+        amountXrp: amt,
+        amountUsdt: toAmount,
+      });
+    
+      if (result.status === "failed") throw new Error(result.error);
+    
+      fromTx = { txHash: result.fromTxHash || "" };
+      toTx = { txHash: result.toTxHash || "" };
+    } else if (
+      fromChain === "SOL" &&
+      toChain === "XRP" &&
+      fromToken === "USDT" &&
+      toToken === "XRP"
+    ) {
+      const result = await bridgeSplToXrp({
+        solUserPrivateKey: fromPriv,
+        solVaultAddress: process.env.SOL_BRIDGE_VAULT!,
+        xrpBridgeSeed: process.env.XRP_BRIDGE_PRIVATE_KEY!,
+        xrpToAddress: toWallet.address,
+        amountUsdt: amt,
+        amountXrp: toAmount,
+      });
+    
+      if (result.status === "failed") throw new Error(result.error);
+    
+      fromTx = { txHash: result.fromTxHash || "" };
+      toTx = { txHash: result.toTxHash || "" };
+    } else if (
+      fromChain === "ETH" &&
+      toChain === "DOGE" &&
+      fromToken === "ETH" &&
+      toToken === "DOGE"
+    ) {
+      const result = await bridgeEthereumToDoge({
+        ethPrivateKey: fromPriv,
+        ethVault: process.env.ETH_BRIDGE_VAULT!,
+        dogeBridgeWif: process.env.DOGE_BRIDGE_WIF!,
+        dogeToAddress: toWallet.address,
+        ethAmount: amt,
+        dogeAmount: toAmount,
+      });
+    
+      if (result.status === "failed") throw new Error(result.error);
+    
+      fromTx = { txHash: result.fromTxHash || "" };
+      toTx = { txHash: result.toTxHash || "" };
+    } else if (
+      fromChain === "DOGE" &&
+      toChain === "ETH" &&
+      fromToken === "DOGE" &&
+      toToken === "ETH"
+    ) {
+      const result = await bridgeDogeToEthereum({
+        dogeUserWif: fromPriv,
+        dogeVaultAddress: process.env.DOGE_BRIDGE_VAULT!,
+        ethBridgePrivateKey: process.env.ETH_BRIDGE_PRIVKEY!,
+        ethToAddress: toWallet.address,
+        amountDoge: amt,
+        amountEth: toAmount,
+      });
+    
+      if (result.status === "failed") throw new Error(result.error);
+    
+      fromTx = { txHash: result.fromTxHash || "" };
+      toTx = { txHash: result.toTxHash || "" };
+    } else if (
+      fromChain === "DOGE" &&
+      toChain === "ETH" &&
+      fromToken === "DOGE" &&
+      toToken === "USDT"
+    ) {
+      const result = await bridgeDogeToERC20({
+        dogeUserWif: fromPriv,
+        dogeVaultAddress: process.env.DOGE_BRIDGE_VAULT!,
+        ethBridgePrivateKey: process.env.ETH_BRIDGE_PRIVKEY!,
+        userEthAddress: toWallet.address,
+        amountDoge: amt,
+        amountErc20: toAmount,
+      });
+    
+      if (result.status === "failed") throw new Error(result.error);
+    
+      fromTx = { txHash: result.fromTxHash || "" };
+      toTx = { txHash: result.toTxHash || "" };
+    } else if (
+      fromChain === "ETH" &&
+      toChain === "DOGE" &&
+      fromToken === "USDT" &&
+      toToken === "DOGE"
+    ) {
+      const result = await bridgeERC20ToDoge({
+        ethPrivateKey: fromPriv,
+        ethVaultAddress: process.env.ETH_BRIDGE_VAULT!,
+        dogeBridgeWif: process.env.DOGE_BRIDGE_WIF!,
+        dogeToAddress: toWallet.address,
+        amountErc20: amt,
+        amountDoge: toAmount,
+      });
+    
+      if (result.status === "failed") throw new Error(result.error);
+    
+      fromTx = { txHash: result.fromTxHash || "" };
+      toTx = { txHash: result.toTxHash || "" };
+    } else if (
+      fromChain === "ETH" &&
+      toChain === "XRP" &&
+      fromToken === "ETH" &&
+      toToken === "XRP"
+    ) {
+      const result = await bridgeEthToXrp({
+        ethPrivateKey: fromPriv,
+        ethVaultAddress: process.env.ETH_BRIDGE_VAULT!,
+        xrpBridgeSeed: process.env.XRP_BRIDGE_PRIVATE_KEY!,
+        xrpToAddress: toWallet.address,
+        amountEth: amt,
+        amountXrp: toAmount,
+      });
+    
+      if (result.status === "failed") throw new Error(result.error);
+    
+      fromTx = { txHash: result.fromTxHash || "" };
+      toTx = { txHash: result.toTxHash || "" };
+    } else if (
+      fromChain === "XRP" &&
+      toChain === "ETH" &&
+      fromToken === "XRP" &&
+      toToken === "ETH"
+    ) {
+      const result = await bridgeXrpToEth({
+        xrpUserSeed: fromPriv,
+        xrpVaultAddress: process.env.XRP_BRIDGE_VAULT!,
+        ethBridgePrivateKey: process.env.ETH_BRIDGE_PRIVKEY!,
+        ethToAddress: toWallet.address,
+        amountXrp: amt,
+        amountEth: toAmount,
+      });
+    
+      if (result.status === "failed") throw new Error(result.error);
+    
+      fromTx = { txHash: result.fromTxHash || "" };
+      toTx = { txHash: result.toTxHash || "" };
+    } else if (
+      fromChain === "XRP" &&
+      toChain === "ETH" &&
+      fromToken === "XRP" &&
+      toToken === "USDT"
+    ) {
+      const result = await bridgeXrpToERC20({
+        xrpUserSeed: fromPriv,
+        xrpVaultAddress: process.env.XRP_BRIDGE_VAULT!,
+        ethBridgePrivateKey: process.env.ETH_BRIDGE_PRIVKEY!,
+        userEthAddress: toWallet.address,
+        amountXrp: amt,
+        amountErc20: toAmount,
+      });
+    
+      if (result.status === "failed") throw new Error(result.error);
+    
+      fromTx = { txHash: result.fromTxHash || "" };
+      toTx = { txHash: result.toTxHash || "" };
+    } else if (
+      fromChain === "ETH" &&
+      toChain === "XRP" &&
+      fromToken === "USDT" &&
+      toToken === "XRP"
+    ) {
+      const result = await bridgeERC20ToXrp({
+        ethPrivateKey: fromPriv,
+        ethVaultAddress: process.env.ETH_BRIDGE_VAULT!,
+        xrpBridgeSeed: process.env.XRP_BRIDGE_PRIVATE_KEY!,
+        xrpToAddress: toWallet.address,
+        amountErc20: amt,
+        amountXrp: toAmount,
+      });
+    
+      if (result.status === "failed") throw new Error(result.error);
+    
+      fromTx = { txHash: result.fromTxHash || "" };
+      toTx = { txHash: result.toTxHash || "" };
+    } else if (
+      fromChain === "BTC" &&
+      toChain === "DOGE" &&
+      fromToken === "BTC" &&
+      toToken === "DOGE"
+    ) {
+      const result = await bridgeBtcToDoge({
+        btcPrivateKeyWIF: fromPriv,
+        btcVaultAddress: process.env.BTC_BRIDGE_VAULT!,
+        dogeBridgeWif: process.env.DOGE_BRIDGE_WIF!,
+        dogeToAddress: toWallet.address,
+        btcAmount: amt,
+        dogeAmount: toAmount,
+      });
+    
+      if (result.status === "failed") throw new Error(result.error);
+    
+      fromTx = { txHash: result.fromTxHash || "" };
+      toTx = { txHash: result.toTxHash || "" };
+    } else if (
+      fromChain === "DOGE" &&
+      toChain === "BTC" &&
+      fromToken === "DOGE" &&
+      toToken === "BTC"
+    ) {
+      const result = await bridgeDogeToBtc({
+        dogePrivateKeyWIF: fromPriv,
+        dogeVaultAddress: process.env.DOGE_BRIDGE_VAULT!,
+        btcBridgePrivateKeyWIF: process.env.BTC_BRIDGE_WIF!,
+        btcToAddress: toWallet.address,
+        dogeAmount: amt,
+        btcAmount: toAmount,
+      });
+    
+      if (result.status === "failed") throw new Error(result.error);
+    
+      fromTx = { txHash: result.fromTxHash || "" };
+      toTx = { txHash: result.toTxHash || "" };
+    } else if (
+      fromChain === "BTC" &&
+      toChain === "XRP" &&
+      fromToken === "BTC" &&
+      toToken === "XRP"
+    ) {
+      const result = await bridgeBtcToXrp({
+        btcPrivateKeyWIF: fromPriv,
+        btcVaultAddress: process.env.BTC_BRIDGE_VAULT!,
+        xrpBridgeSeed: process.env.XRP_BRIDGE_PRIVATE_KEY!,
+        xrpToAddress: toWallet.address,
+        btcAmount: amt,
+        xrpAmount: toAmount,
+      });
+    
+      if (result.status === "failed") throw new Error(result.error);
+    
+      fromTx = { txHash: result.fromTxHash || "" };
+      toTx = { txHash: result.toTxHash || "" };
+    } else if (
+      fromChain === "XRP" &&
+      toChain === "BTC" &&
+      fromToken === "XRP" &&
+      toToken === "BTC"
+    ) {
+      const result = await bridgeXrpToBtc({
+        xrpUserSeed: fromPriv,
+        xrpVaultAddress: process.env.XRP_BRIDGE_VAULT!,
+        btcBridgePrivateKeyWIF: process.env.BTC_BRIDGE_WIF!,
+        btcToAddress: toWallet.address,
+        amountXrp: amt,
+        amountBtc: toAmount,
+      });
+    
+      if (result.status === "failed") throw new Error(result.error);
+    
+      fromTx = { txHash: result.fromTxHash || "" };
+      toTx = { txHash: result.toTxHash || "" };
+    } if (
+      fromChain === "DOGE" &&
+      toChain === "XRP" &&
+      fromToken === "DOGE" &&
+      toToken === "XRP"
+    ) {
+      const result = await bridgeDogeToXrp({
+        dogeUserWif: fromPriv,
+        dogeVaultAddress: process.env.DOGE_BRIDGE_VAULT!,
+        xrpBridgeSeed: process.env.XRP_BRIDGE_PRIVATE_KEY!,
+        xrpToAddress: toWallet.address,
+        dogeAmount: amt,
+        xrpAmount: toAmount,
+      });
+    
+      if (result.status === "failed") throw new Error(result.error);
+    
+      fromTx = { txHash: result.fromTxHash || "" };
+      toTx = { txHash: result.toTxHash || "" };
+    } // inside your logic for routing
+    if (
+      fromChain === "XRP" &&
+      toChain === "DOGE" &&
+      fromToken === "XRP" &&
+      toToken === "DOGE"
+    ) {
+      const result = await bridgeXrpToDoge({
+        xrpUserSeed: fromPriv,
+        xrpVaultAddress: process.env.XRP_BRIDGE_VAULT!,
+        dogeBridgeWif: process.env.DOGE_BRIDGE_WIF!,
+        dogeToAddress: toWallet.address,
+        amountXrp: amt,
+        amountDoge: toAmount,
+      });
+    
+      if (result.status === "failed") throw new Error(result.error);
+    
+      fromTx = { txHash: result.fromTxHash || "" };
+      toTx = { txHash: result.toTxHash || "" };
+    }
     
     else if (fromChain === "TRX" && toChain === "SOL") {
       fromTx = await bridgeTron({

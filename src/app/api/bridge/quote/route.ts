@@ -8,7 +8,7 @@ export async function GET(req: Request) {
   const amount = parseFloat(url.searchParams.get("amount") || "0");
 
   // 🔹 Validate query params
-  const validSymbols: SymbolKey[] = ["SOL", "ETH", "TRX", "BTC", "USDT"];
+  const validSymbols: SymbolKey[] = ["SOL", "ETH", "TRX", "BTC", "DOGE", "XRP", "XMR", "USDT"];
   if (!from || !to || !validSymbols.includes(from) || !validSymbols.includes(to)) {
     return NextResponse.json({ error: "Invalid or missing 'from'/'to' parameter" }, { status: 400 });
   }
