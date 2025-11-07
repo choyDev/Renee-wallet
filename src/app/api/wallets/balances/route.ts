@@ -48,7 +48,7 @@ type Prices = { SOL:number; TRX:number; ETH:number; BTC:number; DOGE:number; XRP
 const PRICE_CACHE = new Map<string, { exp: number; data: Prices }>();
 const TTL_MS = 30_000; // 30s is fine for spot prices
 
-export async function getUsdPrices(symbols: ("SOL"|"TRX"|"ETH"|"BTC"|"DOGE"|"XRP"|"XMR")[]): Promise<Prices> {
+async function getUsdPrices(symbols: ("SOL"|"TRX"|"ETH"|"BTC"|"DOGE"|"XRP"|"XMR")[]): Promise<Prices> {
   const idMap: Record<string,string> = { SOL:"solana", TRX:"tron", ETH:"ethereum", BTC:"bitcoin", DOGE: "dogecoin", XRP:"ripple", XMR:"monero",};
   const idsArr = [...new Set(symbols.map(s => idMap[s]).filter(Boolean))];
   const key = idsArr.sort().join(",");
