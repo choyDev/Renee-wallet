@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import QRCode from "react-qr-code";
@@ -12,6 +12,7 @@ import {
   FaEyeSlash,
 } from "react-icons/fa";
 import { SiSolana, SiEthereum, SiBitcoin, SiDogecoin, SiXrp, SiMonero } from "react-icons/si";
+import Alert from "@/components/ui/alert/Alert";
 
 //  Tron Icon
 export const TronIcon = ({ className = "text-[#FF4747] w-5 h-5" }) => (
@@ -202,6 +203,10 @@ export type AddressSectionProps = {
 export function AddressSection({ symbol, address, explorerUrl, chainId, textSize = "xs", className, addressTextClassName, }: AddressSectionProps) {
   const [showQR, setShowQR] = useState(false);
   const [showAddress, setShowAddress] = useState(false);
+  const [alertVisible, setAlertVisible] = useState(false);
+  const [alertTitle, setAlertTitle] = useState('');
+  const [alertMessage, setAlertMessage] = useState('');
+	const [alertVariant, setAlertVariant] = useState<'error' | 'success' | 'warning' | 'info'>('error');
 
   const resolvedAddress = address?.trim() || "Address not available";
   const maskedAddress =
@@ -212,15 +217,45 @@ export function AddressSection({ symbol, address, explorerUrl, chainId, textSize
   const viewHref = buildExplorerAddressUrl({ symbol, address, explorerUrl, chainId });
   const canView = !!viewHref;
 
+  
+
+	useEffect(() => {
+    if (alertVisible) {
+      const timer = setTimeout(() => {
+        setAlertVisible(false);
+      }, 2500); // Close alert after 2 seconds
+
+      return () => clearTimeout(timer); // Cleanup timer on unmount
+    }
+  }, [alertVisible]);
+
   const copyAddress = async () => {
-    if (!address) return alert("⚠️ No address to copy.");
+    if (!address) {
+        setAlertTitle('Copied Failed');
+        setAlertMessage("No address to copy");
+        setAlertVariant('error');
+        setAlertVisible(true);
+    }
     await navigator.clipboard.writeText(resolvedAddress);
-    alert(" Address copied to clipboard!");
+        setAlertTitle('Copied Successful');
+        setAlertMessage("Address copied to clipboard!");
+        setAlertVariant('success');
+        setAlertVisible(true);
   };
 
   return (
     <div className="mb-0 mt-2">
       {/* Row */}
+      {alertVisible && (
+        <div className="fixed bottom-4 right-4 z-[9999]">
+          <Alert
+            title={alertTitle}
+            message={alertMessage}
+            variant={alertVariant}
+            showLink={false}
+          />
+        </div>
+      )}
       <div
         className={`flex items-center justify-between text-gray-600 dark:text-gray-300 ${textSize === "xl"
           ? "text-xl"

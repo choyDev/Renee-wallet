@@ -1,14 +1,18 @@
 "use client"
 import Link from "next/link";
-import { useState } from "react";
+import { useState,useEffect } from "react";
 import { useRouter } from "next/navigation";
-import toast from "react-hot-toast";
+import Alert from "@/components/ui/alert/Alert";
 
 const SigninPage = () => {
   const router = useRouter();
   const [formData, setFormData] = useState({ email: "", password: "" });
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
+  const [alertVisible, setAlertVisible] = useState(false);
+  const [alertTitle, setAlertTitle] = useState('');
+  const [alertMessage, setAlertMessage] = useState('');
+  const [alertVariant, setAlertVariant] = useState<'error' | 'success' | 'warning' | 'info'>('error');
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) =>
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -28,10 +32,16 @@ const SigninPage = () => {
       const data = await res.json();
 
       if (!res.ok) {
-        toast.error(data.error);
+        setAlertTitle('Server Error');
+        setAlertMessage('Could not get response from server');
+        setAlertVariant('error');
+        setAlertVisible(true);
       } else {
         localStorage.setItem("user", JSON.stringify(data.user));
-        toast.success("Sign in successfully!")
+        setAlertTitle('Login Successful');
+        setAlertMessage("Redirecting to dashboard...");
+        setAlertVariant('success');
+        setAlertVisible(true);
         if (data.user.kycVerified) {
           router.push("/dashboard");
         } else {
@@ -39,13 +49,38 @@ const SigninPage = () => {
         }
       }
     } catch (err) {
-      toast.error("Something went wrong!");
+      setAlertTitle('Server Error');
+      setAlertMessage('Something went wrong.');
+      setAlertVariant('error');
+      setAlertVisible(true);
     } finally {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    if (alertVisible) {
+      const timer = setTimeout(() => {
+        setAlertVisible(false);
+      }, 5000); 
+
+      return () => clearTimeout(timer); // Cleanup timer on unmount
+    }
+  }, [alertVisible]);
+
   return (
     <>
+      {alertVisible && (
+        <div className="fixed top-4 right-4 z-[9999]">
+          <Alert
+            title={alertTitle}
+            message={alertMessage}
+            variant={alertVariant}
+            showLink={false}
+          />
+        </div>
+      )}
+
       <section className="relative z-10 overflow-hidden pt-36 pb-16 md:pb-20 lg:pt-[180px] lg:pb-28">
         <div className="container">
           <div className="-mx-4 flex flex-wrap">
