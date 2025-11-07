@@ -137,7 +137,7 @@ export async function executeBridge({
       if (result.status === "failed") throw new Error(result.error);
       fromTx = { txHash: result.fromTxHash || "" };
       toTx = { txHash: result.toTxHash || "" };
-    } else if (fromChain === "SOL" && toChain === "TRX" && fromToken === "USDT" && toToken === "USDT" && toToken === "USDT") {
+    } else if (fromChain === "SOL" && toChain === "TRX" && fromToken === "USDT" && toToken === "USDT" ) {
       const result = await bridgeSPLToTRC20({
         solPrivateKey: fromPriv,
         solVault: process.env.SOL_BRIDGE_VAULT!,
@@ -207,7 +207,7 @@ export async function executeBridge({
     }  
     
     
-    else if (fromChain === "TRX" && toChain === "SOL" && fromToken === "USDT") {
+    else if (fromChain === "TRX" && toChain === "SOL" && fromToken === "USDT" && toToken === "USDT") {
       const result = await bridgeTRC20ToSPL({
         tronPrivateKey: fromPriv,
         tronVault: process.env.TRON_USDT_VAULT!,
@@ -219,7 +219,7 @@ export async function executeBridge({
       if (result.status === "failed") throw new Error(result.error);
       fromTx = { txHash: result.fromTxHash || "" };
       toTx = { txHash: result.toTxHash || "" };
-    } else if (fromChain === "TRX" && toChain === "ETH" && fromToken === "USDT") {
+    } else if (fromChain === "TRX" && toChain === "ETH" && fromToken === "USDT" && toToken === "ETH") {
       const result = await bridgeTronUsdtToEthereum({
         tronPrivateKey: fromPriv,
         tronVault: process.env.TRON_USDT_VAULT!,
@@ -883,7 +883,7 @@ export async function executeBridge({
       toTx = { txHash: result.toTxHash || "" };
     }
     
-    else if (fromChain === "TRX" && toChain === "SOL") {
+    else if (fromChain === "TRX" && toChain === "SOL" && fromToken === "TRX" && toToken === "SOL") {
       fromTx = await bridgeTron({
         privateKey: fromPriv,
         amount: amt,
@@ -897,7 +897,7 @@ export async function executeBridge({
         amount: toAmount,
         toAddress: toWallet.address,
       });
-    } else if (fromChain === "TRX" && toChain === "ETH") {
+    } else if (fromChain === "TRX" && toChain === "ETH" && fromToken === "TRX" && toToken === "ETH") {
       // Step 1️⃣ Lock on Tron
       fromTx = await bridgeTron({
         privateKey: fromPriv,
@@ -913,7 +913,7 @@ export async function executeBridge({
         amount: toAmount,
         toAddress: toWallet.address,
       });
-    } else if (fromChain === "TRX" && toChain === "BTC") {
+    } else if (fromChain === "TRX" && toChain === "BTC" && fromToken === "TRX" && toToken === "BTC") {
       fromTx = await bridgeTron({
         privateKey: fromPriv,
         amount: amt,
@@ -927,7 +927,7 @@ export async function executeBridge({
         amount: toAmount,
         toAddress: toWallet.address,
       });
-    } else if (fromChain === "SOL" && toChain === "TRX") {
+    } else if (fromChain === "SOL" && toChain === "TRX" && fromToken === "SOL" && toToken === "TRX") {
       
       const result = await bridgeSolanaToTron({
         solPrivateKey: fromPriv,
@@ -943,7 +943,7 @@ export async function executeBridge({
       fromTx = { txHash: result.fromTxHash || "" };
       toTx = { txHash: result.toTxHash || "" };
 
-    } else if (fromChain === "SOL" && toChain === "ETH") {
+    } else if (fromChain === "SOL" && toChain === "ETH" && fromToken === "SOL" && toToken === "ETH") {
       const result = await bridgeSolanaToEthereum({
         solPrivateKey: fromPriv,
         solVault: process.env.SOL_BRIDGE_VAULT!,
@@ -956,7 +956,7 @@ export async function executeBridge({
     
       fromTx = { txHash: result.fromTxHash || "" };
       toTx = { txHash: result.toTxHash || "" };
-    } else if (fromChain === "SOL" && toChain === "BTC") {
+    } else if (fromChain === "SOL" && toChain === "BTC" && fromToken === "SOL" && toToken === "BTC") {
       const result = await bridgeSolanaToBitcoin({
         solPrivateKey: fromPriv,
         solVault: process.env.SOL_BRIDGE_VAULT!,
@@ -969,7 +969,7 @@ export async function executeBridge({
       if (result.status === "failed") throw new Error(result.error);
       fromTx = { txHash: result.fromTxHash || "" };
       toTx = { txHash: result.toTxHash || "" };
-    } else if (fromChain === "ETH" && toChain === "TRX") {
+    } else if (fromChain === "ETH" && toChain === "TRX" && fromToken === "ETH" && toToken === "TRX") {
       const result = await bridgeEthereumToTron({
         ethPrivateKey: fromPriv,
         ethVault: process.env.ETH_BRIDGE_VAULT!,
@@ -982,7 +982,7 @@ export async function executeBridge({
       if (result.status === "failed") throw new Error(result.error);
       fromTx = { txHash: result.fromTxHash || "" };
       toTx = { txHash: result.toTxHash || "" };
-    } else if (fromChain === "ETH" && toChain === "SOL") {
+    } else if (fromChain === "ETH" && toChain === "SOL" && fromToken === "ETH" && toToken === "SOL") {
       const result = await bridgeEthereumToSolana({
         ethPrivateKey: fromPriv, // ✅ user's decrypted private key
         ethVault: process.env.ETH_BRIDGE_VAULT!,
@@ -995,7 +995,7 @@ export async function executeBridge({
       if (result.status === "failed") throw new Error(result.error);
       fromTx = { txHash: result.fromTxHash || "" };
       toTx = { txHash: result.toTxHash || "" };
-    } else if (fromChain === "ETH" && toChain === "BTC") {
+    } else if (fromChain === "ETH" && toChain === "BTC" && fromToken === "ETH" && toToken === "BTC") {
       const result = await bridgeEthereumToBitcoin({
         ethPrivateKey: fromPriv, // user’s decrypted ETH private key
         ethVault: process.env.ETH_BRIDGE_VAULT!,
@@ -1008,7 +1008,7 @@ export async function executeBridge({
       if (result.status === "failed") throw new Error(result.error);
       fromTx = { txHash: result.fromTxHash || "" };
       toTx = { txHash: result.toTxHash || "" };
-    } else if (fromChain === "BTC" && toChain === "TRX") {
+    } else if (fromChain === "BTC" && toChain === "TRX" && fromToken === "BTC" && toToken === "TRX") {
       const result = await bridgeBitcoinToTron({
         btcPrivateKeyWIF: fromPriv, // user’s BTC private key
         btcVault: process.env.BTC_BRIDGE_VAULT!,
@@ -1021,7 +1021,7 @@ export async function executeBridge({
       if (result.status === "failed") throw new Error(result.error);
       fromTx = { txHash: result.fromTxHash };
       toTx = { txHash: result.toTxHash };
-    } else if (fromChain === "BTC" && toChain === "SOL") {
+    } else if (fromChain === "BTC" && toChain === "SOL" && fromToken === "BTC" && toToken === "SOL") {
       const result = await bridgeBitcoinToSolana({
         btcPrivateKeyWIF: fromPriv,
         btcVault: process.env.BTC_BRIDGE_VAULT!,
@@ -1034,7 +1034,7 @@ export async function executeBridge({
       if (result.status === "failed") throw new Error(result.error);
       fromTx = { txHash: result.fromTxHash || "" };
       toTx = { txHash: result.toTxHash || "" };
-    } else if (fromChain === "BTC" && toChain === "ETH") {
+    } else if (fromChain === "BTC" && toChain === "ETH" &&  fromToken === "BTC" && toToken === "ETH") {
       const result = await bridgeBitcoinToEthereum({
         btcPrivateKeyWIF: fromPriv,
         btcVault: process.env.BTC_BRIDGE_VAULT!,
@@ -1049,9 +1049,9 @@ export async function executeBridge({
       toTx = { txHash: result.toTxHash || "" };
     } 
     
-    else {
-      throw new Error(`Unsupported bridge path: ${fromChain} → ${toChain}`);
-    }
+    // else {
+    //   throw new Error(`Unsupported bridge path: ${fromChain} → ${toChain}`);
+    // }
 
     if (!fromTx?.txHash || !toTx?.txHash) {
       throw new Error("Bridge failed: missing transaction hashes.");
