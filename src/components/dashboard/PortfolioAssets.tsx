@@ -40,6 +40,13 @@ export default function PortfolioAssets() {
     return () => clearTimeout(timer);
   }, []);
 
+  
+  useEffect(() => {
+    if (mounted && typeof window !== "undefined") {
+      setTimeout(() => window.dispatchEvent(new Event("resize")), 200);
+    }
+  }, [mounted, wallets]);
+
   const symbols = ["TRX", "SOL", "ETH", "BTC", "XMR", "XRP", "DOGE"];
   const usdValues = symbols.map((sym) => {
     const wallet = wallets.find((w) => w.network.symbol === sym);
@@ -109,11 +116,12 @@ export default function PortfolioAssets() {
                       bg-white/70 dark:bg-[#0B1220]/80 backdrop-blur-sm p-6 shadow-sm
                       transition-all duration-300 hover:shadow-md flex flex-col">
         <h3 className="font-semibold text-gray-900 dark:text-white mb-4">Portfolio Assets</h3>
-        <div className="flex justify-center items-center flex-1 notranslate">
-          {mounted && (
-            <ReactApexChart options={options} series={series} type="donut" height={280} />
-          )}
-        </div>
+        {mounted && (
+           <div className="flex justify-center items-center flex-1 notranslate">
+           <ReactApexChart options={options} series={series} type="donut" height={280} />
+         </div>
+        )}
+       
       </div>
     </div>
   );
