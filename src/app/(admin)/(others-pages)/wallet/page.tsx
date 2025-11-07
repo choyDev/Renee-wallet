@@ -130,7 +130,10 @@ export default function WalletOverviewPage() {
     (tronWallet?.balances.reduce((sum, b) => sum + (b.usd || 0), 0) || 0) +
     (solanaWallet?.balances.reduce((sum, b) => sum + (b.usd || 0), 0) || 0) +
     (ethWallet?.balances.reduce((sum, b) => sum + (b.usd || 0), 0) || 0) +
-    (btcWallet?.balances.reduce((sum, b) => sum + (b.usd || 0), 0) || 0);
+    (btcWallet?.balances.reduce((sum, b) => sum + (b.usd || 0), 0) || 0) +
+    (dogeWallet?.balances.reduce((sum, b) => sum + (b.usd || 0), 0) || 0) +
+    (xrpWallet?.balances.reduce((sum, b) => sum + (b.usd || 0), 0) || 0) +
+    (xmrWallet?.balances.reduce((sum, b) => sum + (b.usd || 0), 0) || 0)
 
   const router = useRouter();
   const handleNavigate = (path: string) => router.push(path);
