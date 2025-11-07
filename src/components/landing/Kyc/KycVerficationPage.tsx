@@ -61,7 +61,10 @@ const KycVerificationPage = () => {
       setAlertVariant('success');
       setAlertVisible(true);
 
-      router.push("/dashboard");
+      setTimeout(() => {
+        router.push("/dashboard");
+      }, 1000);
+      
     } catch (err) {
       console.error(err);
       setAlertTitle('Server Error');

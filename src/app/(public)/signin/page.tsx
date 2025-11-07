@@ -43,10 +43,15 @@ const SigninPage = () => {
         setAlertVariant('success');
         setAlertVisible(true);
         if (data.user.kycVerified) {
-          router.push("/dashboard");
+          setTimeout(() => {
+            router.push("/dashboard");
+          }, 1000); // delay 1 second
         } else {
-          router.push("/kyc-verification");
+          setTimeout(() => {
+            router.push("/kyc-verification");
+          }, 1000); // delay 1 second
         }
+        
       }
     } catch (err) {
       setAlertTitle('Server Error');
