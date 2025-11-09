@@ -130,6 +130,243 @@
 // }
 
 
+// import { spawn, ChildProcess } from "child_process";
+// import net from "net";
+// import axios from "axios";
+
+// // ─────────────────────────────────────────────
+// // ENVIRONMENT-AWARE CONFIGURATION
+// // ─────────────────────────────────────────────
+// const isWindows = process.platform === "win32";
+
+// const WALLET_DIR = isWindows
+//   ? "C:\\monero\\wallets"
+//   : "/opt/monero/wallets";
+
+// const BIN = isWindows
+//   ? "C:\\monero\\monero-wallet-rpc.exe"
+//   : "/usr/local/bin/monero-wallet-rpc";
+
+// const DAEMON = "stagenet.xmr-tw.org:38081";
+// const DEBUG = true;
+
+// function log(...args: any[]) {
+//   if (DEBUG) console.log("[XMR-RPC]", ...args);
+// }
+
+// // ─────────────────────────────────────────────
+// // HELPERS
+// // ─────────────────────────────────────────────
+// async function getFreePort(): Promise<number> {
+//   return new Promise((resolve) => {
+//     const s = net.createServer();
+//     s.listen(0, () => {
+//       const port = (s.address() as any).port;
+//       s.close(() => resolve(port));
+//     });
+//   });
+// }
+
+// async function waitForPort(port: number, timeoutMs = 15000) {
+//   const start = Date.now();
+//   return new Promise<void>((resolve, reject) => {
+//     const check = () => {
+//       const sock = net.connect(port, "127.0.0.1");
+//       sock.on("connect", () => {
+//         sock.end();
+//         resolve();
+//       });
+//       sock.on("error", () => {
+//         if (Date.now() - start > timeoutMs) {
+//           reject(new Error(`RPC not responding on ${port} after ${timeoutMs}ms`));
+//         } else {
+//           setTimeout(check, 500);
+//         }
+//       });
+//     };
+//     check();
+//   });
+// }
+
+// // ─────────────────────────────────────────────
+// // PROCESS POOL - REUSE INSTANCES
+// // ─────────────────────────────────────────────
+// type RpcInstance = {
+//   port: number;
+//   process: ChildProcess;
+//   inUse: boolean;
+//   currentWallet: string | null;
+//   lastUsed: number;
+// };
+
+// const rpcPool = new Map<string, RpcInstance>(); // key = walletName
+// const IDLE_TIMEOUT = 120000; // 2 minutes - kill idle processes
+// const CLEANUP_INTERVAL = 60000; // Check every minute
+
+// // Cleanup idle processes
+// setInterval(() => {
+//   const now = Date.now();
+//   for (const [walletName, instance] of rpcPool.entries()) {
+//     if (!instance.inUse && now - instance.lastUsed > IDLE_TIMEOUT) {
+//       log(`🧹 Cleaning up idle RPC for wallet: ${walletName}`);
+//       try {
+//         instance.process.kill("SIGTERM");
+//       } catch (e) {
+//         log("⚠️ Error killing idle process:", e);
+//       }
+//       rpcPool.delete(walletName);
+//     }
+//   }
+// }, CLEANUP_INTERVAL);
+
+// // ─────────────────────────────────────────────
+// // GET OR CREATE RPC INSTANCE
+// // ─────────────────────────────────────────────
+// async function getOrCreateRpcInstance(walletName: string): Promise<RpcInstance> {
+//   // Check if we already have an instance for this wallet
+//   const existing = rpcPool.get(walletName);
+//   if (existing) {
+//     log(`♻️ Reusing existing RPC instance for ${walletName} on port ${existing.port}`);
+//     existing.inUse = true;
+//     existing.lastUsed = Date.now();
+//     return existing;
+//   }
+
+//   // Create new instance
+//   log(`🆕 Creating new RPC instance for ${walletName}`);
+//   const port = await getFreePort();
+//   const rpcUrl = `http://127.0.0.1:${port}/json_rpc`;
+
+//   const rpcProc: ChildProcess = spawn(BIN, [
+//     "--stagenet",
+//     `--daemon-address=${DAEMON}`,
+//     `--wallet-dir=${WALLET_DIR}`,
+//     "--rpc-bind-ip=127.0.0.1",
+//     `--rpc-bind-port=${port}`,
+//     "--disable-rpc-login",
+//     "--log-level=0",
+//   ]);
+
+//   rpcProc.stdout?.on("data", (d) => DEBUG && console.log(`[RPC-${port}]`, d.toString().trim()));
+//   rpcProc.stderr?.on("data", (d) => DEBUG && console.error(`[RPC-${port} err]`, d.toString().trim()));
+
+//   rpcProc.on("error", (err) => log(`Spawn error on port ${port}:`, err.message));
+//   rpcProc.on("exit", (code) => {
+//     log(`💀 RPC process ${port} exited with code ${code}`);
+//     rpcPool.delete(walletName);
+//   });
+
+//   // Wait for RPC to start
+//   await waitForPort(port);
+//   log(`✅ RPC started on ${port}`);
+
+//   const instance: RpcInstance = {
+//     port,
+//     process: rpcProc,
+//     inUse: true,
+//     currentWallet: null,
+//     lastUsed: Date.now(),
+//   };
+
+//   rpcPool.set(walletName, instance);
+//   return instance;
+// }
+
+// // ─────────────────────────────────────────────
+// // MAIN FUNCTION - WITH PROCESS REUSE
+// // ─────────────────────────────────────────────
+// export async function callXmrOnce(
+//   walletName: string,
+//   walletPassword: string,
+//   method: string,
+//   params?: Record<string, any>
+// ) {
+//   const instance = await getOrCreateRpcInstance(walletName);
+//   const rpcUrl = `http://127.0.0.1:${instance.port}/json_rpc`;
+
+//   try {
+//     // Open wallet if not already open or if different wallet
+//     if (instance.currentWallet !== walletName) {
+//       log(`🔓 Opening wallet: ${walletName}`);
+//       const openRes = await axios.post(rpcUrl, {
+//         jsonrpc: "2.0",
+//         id: "0",
+//         method: "open_wallet",
+//         params: { filename: walletName, password: walletPassword },
+//       });
+
+//       if (openRes.data.error) {
+//         // If wallet not found, maybe it needs to be created first
+//         if (openRes.data.error.message?.includes("not found")) {
+//           throw new Error(`Wallet file "${walletName}" not found in ${WALLET_DIR}`);
+//         }
+//         throw new Error(openRes.data.error.message);
+//       }
+
+//       instance.currentWallet = walletName;
+//       log(`✅ Wallet opened: ${walletName}`);
+//     } else {
+//       log(`📂 Wallet already open: ${walletName}`);
+//     }
+
+//     // Perform the requested operation
+//     log(`📞 Calling method: ${method}`);
+//     const res = await axios.post(rpcUrl, {
+//       jsonrpc: "2.0",
+//       id: "0",
+//       method,
+//       params,
+//     });
+
+//     if (res.data.error) {
+//       throw new Error(res.data.error.message);
+//     }
+
+//     log(`✅ Method ${method} successful`);
+//     return res.data.result;
+//   } catch (err: any) {
+//     log("❌ RPC error:", err.response?.data || err.message);
+    
+//     // If critical error, kill this instance so it can be recreated
+//     if (err.message?.includes("locked") || err.message?.includes("not found")) {
+//       log(`🗑️ Removing failed RPC instance for ${walletName}`);
+//       try {
+//         instance.process.kill("SIGTERM");
+//       } catch (e) {}
+//       rpcPool.delete(walletName);
+//     }
+    
+//     throw err;
+//   } finally {
+//     // Mark as not in use (but keep alive for reuse)
+//     instance.inUse = false;
+//     instance.lastUsed = Date.now();
+//   }
+// }
+
+// // ─────────────────────────────────────────────
+// // GRACEFUL SHUTDOWN
+// // ─────────────────────────────────────────────
+// process.on("SIGTERM", () => {
+//   log("🛑 SIGTERM received, closing all RPC instances...");
+//   for (const [walletName, instance] of rpcPool.entries()) {
+//     try {
+//       instance.process.kill("SIGTERM");
+//     } catch (e) {}
+//   }
+//   process.exit(0);
+// });
+
+// process.on("SIGINT", () => {
+//   log("🛑 SIGINT received, closing all RPC instances...");
+//   for (const [walletName, instance] of rpcPool.entries()) {
+//     try {
+//       instance.process.kill("SIGTERM");
+//     } catch (e) {}
+//   }
+//   process.exit(0);
+// });
+
 import { spawn, ChildProcess } from "child_process";
 import net from "net";
 import axios from "axios";
@@ -153,6 +390,40 @@ const DEBUG = true;
 function log(...args: any[]) {
   if (DEBUG) console.log("[XMR-RPC]", ...args);
 }
+
+// ─────────────────────────────────────────────
+// MUTEX LOCK FOR WALLET OPERATIONS
+// ─────────────────────────────────────────────
+class WalletMutex {
+  private locks = new Map<string, Promise<any>>();
+
+  async acquire<T>(walletName: string, fn: () => Promise<T>): Promise<T> {
+    // Wait for any existing operation on this wallet to complete
+    while (this.locks.has(walletName)) {
+      log(`⏳ Waiting for lock on ${walletName}...`);
+      await this.locks.get(walletName);
+    }
+
+    // Acquire lock
+    let resolve: any;
+    const promise = new Promise((r) => (resolve = r));
+    this.locks.set(walletName, promise);
+    log(`🔒 Lock acquired for ${walletName}`);
+
+    try {
+      // Execute the function
+      const result = await fn();
+      return result;
+    } finally {
+      // Release lock
+      this.locks.delete(walletName);
+      resolve();
+      log(`🔓 Lock released for ${walletName}`);
+    }
+  }
+}
+
+const walletMutex = new WalletMutex();
 
 // ─────────────────────────────────────────────
 // HELPERS
@@ -194,23 +465,32 @@ async function waitForPort(port: number, timeoutMs = 15000) {
 type RpcInstance = {
   port: number;
   process: ChildProcess;
-  inUse: boolean;
   currentWallet: string | null;
   lastUsed: number;
 };
 
 const rpcPool = new Map<string, RpcInstance>(); // key = walletName
-const IDLE_TIMEOUT = 120000; // 2 minutes - kill idle processes
+const IDLE_TIMEOUT = 180000; // 3 minutes - kill idle processes
 const CLEANUP_INTERVAL = 60000; // Check every minute
 
 // Cleanup idle processes
 setInterval(() => {
   const now = Date.now();
   for (const [walletName, instance] of rpcPool.entries()) {
-    if (!instance.inUse && now - instance.lastUsed > IDLE_TIMEOUT) {
+    if (now - instance.lastUsed > IDLE_TIMEOUT) {
       log(`🧹 Cleaning up idle RPC for wallet: ${walletName}`);
       try {
-        instance.process.kill("SIGTERM");
+        // Close wallet before killing process
+        const rpcUrl = `http://127.0.0.1:${instance.port}/json_rpc`;
+        axios.post(rpcUrl, {
+          jsonrpc: "2.0",
+          id: "0",
+          method: "close_wallet",
+        }).catch(() => {});
+        
+        setTimeout(() => {
+          instance.process.kill("SIGTERM");
+        }, 500);
       } catch (e) {
         log("⚠️ Error killing idle process:", e);
       }
@@ -227,7 +507,6 @@ async function getOrCreateRpcInstance(walletName: string): Promise<RpcInstance> 
   const existing = rpcPool.get(walletName);
   if (existing) {
     log(`♻️ Reusing existing RPC instance for ${walletName} on port ${existing.port}`);
-    existing.inUse = true;
     existing.lastUsed = Date.now();
     return existing;
   }
@@ -235,7 +514,6 @@ async function getOrCreateRpcInstance(walletName: string): Promise<RpcInstance> 
   // Create new instance
   log(`🆕 Creating new RPC instance for ${walletName}`);
   const port = await getFreePort();
-  const rpcUrl = `http://127.0.0.1:${port}/json_rpc`;
 
   const rpcProc: ChildProcess = spawn(BIN, [
     "--stagenet",
@@ -263,7 +541,6 @@ async function getOrCreateRpcInstance(walletName: string): Promise<RpcInstance> 
   const instance: RpcInstance = {
     port,
     process: rpcProc,
-    inUse: true,
     currentWallet: null,
     lastUsed: Date.now(),
   };
@@ -273,7 +550,7 @@ async function getOrCreateRpcInstance(walletName: string): Promise<RpcInstance> 
 }
 
 // ─────────────────────────────────────────────
-// MAIN FUNCTION - WITH PROCESS REUSE
+// MAIN FUNCTION - WITH MUTEX LOCK
 // ─────────────────────────────────────────────
 export async function callXmrOnce(
   walletName: string,
@@ -281,88 +558,118 @@ export async function callXmrOnce(
   method: string,
   params?: Record<string, any>
 ) {
-  const instance = await getOrCreateRpcInstance(walletName);
-  const rpcUrl = `http://127.0.0.1:${instance.port}/json_rpc`;
+  // Use mutex to ensure only ONE operation per wallet at a time
+  return walletMutex.acquire(walletName, async () => {
+    const instance = await getOrCreateRpcInstance(walletName);
+    const rpcUrl = `http://127.0.0.1:${instance.port}/json_rpc`;
 
-  try {
-    // Open wallet if not already open or if different wallet
-    if (instance.currentWallet !== walletName) {
-      log(`🔓 Opening wallet: ${walletName}`);
-      const openRes = await axios.post(rpcUrl, {
-        jsonrpc: "2.0",
-        id: "0",
-        method: "open_wallet",
-        params: { filename: walletName, password: walletPassword },
-      });
-
-      if (openRes.data.error) {
-        // If wallet not found, maybe it needs to be created first
-        if (openRes.data.error.message?.includes("not found")) {
-          throw new Error(`Wallet file "${walletName}" not found in ${WALLET_DIR}`);
+    try {
+      // Open wallet if not already open or if different wallet
+      if (instance.currentWallet !== walletName) {
+        log(`🔓 Opening wallet: ${walletName}`);
+        
+        // First try to close any open wallet
+        try {
+          await axios.post(rpcUrl, {
+            jsonrpc: "2.0",
+            id: "0",
+            method: "close_wallet",
+          }, { timeout: 5000 });
+          log(`📪 Closed previous wallet`);
+        } catch (e) {
+          // Ignore close errors (wallet might not be open)
         }
-        throw new Error(openRes.data.error.message);
+
+        // Now open the target wallet
+        const openRes = await axios.post(rpcUrl, {
+          jsonrpc: "2.0",
+          id: "0",
+          method: "open_wallet",
+          params: { filename: walletName, password: walletPassword },
+        }, { timeout: 10000 });
+
+        if (openRes.data.error) {
+          // If wallet not found or locked
+          if (openRes.data.error.message?.includes("not found")) {
+            throw new Error(`Wallet file "${walletName}" not found in ${WALLET_DIR}`);
+          }
+          if (openRes.data.error.message?.includes("locked")) {
+            log(`⚠️ Wallet locked, recreating RPC instance...`);
+            // Kill this instance and remove from pool
+            try {
+              instance.process.kill("SIGTERM");
+            } catch (e) {}
+            rpcPool.delete(walletName);
+            throw new Error(`Wallet locked, please retry`);
+          }
+          throw new Error(openRes.data.error.message);
+        }
+
+        instance.currentWallet = walletName;
+        log(`✅ Wallet opened: ${walletName}`);
+        
+        // Give it a moment to fully open
+        await new Promise(resolve => setTimeout(resolve, 500));
+      } else {
+        log(`📂 Wallet already open: ${walletName}`);
       }
 
-      instance.currentWallet = walletName;
-      log(`✅ Wallet opened: ${walletName}`);
-    } else {
-      log(`📂 Wallet already open: ${walletName}`);
-    }
+      // Perform the requested operation
+      log(`📞 Calling method: ${method}`);
+      const res = await axios.post(rpcUrl, {
+        jsonrpc: "2.0",
+        id: "0",
+        method,
+        params,
+      }, { timeout: 30000 });
 
-    // Perform the requested operation
-    log(`📞 Calling method: ${method}`);
-    const res = await axios.post(rpcUrl, {
-      jsonrpc: "2.0",
-      id: "0",
-      method,
-      params,
-    });
+      if (res.data.error) {
+        throw new Error(res.data.error.message);
+      }
 
-    if (res.data.error) {
-      throw new Error(res.data.error.message);
+      log(`✅ Method ${method} successful`);
+      instance.lastUsed = Date.now();
+      return res.data.result;
+      
+    } catch (err: any) {
+      log("❌ RPC error:", err.response?.data || err.message);
+      
+      // If critical error, kill this instance so it can be recreated
+      if (err.message?.includes("locked") || err.message?.includes("ECONNREFUSED")) {
+        log(`🗑️ Removing failed RPC instance for ${walletName}`);
+        try {
+          instance.process.kill("SIGTERM");
+        } catch (e) {}
+        rpcPool.delete(walletName);
+      }
+      
+      throw err;
     }
-
-    log(`✅ Method ${method} successful`);
-    return res.data.result;
-  } catch (err: any) {
-    log("❌ RPC error:", err.response?.data || err.message);
-    
-    // If critical error, kill this instance so it can be recreated
-    if (err.message?.includes("locked") || err.message?.includes("not found")) {
-      log(`🗑️ Removing failed RPC instance for ${walletName}`);
-      try {
-        instance.process.kill("SIGTERM");
-      } catch (e) {}
-      rpcPool.delete(walletName);
-    }
-    
-    throw err;
-  } finally {
-    // Mark as not in use (but keep alive for reuse)
-    instance.inUse = false;
-    instance.lastUsed = Date.now();
-  }
+  });
 }
 
 // ─────────────────────────────────────────────
 // GRACEFUL SHUTDOWN
 // ─────────────────────────────────────────────
-process.on("SIGTERM", () => {
-  log("🛑 SIGTERM received, closing all RPC instances...");
+async function shutdown() {
+  log("🛑 Shutting down, closing all wallets...");
+  
   for (const [walletName, instance] of rpcPool.entries()) {
     try {
+      const rpcUrl = `http://127.0.0.1:${instance.port}/json_rpc`;
+      await axios.post(rpcUrl, {
+        jsonrpc: "2.0",
+        id: "0",
+        method: "close_wallet",
+      }, { timeout: 3000 }).catch(() => {});
+      
       instance.process.kill("SIGTERM");
     } catch (e) {}
   }
-  process.exit(0);
-});
+  
+  // Give processes time to clean up
+  setTimeout(() => process.exit(0), 2000);
+}
 
-process.on("SIGINT", () => {
-  log("🛑 SIGINT received, closing all RPC instances...");
-  for (const [walletName, instance] of rpcPool.entries()) {
-    try {
-      instance.process.kill("SIGTERM");
-    } catch (e) {}
-  }
-  process.exit(0);
-});
+process.on("SIGTERM", shutdown);
+process.on("SIGINT", shutdown);
