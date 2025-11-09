@@ -9,15 +9,15 @@ const isWindows = process.platform === "win32";
 
 
 const WALLET_DIR = isWindows
-  ? "C:\\Monero\\wallets"            // development on Windows
-  : "/opt/monero/wallets";           // production on Ubuntu
+  ? "C:\\monero\\wallets"            // development on Windows
+  : "/usr/local/bin/wallets";           // production on Ubuntu
 
 const BIN = isWindows
   ? "C:\\Monero\\monero-wallet-rpc.exe"
   : "/usr/local/bin/monero-wallet-rpc"; // adjust if installed elsewhere
 
 const DAEMON = "stagenet.xmr-tw.org:38081"; // or mainnet node if needed
-const DEBUG = process.env.NODE_ENV !== "production";
+const DEBUG = true
 
 function log(...args: any[]) {
   if (DEBUG) console.log("[XMR-RPC]", ...args);
