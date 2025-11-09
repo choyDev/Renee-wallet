@@ -55,7 +55,7 @@ export default function WalletOverviewPage() {
         const wallets: WalletData[] = data.wallets || [];
       
         const xmr = wallets.find(w => w.network.symbol === "XMR") || null;
-
+  
         setXmrWallet(xmr);
 
       } catch (err) {

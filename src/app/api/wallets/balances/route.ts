@@ -3,7 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { Connection, PublicKey, LAMPORTS_PER_SOL } from "@solana/web3.js";
 import { ethers, Contract } from "ethers";
 import { Client } from "xrpl";
-import { decryptPrivateKey } from "@/lib/wallet";
+import { callXmrOnce } from "@/lib/xmrRpcPool";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -229,83 +229,16 @@ async function getXrpBalance(address: string) {
   return Number(res.result.account_data.Balance ?? 0) / 1_000_000;
 }
 
-async function getXmrBalance(rpcUrl: string, walletFile: string, encPassword: string) {
-
-  const password = decryptPrivateKey(encPassword);
-  console.log("password: ", password);
-  const filename = walletFile;
-  
+async function getXmrBalance(walletName: string, walletPassword: string) {
   try {
-    // Close any previously opened wallet (safety)
-    try {
-      await fetch(rpcUrl, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          jsonrpc: "2.0",
-          id: "0",
-          method: "close_wallet",
-        }),
-      });
-      await new Promise((r) => setTimeout(r, 1000));
-    } catch {}
-
-    // Open the user's wallet
-    const openRes = await fetch(rpcUrl, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        jsonrpc: "2.0",
-        id: "0",
-        method: "open_wallet",
-        params: { filename, password },
-      }),
-    });
-    const openJson = await openRes.json();
-    if (openJson.error) throw new Error(openJson.error.message);
-
-    await new Promise((r) => setTimeout(r, 1000));
-
-    // Get balance
-    const balRes = await fetch(rpcUrl, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        jsonrpc: "2.0",
-        id: "0",
-        method: "get_balance",
-        params: { account_index: 0 },
-      }),
-    });
-    const j = await balRes.json();
-    console.log(j);
-    if (j.error) throw new Error(j.error.message);
-
-    // 4️⃣ Close wallet to free file lock
-    await fetch(rpcUrl, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        jsonrpc: "2.0",
-        id: "0",
-        method: "close_wallet",
-      }),
-    });
-
-    // 5️⃣ Convert atomic units (1 XMR = 1e12)
-    const total = (j.result?.balance ?? 0) / 1e12;
-    const unlocked = (j.result?.unlocked_balance ?? 0) / 1e12;
-    return unlocked > 0 ? unlocked : total;
+    const res = await callXmrOnce(walletName, walletPassword, "get_balance");
+    return (res.balance ?? 0) / 1e12;
   } catch (err: any) {
-    console.error("XMR balance fetch error:", err.message);
+    console.error(`❌ XMR balance error for ${walletName}:`, err.message);
     return 0;
   }
 }
 
-
-
-
-// ---- API handler ----
 export async function GET(req: Request) {
   try {
     const { searchParams } = new URL(req.url);
@@ -349,14 +282,21 @@ export async function GET(req: Request) {
           } else if (net === "XRP") {
             native = await getXrpBalance(w.address);
           } else if (net === "XMR") {
-            const filename = w.meta;
-            if (filename) {
-              native = await getXmrBalance(w.network.rpcUrl, filename, w.privateKeyEnc);
-            } else {
-              console.warn(`⚠️ No filename found for Monero wallet of user ${userId}`);
+            try {
+              const meta = w.meta ? JSON.parse(w.meta) : null;
+              if (!meta?.walletName || !meta?.walletPassword) {
+                console.warn(`⚠️ Missing Monero meta info for user ${userId}`);
+                native = 0;
+              } else {
+                native = await getXmrBalance(meta.walletName, meta.walletPassword);
+                console.log(`✅ ${meta.walletName} balance:`, native);
+              }
+            } catch (e: any) {
+              console.error(`❌ XMR fetch failed for user ${userId}:`, e.message);
               native = 0;
             }
           }
+          
         } catch (e: any) {
           console.error("Balance fetch error", {
             network: w.network.name,

@@ -118,7 +118,7 @@ export default function SendReceiveModal({
           break;
     
         case "XMR":
-          endpoint = "/api/monero/send";
+          endpoint = "/api/xmr/send";
           body = { fromWalletId: currentWallet!.id, to, amountXmr: amt, paymentId: memo || undefined };
           break;
       default:
