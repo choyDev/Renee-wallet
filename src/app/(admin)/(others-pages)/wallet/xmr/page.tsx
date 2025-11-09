@@ -149,7 +149,7 @@ export default function WalletOverviewPage() {
                       <div className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white">
                         Monero
                       </div>
-                      <div className="text-sm text-gray-500 dark:text-gray-400">TRX</div>
+                      <div className="text-sm text-gray-500 dark:text-gray-400">XMR</div>
                     </div>
                   </div>
 
