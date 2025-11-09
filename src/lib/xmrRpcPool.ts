@@ -1,4 +1,3 @@
-
 import { spawn, ChildProcess } from "child_process";
 import net from "net";
 import axios from "axios";
@@ -8,13 +7,14 @@ import axios from "axios";
 // ─────────────────────────────────────────────
 const isWindows = process.platform === "win32";
 
+
 const WALLET_DIR = isWindows
-  ? "C:\\monero\\wallets"            // development on Windows
+  ? "C:\\Monero\\wallets"            // development on Windows
   : "/opt/monero/wallets";           // production on Ubuntu
 
 const BIN = isWindows
-  ? "C:\\monero\\monero-wallet-rpc.exe"
-  : "/opt/monero/monero-wallet-rpc"; // adjust if installed elsewhere
+  ? "C:\\Monero\\monero-wallet-rpc.exe"
+  : "/usr/local/bin/monero-wallet-rpc"; // adjust if installed elsewhere
 
 const DAEMON = "stagenet.xmr-tw.org:38081"; // or mainnet node if needed
 const DEBUG = process.env.NODE_ENV !== "production";
