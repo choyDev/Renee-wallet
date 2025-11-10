@@ -78,13 +78,13 @@ export default function TransactionTable({ chain }: TransactionTableProps) {
   const getIcon = (sym: string) => {
     switch (sym) {
       case "TRX": return <TronIcon className="w-5 h-5 text-[#FF060A]" />;
-      case "ETH": return <FaEthereum className="text-[#4B70C6] size-5" />;
+      case "ETH": return <FaEthereum className="text-[#627EEA] size-5" />;
       case "USDT": return <SiTether className="text-[#26A17B] size-5" />;
       case "SOL": return <SiSolana className="text-[#14F195] size-5" />;
       case "BTC": return <FaBitcoin className="text-[#F7931A] size-5" />;
       case "DOGE": return <SiDogecoin className="text-[#C2A633] w-5 h-5" />;
       case "XMR": return <SiMonero className="text-[#FF6600] w-5 h-5" />;
-      case "XRP": return <SiXrp className="text-[#0A74E6] w-5 h-5" />;
+      case "XRP": return <SiXrp className="text-[#25A768] w-5 h-5" />;
       default:    return <SiTether className="text-[#26A17B] size-5" />;
     }
   };

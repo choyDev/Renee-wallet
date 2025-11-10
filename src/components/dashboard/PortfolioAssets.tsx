@@ -63,7 +63,7 @@ export default function PortfolioAssets() {
   const options: ApexOptions = {
     chart: { type: "donut", background: "transparent" },
     labels: symbols,
-    colors: ["#FF060A", "#14F195", "#627EEA", "#F7931A", "#FF6600", "#006097", "#C2A633"],
+    colors: ["#FF060A", "#14F195", "#627EEA", "#F7931A", "#FF6600", "#25A768", "#C2A633"],
     dataLabels: { enabled: false },
     stroke: { show: false },
     legend: {

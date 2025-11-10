@@ -133,7 +133,7 @@ export default function WalletOverviewPage() {
     (btcWallet?.balances.reduce((sum, b) => sum + (b.usd || 0), 0) || 0) +
     (dogeWallet?.balances.reduce((sum, b) => sum + (b.usd || 0), 0) || 0) +
     (xrpWallet?.balances.reduce((sum, b) => sum + (b.usd || 0), 0) || 0) +
-    (xmrWallet?.balances.reduce((sum, b) => sum + (b.usd || 0), 0) || 0)
+    (xmrWallet?.balances.reduce((sum, b) => sum + (b.usd || 0), 0) || 0);
 
   const router = useRouter();
   const handleNavigate = (path: string) => router.push(path);
@@ -188,7 +188,7 @@ export default function WalletOverviewPage() {
           />
         </div>
 
-        <div onClick={() => handleNavigate("/wallet/btc")} className="cursor-pointer grid">
+        <div onClick={() => handleNavigate("/wallet/btc")} className="cursor-pointer">
           <WalletNetworkCard
             name="Bitcoin"
             symbol="BTC"

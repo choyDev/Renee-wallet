@@ -37,9 +37,9 @@ export const COLOR_CLASS: Record<AssetKey, string> = {
   SOL: "text-emerald-400",
   ETH: "text-indigo-300",
   BTC: "text-amber-500",
-  XMR: "text-orange-400",
-  XRP: "text-sky-400",
-  DOGE: "text-yellow-400",
+  XMR: "text-[#FF6600]",
+  XRP: "text-[#25A768]",
+  DOGE: "text-[#C2A633]",
 };
 
 // --- Utilities

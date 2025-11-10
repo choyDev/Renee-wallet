@@ -65,7 +65,7 @@
 //       case "TRX":
 //         return <TronIcon className="w-5 h-5 text-[#FF060A]" />; //  Tron red
 //       case "ETH":
-//         return <FaEthereum className="text-[#4B70C6] size-5" />;
+//         return <FaEthereum className="text-[#627EEA] size-5" />;
 //       case "USDT":
 //         return <SiTether className="text-[#26A17B] size-5" />; //  Official Tether green
 //       case "SOL":
@@ -203,20 +203,20 @@ export default function RecentActivityTable() {
   const getIcon = (coin: string) => {
     switch (coin) {
       case "TRX": return <TronIcon className="w-5 h-5 text-[#FF060A]" />;
-      case "ETH": return <FaEthereum className="text-[#4B70C6] size-5" />;
+      case "ETH": return <FaEthereum className="text-[#627EEA] size-5" />;
       case "USDT": return <SiTether className="text-[#26A17B] size-5" />;
       case "SOL": return <SiSolana className="text-[#14F195] size-5" />;
       case "BTC": return <FaBitcoin className="text-[#F7931A] size-5" />;
       case "DOGE": return <SiDogecoin className="text-[#C2A633] w-5 h-5" />;
       case "XMR": return <SiMonero className="text-[#FF6600] w-5 h-5" />;
-      case "XRP": return <SiXrp className="text-[#0A74E6] w-5 h-5" />;
+      case "XRP": return <SiXrp className="text-[#25A768] w-5 h-5" />;
       default:    return <SiTether className="text-[#26A17B] size-5" />;
     }
   };
 
   const getBadgeColor = (status: string) => {
     if (status === "CONFIRMED" || status === "Completed") return "success";
-    if (status === "PENDING"   || status === "Pending")   return "warning";
+    if (status === "PENDING" || status === "Pending") return "warning";
     return "error";
   };
 
@@ -247,7 +247,7 @@ export default function RecentActivityTable() {
               <tbody>
                 {txs.map((t) => (
                   <tr key={t.id}
-                      className="border-b border-gray-100/70 dark:border-gray-800/60 hover:bg-gray-50 dark:hover:bg-[#1A2235]/40 transition">
+                    className="border-b border-gray-100/70 dark:border-gray-800/60 hover:bg-gray-50 dark:hover:bg-[#1A2235]/40 transition">
                     <td className="py-4 px-4 flex items-center gap-2 font-medium text-gray-900 dark:text-white notranslate">
                       {getIcon(t.token)} <span>{t.token}</span>
                     </td>

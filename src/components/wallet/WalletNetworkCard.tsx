@@ -140,7 +140,7 @@ function getNetworkIcon(symbol: ChainSym) {
     case "DOGE":
       return <SiDogecoin className="text-[#C2A633] w-6 h-6" />;
     case "XRP":
-      return <SiXrp className="text-[#0A74E6] w-6 h-6" />;
+      return <SiXrp className="text-[#25A768] w-6 h-6" />;
     case "XMR":
       return <SiMonero className="text-[#FF6600] w-6 h-6" />;
   }
@@ -377,7 +377,7 @@ export default function WalletNetworkCard({
 
   const CardInner = (
     <div className="flex flex-col group h-full rounded-2xl border border-gray-200/60 dark:border-white/10
-                    bg-white/70 dark:bg-[#0B1220]/80 backdrop-blur-sm
+                    bg-white/70 dark:bg-[#0B1220]/80 backdrop-blur-sm min-h-[223px]
                     p-5 shadow-sm transition-all duration-300 hover:shadow-md hover:-translate-y-0.5">
       {/* Header */}
       <div className="flex items-start justify-between">
@@ -438,7 +438,7 @@ export default function WalletNetworkCard({
   );
 
   return hairline ? (
-    <div className={`rounded-2xl p-px bg-gradient-to-r ${hairlineGradient}`}>{CardInner}</div>
+    <div className={`h-full rounded-2xl p-px bg-gradient-to-r ${hairlineGradient}`}>{CardInner}</div>
   ) : (
     CardInner
   );
