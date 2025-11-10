@@ -23,7 +23,7 @@ type Row = {
 function Icon({ symbol, id }: { symbol: string; id: string }) {
   switch (symbol) {
     case "BTC": return <SiBitcoin className="text-[#F7931A] text-xl" />;
-    case "ETH": return <FaEthereum className="text-[#4B70C6] text-xl" />;
+    case "ETH": return <FaEthereum className="text-[#627EEA] text-xl" />;
     case "SOL": return <SiSolana className="text-[#14F195] text-xl" />;
     case "USDT": return <SiTether className="text-[#26A17B] text-xl" />;
     case "BNB": return <SiBinance className="text-[#F0B90B] text-xl" />;
@@ -84,7 +84,7 @@ export default function TokensTable() {
       } catch { }
     }
     load();
-    const t = setInterval(load, 60_000);
+    const t = setInterval(load, 6_000_000);
     return () => { ctrl.abort(); clearInterval(t); };
   }, []);
 

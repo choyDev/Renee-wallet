@@ -134,11 +134,11 @@ export default function WalletBalanceCard({
       case "BTC":
         return "#F59E0B";
       case "DOGE": 
-        return "#C2A633";
+        return "#EAB308";
       case "XMR": 
-        return "#FF6600";
+        return "#F97316";
       case "XRP": 
-        return "#0A74E6";
+        return "#25A768";
       default:
         return "#3B82F6"; // fallback blue
     }

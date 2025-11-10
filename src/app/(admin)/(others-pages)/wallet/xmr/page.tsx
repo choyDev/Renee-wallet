@@ -90,7 +90,7 @@ export default function WalletOverviewPage() {
       <div className="grid grid-cols-12 gap-4 items-stretch">
         {/* LEFT: Chart */}
         <section className="col-span-12 lg:col-span-8">
-          <div className="group relative h-full rounded-2xl p-px bg-gradient-to-br from-brand-400/40 via-transparent to-[#EF4444]/30">
+          <div className="group relative h-full rounded-2xl p-px bg-gradient-to-br from-brand-400/40 via-transparent to-[#FF6600]/30">
             <div className="h-full rounded-2xl border border-gray-200/60 dark:border-white/10 
                           bg-white/70 dark:bg-[#0B1220]/80 backdrop-blur-sm 
                           shadow-[0_1px_0_0_rgba(255,255,255,0.06)_inset,0_10px_30px_-10px_rgba(0,0,0,0.35)]
@@ -116,8 +116,8 @@ export default function WalletOverviewPage() {
         <aside className="col-span-12 lg:col-span-4">
           <div className="flex h-full flex-col gap-4">
             {/* Total Balance */}
-            <div className="rounded-2xl p-px bg-gradient-to-r from-brand-500/50 to-cyan-500/40">
-              <div className="rounded-2xl border border-gray-200/60 dark:border-white/10 
+            <div className="h-full rounded-2xl p-px bg-gradient-to-r from-brand-500/50 to-cyan-500/40">
+              <div className="h-full flex flex-col rounded-2xl border border-gray-200/60 dark:border-white/10 
                             bg-white/70 dark:bg-[#0B1220]/80 backdrop-blur-sm p-4 sm:p-5 
                             shadow-sm transition-all duration-300 hover:shadow-md">
                 <div className="flex items-center justify-between">
@@ -126,14 +126,14 @@ export default function WalletOverviewPage() {
                     USD
                   </span>
                 </div>
-                <div className="mt-2 text-2xl sm:text-3xl font-semibold tabular-nums tracking-tight text-gray-900 dark:text-white">
+                <div className="h-full flex items-center mt-2 text-2xl sm:text-3xl font-semibold tabular-nums tracking-tight text-gray-900 dark:text-white">
                   {usd(TotalUsd)}
                 </div>
               </div>
             </div>
 
             {/* Asset cards */}
-            <div className="grid grid-cols-1 gap-2 text-[15px] sm:text-base">  {/* base size for the section */}
+            <div className="mt-auto grid grid-cols-1 gap-2 text-[15px] sm:text-base">  {/* base size for the section */}
               
               <div className="group rounded-xl border border-gray-200/60 dark:border-white/10
                   bg-white/70 dark:bg-[#0B1220]/80 backdrop-blur-sm p-4
