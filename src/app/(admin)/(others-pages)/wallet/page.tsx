@@ -130,10 +130,10 @@ export default function WalletOverviewPage() {
     (tronWallet?.balances.reduce((sum, b) => sum + (b.usd || 0), 0) || 0) +
     (solanaWallet?.balances.reduce((sum, b) => sum + (b.usd || 0), 0) || 0) +
     (ethWallet?.balances.reduce((sum, b) => sum + (b.usd || 0), 0) || 0) +
-    (btcWallet?.balances.reduce((sum, b) => sum + (b.usd || 0), 0) || 0)+
-    (xrpWallet?.balances.reduce((sum, b) => sum + (b.usd || 0), 0) || 0)+
-    (xmrWallet?.balances.reduce((sum, b) => sum + (b.usd || 0), 0) || 0)+
-    (dogeWallet?.balances.reduce((sum, b) => sum + (b.usd || 0), 0) || 0);
+    (btcWallet?.balances.reduce((sum, b) => sum + (b.usd || 0), 0) || 0) +
+    (dogeWallet?.balances.reduce((sum, b) => sum + (b.usd || 0), 0) || 0) +
+    (xrpWallet?.balances.reduce((sum, b) => sum + (b.usd || 0), 0) || 0) +
+    (xmrWallet?.balances.reduce((sum, b) => sum + (b.usd || 0), 0) || 0);
 
   const router = useRouter();
   const handleNavigate = (path: string) => router.push(path);
@@ -159,21 +159,6 @@ export default function WalletOverviewPage() {
             </div>
           </div>
         </div>
-        {/* <div className="h-full rounded-2xl p-px bg-gradient-to-r from-brand-500/50 to-cyan-500/40 w-1/4">
-          <div className="h-full flex flex-col rounded-2xl border border-gray-200/60 dark:border-white/10 
-                            bg-white/70 dark:bg-[#0B1220]/80 backdrop-blur-sm p-4 sm:p-5 
-                            shadow-sm transition-all duration-300 hover:shadow-md">
-            <div className="flex items-center justify-between">
-              <span className="text-sm text-gray-500 dark:text-gray-400">Total Balance</span>
-              <span className="text-[10px] px-2 py-0.5 rounded-full bg-gray-100 dark:bg-white/10 text-gray-600 dark:text-gray-300">
-                USD
-              </span>
-            </div>
-            <div className="h-full flex items-center mt-2 text-2xl sm:text-3xl font-semibold tabular-nums tracking-tight text-gray-900 dark:text-white">
-              {usd(totalUsd)}
-            </div>
-          </div>
-        </div> */}
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-2 gap-6 items-stretch p-2">

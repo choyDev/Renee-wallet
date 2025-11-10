@@ -8,6 +8,7 @@ import * as bitcoin from "bitcoinjs-lib";
 import * as ecc from "tiny-secp256k1";
 import { ECPairFactory } from "ecpair";
 import { Wallet as XrpWallet } from "xrpl";
+import { callXmrOnce } from "@/lib/xmrRpcPool";
 
 bitcoin.initEccLib(ecc);
 const ECPair = ECPairFactory(ecc);
@@ -90,20 +91,20 @@ const XRP_NET = {
 };
 
 const XMR_NET = {
-  name: CHAIN_ENV === "testnet" ? "Monero (Testnet)" : "Monero",
-  chainId: CHAIN_ENV === "testnet" ? "xmr-testnet" : "xmr-mainnet",
+  name: CHAIN_ENV === "testnet" ? "Monero (Stagenet)" : "Monero",
+  chainId: CHAIN_ENV === "testnet" ? "xmr-stagenet" : "xmr-mainnet",
   rpcUrl:
     CHAIN_ENV === "testnet"
-      ? process.env.MONERO_RPC_TESTNET || "http://127.0.0.1:18082/json_rpc"
-      : process.env.MONERO_RPC_MAINNET || "http://127.0.0.1:18082/json_rpc",
+      // 👇 point to your running wallet-RPC, not monerod
+      ? process.env.MONERO_RPC_TESTNET || "http://127.0.0.1:38083/json_rpc"
+      // mainnet default (change when you deploy)
+      : process.env.MONERO_RPC_MAINNET || "http://127.0.0.1:38083/json_rpc",
   symbol: "XMR",
   explorerUrl:
     CHAIN_ENV === "testnet"
-      ? "https://testnet.xmrchain.net"
+      ? "https://stagenet.xmrchain.net"
       : "https://xmrchain.net",
 };
-
-
 
 // ----------------------
 // Encrypt private key
@@ -136,19 +137,6 @@ export function decryptPrivateKey(ciphertext: string): string {
   const decrypted = Buffer.concat([decipher.update(Buffer.from(encHex, "hex")), decipher.final()]);
   return decrypted.toString("utf8"); // base64 secretKey for Solana, hex for Tron
 }
-
-async function callMoneroRpc(method: string, params = {}, rpcUrl?: string) {
-  const url = rpcUrl || XMR_NET.rpcUrl;
-  const res = await fetch(url, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ jsonrpc: "2.0", id: "0", method, params }),
-  });
-  const j = await res.json();
-  if (j.error) throw new Error(j.error.message);
-  return j.result;
-}
-
 
 // ----------------------
 // Create Solana + Tron wallets if missing
@@ -336,7 +324,9 @@ export async function ensureWalletsForUser(userId: number) {
       network: net,
     });
     if (!address) throw new Error("Dogecoin address generation failed");
+    
     const wif = keyPair.toWIF();
+
     const enc = encryptPrivateKey(wif);
     walletsToCreate.push({
       userId,
@@ -359,49 +349,48 @@ export async function ensureWalletsForUser(userId: number) {
     });
   }
 
-  // XMR (Monero) wallet via RPC
-  
-  if (!existingNetworks.has(xmrNet.id)) {
-    try {
-      const filename = `wallet_${userId}_${Date.now()}`;
-      const password = crypto.randomBytes(8).toString("hex");
-  
-      // Close any open wallet
+  // XMR (Monero) wallet creation via monero-wallet-rpc
+    if (!existingNetworks.has(xmrNet.id)) {
       try {
-        await callMoneroRpc("close_wallet");
-        await new Promise((r) => setTimeout(r, 1500));
-      } catch {}
-  
-      // Create new wallet
-      await callMoneroRpc("create_wallet", {
-        filename,
-        password,
-        language: "English",
-      });
-  
-      // 💤 wait to release .keys.lock (Windows-specific)
-      await new Promise((r) => setTimeout(r, 5000));
-  
-      // No need to re-open; get address directly
-      const addrRes = await callMoneroRpc("get_address", { account_index: 0 });
-      const address = addrRes.address;
-  
-      const enc = encryptPrivateKey(password);
-      walletsToCreate.push({
-        userId,
-        networkId: xmrNet.id,
-        address,
-        privateKeyEnc: enc,
-        meta: filename,
-      });
-  
-      await callMoneroRpc("close_wallet");
-      await new Promise((r) => setTimeout(r, 1500));
-    } catch (err: any) {
-      console.error("❌ Monero wallet creation failed:", err.message);
+        const isTestnet = CHAIN_ENV === "testnet";
+        const networkType = isTestnet ? "stagenet" : "mainnet";
+
+        const walletName = `user_${userId}_xmr`;
+        const walletPassword = crypto.randomBytes(12).toString("hex");
+
+        console.log(`🪙 Creating Monero wallet for user ${userId} (${networkType})...`);
+
+        // 1️⃣ Create wallet via xmrRpcPool
+        await callXmrOnce(walletName, walletPassword, "create_wallet", {
+          filename: walletName,
+          password: walletPassword,
+          language: "English",
+        });
+
+        // 2️⃣ Fetch address from same one-shot process
+        const addrRes = await callXmrOnce(walletName, walletPassword, "get_address");
+        const address = addrRes.address;
+
+        const metaData = {
+          rpcUrl: "http://127.0.0.1:38083/json_rpc", // optional reference, not used here
+          walletName,
+          walletPassword,
+          networkType,
+        };
+
+        walletsToCreate.push({
+          userId,
+          networkId: xmrNet.id,
+          address,
+          privateKeyEnc: "",
+          meta: JSON.stringify(metaData),
+        });
+
+        console.log(`✅ Monero wallet created for user ${userId}: ${address}`);
+      } catch (err: any) {
+        console.error("❌ Monero wallet creation failed:", err.message);
+      }
     }
-  }
-  
 
     if (walletsToCreate.length) {
       await prisma.wallet.createMany({ data: walletsToCreate, skipDuplicates: true });

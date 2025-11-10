@@ -49,18 +49,18 @@ function WalletBadgesHydrator({ refreshMs = 60_000 }: { refreshMs?: number }) {
     }
 
     load();
-    timer = window.setInterval(load, Math.max(10_000, refreshMs));
+    // timer = window.setInterval(load, Math.max(10_000, refreshMs));
 
-    const onStorage = (e: StorageEvent) => {
-      if (e.key === "user") load();
-    };
-    window.addEventListener("storage", onStorage);
+    // const onStorage = (e: StorageEvent) => {
+    //   if (e.key === "user") load();
+    // };
+    // window.addEventListener("storage", onStorage);
 
-    return () => {
-      if (timer) window.clearInterval(timer);
-      window.removeEventListener("storage", onStorage);
-      abort.abort();
-    };
+    // return () => {
+    //   if (timer) window.clearInterval(timer);
+    //   window.removeEventListener("storage", onStorage);
+    //   abort.abort();
+    // };
   }, [setWalletBadgesBulk, refreshMs]);
 
   return null;

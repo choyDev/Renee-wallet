@@ -4,7 +4,7 @@
 import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { FiX, FiCopy, FiLoader } from "react-icons/fi";
-import { SiSolana, SiEthereum, SiBitcoin, SiTether, SiDogecoin, SiRipple, SiMonero } from "react-icons/si";
+import { SiSolana, SiEthereum, SiBitcoin, SiTether, SiDogecoin, SiXrp, SiMonero } from "react-icons/si";
 import QRCode from "react-qr-code";
 import toast from "react-hot-toast";
 import { walletEventBus } from "@/lib/events";
@@ -53,7 +53,7 @@ export default function SendReceiveModal({
     BTC: <SiBitcoin className="text-[#F7931A] text-lg" />,
     DOGE:<SiDogecoin className="text-[#C2A633] text-lg" />,
     XMR: <SiMonero className="text-[#FF6600] text-lg" />,
-    XRP: <SiRipple className="text-[#0A74E6] text-lg" />,
+    XRP: <SiXrp className="text-[#0A74E6] text-lg" />,
   };
 
   // token options per chain
@@ -118,7 +118,7 @@ export default function SendReceiveModal({
           break;
     
         case "XMR":
-          endpoint = "/api/monero/send";
+          endpoint = "/api/xmr/send";
           body = { fromWalletId: currentWallet!.id, to, amountXmr: amt, paymentId: memo || undefined };
           break;
       default:

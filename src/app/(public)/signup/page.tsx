@@ -1,8 +1,8 @@
 "use client"
 import Link from "next/link";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import toast from "react-hot-toast";
+import Alert from "@/components/ui/alert/Alert";
 
 const SignupPage = () => {
 
@@ -10,10 +10,24 @@ const SignupPage = () => {
   const [formData, setFormData] = useState({ full_name: "", email: "", password: "" });
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
+  const [alertVisible, setAlertVisible] = useState(false);
+  const [alertTitle, setAlertTitle] = useState('');
+  const [alertMessage, setAlertMessage] = useState('');
+	const [alertVariant, setAlertVariant] = useState<'error' | 'success' | 'warning' | 'info'>('error');
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
+
+  useEffect(() => {
+    if (alertVisible) {
+      const timer = setTimeout(() => {
+        setAlertVisible(false);
+      }, 5000); 
+
+      return () => clearTimeout(timer); // Cleanup timer on unmount
+    }
+  }, [alertVisible]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -30,9 +44,15 @@ const SignupPage = () => {
       const data = await res.json();
 
       if (!res.ok) {
-        toast.error(data.error);
+        setAlertTitle('Server Error');
+        setAlertMessage('Could not get response from server');
+        setAlertVariant('error');
+        setAlertVisible(true);
       } else {
-        toast.success("Account created successfully! You can now sign in.");
+        setAlertTitle('Register Successful');
+        setAlertMessage("Account created successfully! You can now sign in.");
+        setAlertVariant('success');
+        setAlertVisible(true);
         setFormData({ full_name: "", email: "", password: "" });
         setTimeout(() => {
           router.push("/signin");
@@ -40,13 +60,29 @@ const SignupPage = () => {
       }
     } catch (err) {
       console.error("Signup error:", err);
-      toast.error("An error occured! Please try again.")
+      setAlertTitle('Server Error');
+      setAlertMessage('An error occured! Please try again.');
+      setAlertVariant('error');
+      setAlertVisible(true);
     } finally {
       setLoading(false);
     }
   };
+
+  
   return (
     <>
+
+    {alertVisible && (
+      <div className="fixed top-4 right-4 z-[9999]">
+        <Alert
+          title={alertTitle}
+          message={alertMessage}
+          variant={alertVariant}
+          showLink={false}
+        />
+      </div>
+    )}
       <section className="relative z-10 overflow-hidden pt-36 pb-16 md:pb-20 lg:pt-[180px] lg:pb-28">
         <div className="container">
           <div className="-mx-4 flex flex-wrap">

@@ -2,9 +2,8 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { FaEthereum, FaMonero } from "react-icons/fa";
-import { SiTether, SiSolana, SiXrp, SiDogecoin } from "react-icons/si";
-import { BsCurrencyBitcoin } from "react-icons/bs";
+import { SiTether, SiSolana, SiDogecoin, SiMonero, SiXrp } from "react-icons/si";
+import { FaEthereum, FaBitcoin } from "react-icons/fa";
 import { FiLoader, FiList } from "react-icons/fi";
 
 /*  Tron SVG icon */
@@ -78,16 +77,15 @@ export default function TransactionTable({ chain }: TransactionTableProps) {
 
   const getIcon = (sym: string) => {
     switch (sym) {
-      case "TRX": return <TronIcon />;
-      case "ETH": return <FaEthereum className="text-[#627EEA] w-5 h-5" />;
-      case "USDT": return <SiTether className="text-[#26A17B] w-5 h-5" />;
-      case "SOL": return <SiSolana className="text-[#14F195] w-5 h-5" />;
-      case "BTC": return <BsCurrencyBitcoin className="text-[#F7931A] w-5 h-5" />;
-      case "XRP": return <SiXrp className="text-[#25A768] w-5 h-5" />;
-      case "XMR": return <FaMonero className="text-[#FF6600] w-5 h-5" />;
+      case "TRX": return <TronIcon className="w-5 h-5 text-[#FF060A]" />;
+      case "ETH": return <FaEthereum className="text-[#627EEA] size-5" />;
+      case "USDT": return <SiTether className="text-[#26A17B] size-5" />;
+      case "SOL": return <SiSolana className="text-[#14F195] size-5" />;
+      case "BTC": return <FaBitcoin className="text-[#F7931A] size-5" />;
       case "DOGE": return <SiDogecoin className="text-[#C2A633] w-5 h-5" />;
-      default:
-        return <BsCurrencyBitcoin className="text-gray-400 w-5 h-5" />;
+      case "XMR": return <SiMonero className="text-[#FF6600] w-5 h-5" />;
+      case "XRP": return <SiXrp className="text-[#25A768] w-5 h-5" />;
+      default:    return <SiTether className="text-[#26A17B] size-5" />;
     }
   };
 

@@ -5,6 +5,7 @@ import React, {useEffect, useState } from "react";
 import { FaPassport, FaIdCard, FaCar, FaHome, } from "react-icons/fa";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
+import Alert from "@/components/ui/alert/Alert";
 
 const KycVerificationPage = () => {
   const [kycType, setKycType] = useState<"personal" | "corporate">("personal");
@@ -12,6 +13,10 @@ const KycVerificationPage = () => {
   const [user, setUser] = useState<any>(null);
   const [loading, setLoading] = useState(false);
   const router = useRouter();
+  const [alertVisible, setAlertVisible] = useState(false);
+  const [alertTitle, setAlertTitle] = useState('');
+  const [alertMessage, setAlertMessage] = useState('');
+	const [alertVariant, setAlertVariant] = useState<'error' | 'success' | 'warning' | 'info'>('error');
 
   useEffect(() => {
     const stored = localStorage.getItem("user");
@@ -40,26 +45,59 @@ const KycVerificationPage = () => {
       const data = await res.json();
 
       if (!res.ok) {
-        toast.error(data.error || "KYC submission failed");
+        setAlertTitle('Server Error');
+        setAlertMessage('Could not get response from server');
+        setAlertVariant('error');
+        setAlertVisible(true);
         return;
       }
 
       const updatedUser = { ...user, kycVerified: true };
       localStorage.setItem("user", JSON.stringify(updatedUser));
 
-      toast.success(" KYC verified & wallet created successfully!");
+      toast.success(" ");
+      setAlertTitle('Kyc Verification Successful');
+      setAlertMessage("KYC verified & wallet created successfully!");
+      setAlertVariant('success');
+      setAlertVisible(true);
 
-      router.push("/dashboard");
+      setTimeout(() => {
+        router.push("/dashboard");
+      }, 1000);
+      
     } catch (err) {
       console.error(err);
-      toast.error("An error occured. Please try again");
+      setAlertTitle('Server Error');
+      setAlertMessage('Something went wrong.');
+      setAlertVariant('error');
+      setAlertVisible(true);
     } finally {
       setLoading(false);
     }
   };
 
+  useEffect(() => {
+    if (alertVisible) {
+      const timer = setTimeout(() => {
+        setAlertVisible(false);
+      }, 2500); // Close alert after 2 seconds
+
+      return () => clearTimeout(timer); // Cleanup timer on unmount
+    }
+  }, [alertVisible]);
+
   return (
     <>
+      {alertVisible && (
+        <div className="fixed top-4 right-4 z-[9999]">
+          <Alert
+            title={alertTitle}
+            message={alertMessage}
+            variant={alertVariant}
+            showLink={false}
+          />
+        </div>
+      )}
       {/* Scene Switcher */}
       <div className="flex justify-center mb-10">
         <div className="flex rounded-full bg-gray-200 dark:bg-[#2C303B] p-1">

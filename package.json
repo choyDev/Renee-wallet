@@ -41,7 +41,6 @@
     "jsonwebtoken": "^9.0.2",
     "lucide-react": "^0.545.0",
     "monero-javascript": "^0.8.4",
-    "monero-ts": "^0.11.6",
     "next": "^15.5.5",
     "next-auth": "^4.24.12",
     "next-themes": "^0.2.1",
