@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from "react";
 import { FaEthereum } from "react-icons/fa";
 import { SiSolana, SiTether, SiBitcoin, SiBinance, SiXrp, SiDogecoin, SiCardano } from "react-icons/si";
+import { FaMonero } from "react-icons/fa";
 
 const TronIcon = ({ className = "text-[#FF4747] w-4 h-4" }) => (
   <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24" className={className}>
@@ -31,6 +32,7 @@ function Icon({ symbol, id }: { symbol: string; id: string }) {
     case "DOGE": return <SiDogecoin className="text-[#C2A633] text-xl" />;
     case "ADA": return <SiCardano className="text-[#0033AD] text-xl" />;
     case "TRX": return <TronIcon className="w-5 h-5 text-[#FF060A]" />;
+    case "XMR": return <FaMonero className="text-[#FF6600] text-xl" />;
     default: return <span className="inline-block w-5 h-5 rounded bg-gray-300 dark:bg-gray-700" />;
   }
 }
@@ -74,7 +76,11 @@ export default function TokensTable() {
     const ctrl = new AbortController();
     async function load() {
       try {
-        const r = await fetch("/api/market/top?limit=4", { signal: ctrl.signal, cache: "no-store" });
+        const SYMBOLS_8 = ["TRX", "ETH", "XMR", "SOL", "BTC", "XRP", "DOGE", "USDT"] as const;
+        const r = await fetch(
+          `/api/market/top?symbols=${encodeURIComponent(SYMBOLS_8.join(","))}`,
+          { signal: ctrl.signal, cache: "no-store" }
+        );
         const j = await r.json();
         if (Array.isArray(j.items)) {
           setRows(j.items);
