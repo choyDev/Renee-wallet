@@ -221,6 +221,130 @@ async function testRpcAlive(url: string): Promise<boolean> {
   }
 }
 
+
+export async function createXmrWallet(
+  walletName: string,
+  walletPassword: string,
+  language: string = "English"
+): Promise<{ address: string; seed?: string }> {
+  log(`🆕 [${walletName}] Creating new wallet...`);
+
+  const port = await getFreePort();
+  const url = `http://127.0.0.1:${port}/json_rpc`;
+
+  // Spawn temporary RPC for creation only
+  const args = [
+    "--stagenet",
+    `--daemon-address=${DAEMON}`,
+    `--wallet-dir=${WALLET_DIR}`,
+    "--rpc-bind-ip=127.0.0.1",
+    `--rpc-bind-port=${port}`,
+    "--disable-rpc-login",
+    "--log-level=0",
+    "--trusted-daemon",
+  ];
+
+  const rpcProc = spawn(BIN, args, {
+    detached: false,
+    stdio: ['ignore', 'pipe', 'pipe']
+  });
+
+  rpcProc.stdout?.on("data", (d) => {
+    if (DEBUG) console.log(`[RPC-${port}]`, d.toString().trim());
+  });
+
+  rpcProc.stderr?.on("data", (d) => {
+    const msg = d.toString().trim();
+    if (DEBUG && msg) console.error(`[RPC-${port}]`, msg);
+  });
+
+  try {
+    // Wait for RPC to start
+    await waitForPort(port);
+    log(`✅ [${walletName}] RPC started on port ${port}`);
+
+    // Give it time to initialize
+    await new Promise(r => setTimeout(r, 1000));
+
+    // Create the wallet
+    log(`🔨 [${walletName}] Calling create_wallet...`);
+    const createRes = await axios.post(url, {
+      jsonrpc: "2.0",
+      id: "0",
+      method: "create_wallet",
+      params: {
+        filename: walletName,
+        password: walletPassword,
+        language,
+      },
+    }, { timeout: 20000 });
+
+    if (createRes.data.error) {
+      const errMsg = createRes.data.error.message || "";
+      log(`❌ [${walletName}] Create error:`, errMsg);
+      throw new Error(errMsg);
+    }
+
+    log(`✅ [${walletName}] Wallet created successfully`);
+
+    // Wait for wallet to finish creating
+    await new Promise(r => setTimeout(r, 2000));
+
+    // Get the address (wallet is already open after creation)
+    log(`📍 [${walletName}] Getting address...`);
+    const addrRes = await axios.post(url, {
+      jsonrpc: "2.0",
+      id: "0",
+      method: "get_address",
+      params: { account_index: 0 },
+    }, { timeout: 10000 });
+
+    if (addrRes.data.error) {
+      throw new Error(addrRes.data.error.message);
+    }
+
+    const address = addrRes.data.result.address;
+    log(`✅ [${walletName}] Address: ${address}`);
+
+    // Optionally get seed
+    let seed;
+    try {
+      const seedRes = await axios.post(url, {
+        jsonrpc: "2.0",
+        id: "0",
+        method: "query_key",
+        params: { key_type: "mnemonic" },
+      }, { timeout: 5000 });
+
+      if (!seedRes.data.error) {
+        seed = seedRes.data.result.key;
+      }
+    } catch (e) {
+      log(`⚠️ [${walletName}] Could not retrieve seed`);
+    }
+
+    // Close wallet gracefully
+    log(`📪 [${walletName}] Closing wallet...`);
+    await axios.post(url, {
+      jsonrpc: "2.0",
+      id: "0",
+      method: "close_wallet",
+    }, { timeout: 5000 }).catch(() => {});
+
+    return { address, seed };
+
+  } catch (err: any) {
+    log(`❌ [${walletName}] Creation failed:`, err.response?.data || err.message);
+    throw err;
+  } finally {
+    // Always kill the temporary RPC
+    try {
+      rpcProc.kill("SIGTERM");
+      log(`💀 [${walletName}] Temporary RPC stopped (${port})`);
+    } catch (e) {}
+  }
+}
+
 // ─────────────────────────────────────────────
 // GET OR CREATE DEDICATED RPC FOR WALLET
 // ─────────────────────────────────────────────
