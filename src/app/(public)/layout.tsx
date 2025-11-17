@@ -17,7 +17,7 @@ export default function PublicLayout({
     <div
       className={`min-h-screen bg-[#101010] text-white ${inter.className}`}
       style={{
-        backgroundColor: "#101010",
+        backgroundColor: "#1A132B",
         color: "#fff",
       }}
     >

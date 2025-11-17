@@ -13,7 +13,7 @@ const SignupPage = () => {
   const [alertVisible, setAlertVisible] = useState(false);
   const [alertTitle, setAlertTitle] = useState('');
   const [alertMessage, setAlertMessage] = useState('');
-	const [alertVariant, setAlertVariant] = useState<'error' | 'success' | 'warning' | 'info'>('error');
+  const [alertVariant, setAlertVariant] = useState<'error' | 'success' | 'warning' | 'info'>('error');
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -23,7 +23,7 @@ const SignupPage = () => {
     if (alertVisible) {
       const timer = setTimeout(() => {
         setAlertVisible(false);
-      }, 5000); 
+      }, 5000);
 
       return () => clearTimeout(timer); // Cleanup timer on unmount
     }
@@ -69,20 +69,20 @@ const SignupPage = () => {
     }
   };
 
-  
+
   return (
     <>
 
-    {alertVisible && (
-      <div className="fixed top-4 right-4 z-[9999]">
-        <Alert
-          title={alertTitle}
-          message={alertMessage}
-          variant={alertVariant}
-          showLink={false}
-        />
-      </div>
-    )}
+      {alertVisible && (
+        <div className="fixed top-4 right-4 z-[9999]">
+          <Alert
+            title={alertTitle}
+            message={alertMessage}
+            variant={alertVariant}
+            showLink={false}
+          />
+        </div>
+      )}
       <section className="relative z-10 overflow-hidden pt-36 pb-16 md:pb-20 lg:pt-[180px] lg:pb-28">
         <div className="container">
           <div className="-mx-4 flex flex-wrap">
@@ -169,7 +169,7 @@ const SignupPage = () => {
                       onChange={handleChange}
                       required
                       placeholder="Enter your full name"
-                      className="border-stroke dark:text-body-color-dark dark:shadow-two text-body-color focus:border-primary dark:focus:border-primary w-full rounded-xs border bg-[#f8f8f8] px-6 py-3 text-base outline-hidden transition-all duration-300 dark:border-transparent dark:bg-[#2C303B] dark:focus:shadow-none"
+                      className="border-stroke dark:text-body-color-dark dark:shadow-two text-body-color focus:border-[var(--brand-500)] dark:focus:border-[var(--brand-500)] w-full rounded-xs border bg-[#f8f8f8] px-6 py-3 text-base outline-hidden transition-all duration-300 dark:border-transparent dark:bg-[#2E224D] dark:focus:shadow-none"
                     />
                   </div>
                   <div className="mb-8">
@@ -188,7 +188,7 @@ const SignupPage = () => {
                       onChange={handleChange}
                       required
                       placeholder="Enter your Email"
-                      className="border-stroke dark:text-body-color-dark dark:shadow-two text-body-color focus:border-primary dark:focus:border-primary w-full rounded-xs border bg-[#f8f8f8] px-6 py-3 text-base outline-hidden transition-all duration-300 dark:border-transparent dark:bg-[#2C303B] dark:focus:shadow-none"
+                      className="border-stroke dark:text-body-color-dark dark:shadow-two text-body-color focus:border-primary dark:focus:border-[var(--brand-500)] w-full rounded-xs border bg-[#f8f8f8] px-6 py-3 text-base outline-hidden transition-all duration-300 dark:border-transparent dark:bg-[#2E224D] dark:focus:shadow-none"
                     />
                   </div>
                   <div className="mb-8">
@@ -207,7 +207,7 @@ const SignupPage = () => {
                       required
                       name="password"
                       placeholder="Enter your Password"
-                      className="border-stroke dark:text-body-color-dark dark:shadow-two text-body-color focus:border-primary dark:focus:border-primary w-full rounded-xs border bg-[#f8f8f8] px-6 py-3 text-base outline-hidden transition-all duration-300 dark:border-transparent dark:bg-[#2C303B] dark:focus:shadow-none"
+                      className="border-stroke dark:text-body-color-dark dark:shadow-two text-body-color focus:border-primary dark:focus:border-[var(--brand-500)] w-full rounded-xs border bg-[#f8f8f8] px-6 py-3 text-base outline-hidden transition-all duration-300 dark:border-transparent dark:bg-[#2E224D] dark:focus:shadow-none"
                     />
                   </div>
                   <div className="mb-8 flex">
@@ -242,12 +242,12 @@ const SignupPage = () => {
                       </div>
                       <span>
                         By creating account means you agree to the
-                        <a href="#0" className="text-primary hover:underline">
+                        <a href="#0" className="text-[var(--brand-600)] hover:underline">
                           {" "}
                           Terms and Conditions{" "}
                         </a>
                         , and our
-                        <a href="#0" className="text-primary hover:underline">
+                        <a href="#0" className="text-[var(--brand-600)] hover:underline">
                           {" "}
                           Privacy Policy{" "}
                         </a>
@@ -255,7 +255,13 @@ const SignupPage = () => {
                     </label>
                   </div>
                   <div className="mb-6">
-                    <button className="shadow-submit dark:shadow-submit-dark bg-primary hover:bg-primary/90 flex w-full items-center justify-center rounded-xs px-9 py-4 text-base font-medium text-white duration-300">
+                    <button className="shadow-submit dark:shadow-submit-dark bg-primary hover:bg-primary/90 flex w-full items-center justify-center rounded-xs px-9 py-4 text-base font-medium text-white duration-300
+                    relative inline-flex items-center justify-center px-10 py-3.5 text-[15px] font-semibold text-white rounded-sm
+                    bg-[linear-gradient(135deg,var(--brand-500)_0%,var(--brand-300)_100%)]
+                    shadow-[0_6px_20px_var(--brand-500-50)]
+                    transition-all duration-300 hover:-translate-y-[3px]
+                    hover:shadow-[0_6px_20px_var(--brand-500-65)]
+                    active:scale-[0.98]">
                       Sign up
                     </button>
                   </div>
@@ -267,7 +273,7 @@ const SignupPage = () => {
                 )}
                 <p className="text-body-color text-center text-base font-medium">
                   Already using Renee Wallet?{" "}
-                  <Link href="/signin" className="text-primary hover:underline">
+                  <Link href="/signin" className="text-[var(--brand-600)] hover:underline">
                     Sign in
                   </Link>
                 </p>

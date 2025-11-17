@@ -306,22 +306,30 @@ const AppSidebar: React.FC = () => {
       <div className={`py-8 flex ${!isExpanded && !isHovered ? "lg:justify-center" : "justify-start"}`}>
         <Link href="/">
           {isExpanded || isHovered || isMobileOpen ? (
-            <>
+            <div className="flex flex-row items-center gap-2">
               <Image
                 className="dark:hidden"
                 src="/images/logo/logo-light.svg"
                 alt="Logo"
-                width={150}
-                height={40}
+                width={50}
+                height={50}
               />
               <Image
                 className="hidden dark:block"
                 src="/images/logo/logo-dark.svg"
                 alt="Logo"
-                width={150}
-                height={40}
+                width={50}
+                height={50}
               />
-            </>
+              <span
+                className="hidden dark:block text-2xl font-bold tracking-tight bg-clip-text text-transparent"
+                style={{
+                  backgroundImage: "linear-gradient(135deg, #6e3bff 0%, #a855f7 100%)",
+                }}
+              >
+                Renee Wallet
+              </span>
+              </div>
           ) : (
             <Image src="/images/logo/logo-icon.svg" alt="Logo" width={32} height={32} />
           )}

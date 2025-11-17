@@ -1,6 +1,6 @@
 "use client"
 import Link from "next/link";
-import { useState,useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Alert from "@/components/ui/alert/Alert";
 
@@ -51,7 +51,7 @@ const SigninPage = () => {
             router.push("/kyc-verification");
           }, 1000); // delay 1 second
         }
-        
+
       }
     } catch (err) {
       setAlertTitle('Server Error');
@@ -67,7 +67,7 @@ const SigninPage = () => {
     if (alertVisible) {
       const timer = setTimeout(() => {
         setAlertVisible(false);
-      }, 5000); 
+      }, 5000);
 
       return () => clearTimeout(timer); // Cleanup timer on unmount
     }
@@ -170,7 +170,7 @@ const SigninPage = () => {
                       onChange={handleChange}
                       required
                       placeholder="Enter your Email"
-                      className="border-stroke dark:text-body-color-dark dark:shadow-two text-body-color focus:border-primary dark:focus:border-primary w-full rounded-xs border bg-[#f8f8f8] px-6 py-3 text-base outline-hidden transition-all duration-300 dark:border-transparent dark:bg-[#2C303B] dark:focus:shadow-none"
+                      className="border-stroke dark:text-body-color-dark dark:shadow-two text-body-color focus:border-primary dark:focus:border-[var(--brand-500)] w-full rounded-xs border bg-[#f8f8f8] px-6 py-3 text-base outline-hidden transition-all duration-300 dark:border-transparent dark:bg-[#2E224D] dark:focus:shadow-none"
                     />
                   </div>
                   <div className="mb-8">
@@ -187,7 +187,7 @@ const SigninPage = () => {
                       onChange={handleChange}
                       required
                       placeholder="Enter your Password"
-                      className="border-stroke dark:text-body-color-dark dark:shadow-two text-body-color focus:border-primary dark:focus:border-primary w-full rounded-xs border bg-[#f8f8f8] px-6 py-3 text-base outline-hidden transition-all duration-300 dark:border-transparent dark:bg-[#2C303B] dark:focus:shadow-none"
+                      className="border-stroke dark:text-body-color-dark dark:shadow-two text-body-color focus:border-primary dark:focus:border-[var(--brand-500)] w-full rounded-xs border bg-[#f8f8f8] px-6 py-3 text-base outline-hidden transition-all duration-300 dark:border-transparent dark:bg-[#2E224D] dark:focus:shadow-none"
                     />
                   </div>
                   <div className="mb-8 flex flex-col justify-between sm:flex-row sm:items-center">
@@ -227,15 +227,27 @@ const SigninPage = () => {
                     <div>
                       <a
                         href="#0"
-                        className="text-primary text-sm font-medium hover:underline"
+                        className="text-[var(--brand-600)] text-sm font-medium hover:underline"
                       >
                         Forgot Password?
                       </a>
                     </div>
                   </div>
                   <div className="mb-6">
-                    <button className="shadow-submit dark:shadow-submit-dark bg-primary hover:bg-primary/90 flex w-full items-center justify-center rounded-xs px-9 py-4 text-base font-medium text-white duration-300">
-                      Sign in
+                    <button className="shadow-submit dark:shadow-submit-dark bg-primary hover:bg-primary/90 flex w-full items-center justify-center rounded-xs px-9 py-4 text-base font-medium text-white duration-300
+                    relative inline-flex items-center justify-center px-10 py-3.5 text-[15px] font-semibold text-white rounded-sm
+                    bg-[linear-gradient(135deg,var(--brand-500)_0%,var(--brand-300)_100%)]
+                    shadow-[0_6px_20px_var(--brand-500-50)]
+                    transition-all duration-300 hover:-translate-y-[3px]
+                    hover:shadow-[0_6px_20px_var(--brand-500-65)]
+                    active:scale-[0.98]">
+                      <span className="relative z-10">Sign in</span>
+                      {/* glow on hover */}
+                      <span
+                        className="absolute inset-0 rounded-sm opacity-0 group-hover:opacity-100 blur-[20px]
+                    bg-[linear-gradient(135deg,var(--brand-500)_0%,var(--brand-300)_100%)]
+                    transition-opacity duration-300"
+                      />
                     </button>
                   </div>
                 </form>
@@ -246,14 +258,14 @@ const SigninPage = () => {
                 )}
                 <p className="text-body-color text-center text-base font-medium">
                   Don’t you have an account?{" "}
-                  <Link href="/signup" className="text-primary hover:underline">
+                  <Link href="/signup" className="text-[var(--brand-600)] hover:underline">
                     Sign up
                   </Link>
                 </p>
               </div>
             </div>
           </div>
-        </div>
+        </div >
         <div className="absolute top-0 left-0 z-[-1]">
           <svg
             width="1440"
@@ -311,7 +323,7 @@ const SigninPage = () => {
             </defs>
           </svg>
         </div>
-      </section>
+      </section >
     </>
   );
 };
