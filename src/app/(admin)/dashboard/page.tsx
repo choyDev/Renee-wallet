@@ -1,7 +1,7 @@
 
 "use client";
 
-import React from "react";
+import React, {useEffect} from "react";
 import TokensTable from "@/components/dashboard/TokensTable";
 import RecentActivityTable from "@/components/dashboard/RecentActivityTable";
 import DashboardStats from "@/components/dashboard/DashboardStats";
@@ -10,6 +10,7 @@ import BridgeCard from "@/components/dashboard/BridgeCard";
 import PortfolioBreakdown from "@/components/dashboard/PortofolioBreakdown";
 
 export default function Dashboard() {
+
   return (
     <div
       className="
