@@ -41,11 +41,12 @@ const Header = () => {
     return pathname === p;
   };
 
+  const isHomePage = pathname === "/";
+
   return (
     <header
-      className={`fixed top-0 left-0 z-[9999] w-full transition-all duration-500 ${
-        sticky ? "bg-[var(--bg-body)]/85 backdrop-blur-md" : "bg-transparent"
-      }`}
+      className={`fixed top-0 left-0 z-[9999] w-full transition-all duration-500 ${sticky ? "bg-[var(--bg-body)]/85 backdrop-blur-md" : "bg-transparent"
+        }`}
     >
       <div className="container mx-auto flex items-center justify-between px-4 py-4 md:py-5">
         {/* ---------------- LOGO ---------------- */}
@@ -73,55 +74,88 @@ const Header = () => {
             absolute right-0 top-[65px] z-50 w-[230px] rounded-lg 
             border border-white/10 bg-[var(--white-10)]/95 backdrop-blur-md p-4
             transition-all duration-300 md:static md:block md:w-auto md:border-none md:bg-transparent md:p-0
-            ${
-              navbarOpen
-                ? "opacity-100 translate-y-1 pointer-events-auto"
-                : "opacity-0 -translate-y-2 pointer-events-none md:opacity-100 md:translate-y-0 md:pointer-events-auto"
+            ${navbarOpen
+              ? "opacity-100 translate-y-1 pointer-events-auto"
+              : "opacity-0 -translate-y-2 pointer-events-none md:opacity-100 md:translate-y-0 md:pointer-events-auto"
             }
           `}
         >
           <ul className="flex flex-col space-y-3 md:flex-row md:items-center md:space-x-8 md:space-y-0">
-            {menuData.map((m) => {
-              if (!m.path) return null;
-              const anchor = isAnchorPath(m.path);
 
-              return (
-                <li key={m.id}>
-                  <Link
-                    href={m.path}
-                    prefetch={false}
-                    onClick={(e) => {
-                      if (anchor) {
-                        e.preventDefault();
-                        const id = m.path ? normHash(m.path).slice(1) : "";
-                        document.getElementById(id)?.scrollIntoView({
-                          behavior: "smooth",
-                          block: "start",
-                        });
-                        history.replaceState(null, "", normHash(m.path));
-                        setActiveHash(normHash(m.path));
-                      } else if (m.path === "/") {
-                        setActiveHash("");
-                      }
-                      setNavbarOpen(false);
-                    }}
-                    className={`relative block px-2 py-2 text-base font-medium transition md:px-0 md:py-0 ${
-                      isActive(m.path)
+            {/* ---------------- NON-HOMEPAGE HEADER ---------------- */}
+            {!isHomePage && (
+              <li>
+                <Link
+                  href="/"
+                  className="inline-flex items-center gap-2 rounded-md px-4 py-2 text-base font-medium
+                   text-white transition-all duration-300 
+                   bg-[linear-gradient(135deg,var(--brand-600),var(--brand-400))]
+                   shadow-[0_0_12px_#6e3bff70]
+                   hover:shadow-[0_0_18px_#a855f780]"
+                >
+                  <svg
+                    width="18"
+                    height="18"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="white"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <path d="M15 18L9 12L15 6" />
+                  </svg>
+                  Back to Home
+                </Link>
+              </li>
+            )}
+
+            {/* ---------------- HOMEPAGE FULL MENU ---------------- */}
+            {isHomePage &&
+              menuData.map((m) => {
+                if (!m.path) return null;
+
+                const anchor = isAnchorPath(m.path);
+
+                return (
+                  <li key={m.id}>
+                    <Link
+                      href={m.path}
+                      prefetch={false}
+                      onClick={(e) => {
+                        if (anchor) {
+                          e.preventDefault();
+                          const id = m.path ? normHash(m.path).slice(1) : "";
+                          document.getElementById(id)?.scrollIntoView({
+                            behavior: "smooth",
+                            block: "start",
+                          });
+                          history.replaceState(null, "", normHash(m.path));
+                          setActiveHash(normHash(m.path));
+                        } else if (m.path === "/") {
+                          setActiveHash("");
+                        }
+                        setNavbarOpen(false);
+                      }}
+                      className={`relative block px-2 py-2 text-base font-medium transition md:px-0 md:py-0 ${isActive(m.path)
                         ? "text-[var(--brand-600)]"
                         : "text-slate-300 hover:text-[var(--brand-600)]"
-                    }`}
-                  >
-                    {m.title}
-                  </Link>
-                </li>
-              );
-            })}
+                        }`}
+                    >
+                      {m.title}
+                    </Link>
+                  </li>
+                );
+              })}
 
-            {/* ---- MOBILE LANGUAGE SWITCHER ---- */}
-            <li className="block md:hidden pt-3 border-t border-white/10">
-              <LanguageSwitcher />
-            </li>
+            {/* MOBILE LANGUAGE SWITCHER — only on home */}
+            {isHomePage && (
+              <li className="block md:hidden pt-3 border-t border-white/10">
+                <LanguageSwitcher />
+              </li>
+            )}
           </ul>
+
         </nav>
 
         {/* ---------------- RIGHT SIDE ---------------- */}
