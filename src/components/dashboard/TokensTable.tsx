@@ -1,11 +1,12 @@
+
 "use client";
 
 import React, { useEffect, useState } from "react";
 import { FaEthereum } from "react-icons/fa";
-import { SiSolana, SiTether, SiBitcoin, SiBinance, SiXrp, SiDogecoin, SiCardano } from "react-icons/si";
+import { SiSolana, SiBitcoin, SiXrp, SiDogecoin } from "react-icons/si";
 import { FaMonero } from "react-icons/fa";
 
-const TronIcon = ({ className = "text-[#FF4747] w-4 h-4" }) => (
+const TronIcon = ({ className = "text-red-500 w-5 h-5" }) => (
   <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24" className={className}>
     <path d="M1.5 3.75L12 22.5L22.5 3.75L12 1.5L1.5 3.75ZM12 4.5L18.24 5.76L12 20.1L5.76 5.76L12 4.5ZM9.3 7.26L12 12.93L14.7 7.26H9.3Z" />
   </svg>
@@ -21,151 +22,151 @@ type Row = {
   marketCap: number;
 };
 
-function Icon({ symbol, id }: { symbol: string; id: string }) {
+function Icon({ symbol }: { symbol: string }) {
   switch (symbol) {
-    case "BTC": return <SiBitcoin className="text-[#F7931A] text-xl" />;
-    case "ETH": return <FaEthereum className="text-[#627EEA] text-xl" />;
-    case "SOL": return <SiSolana className="text-[#14F195] text-xl" />;
-    case "USDT": return <SiTether className="text-[#26A17B] text-xl" />;
-    case "BNB": return <SiBinance className="text-[#F0B90B] text-xl" />;
-    case "XRP": return <SiXrp className="text-[#0A74E6] text-xl" />;
-    case "DOGE": return <SiDogecoin className="text-[#C2A633] text-xl" />;
-    case "ADA": return <SiCardano className="text-[#0033AD] text-xl" />;
+    case "BTC": return <SiBitcoin className="text-[#F7931A] w-5 h-5" />;
+    case "ETH": return <FaEthereum className="text-[#627EEA] w-5 h-5" />;
+    case "SOL": return <SiSolana className="text-[#14F195] w-5 h-5" />;
+    case "XRP": return <SiXrp className="text-[#0A74E6] w-5 h-5" />;
+    case "DOGE": return <SiDogecoin className="text-[#C2A633] w-5 h-5" />;
     case "TRX": return <TronIcon className="w-5 h-5 text-[#FF060A]" />;
-    case "XMR": return <FaMonero className="text-[#FF6600] text-xl" />;
-    default: return <span className="inline-block w-5 h-5 rounded bg-gray-300 dark:bg-gray-700" />;
+    case "XMR": return <FaMonero className="text-[#FF6600] w-5 h-5" />;
+    default:
+      return <span className="inline-block w-5 h-5 rounded bg-gray-300 dark:bg-gray-700" />;
   }
 }
-
-const fmtUSD = (n: number) =>
-  n >= 1_000_000_000
-    ? `$${(n / 1_000_000_000).toFixed(2)}B`
-    : n >= 1_000_000
-      ? `$${(n / 1_000_000).toFixed(2)}M`
-      : n >= 1_000
-        ? `$${(n / 1_000).toFixed(2)}K`
-        : `$${n.toFixed(2)}`;
 
 const fmtPrice = (n: number) =>
   n >= 1 ? `$${n.toLocaleString(undefined, { maximumFractionDigits: 2 })}` : `$${n.toFixed(6)}`;
 
-const badgeClass = (val: number) =>
-  val >= 0 ? "bg-green-500/10 text-green-600 dark:text-green-400"
-    : "bg-red-500/10 text-red-600 dark:text-red-400";
-
 export default function TokensTable() {
   const [rows, setRows] = useState<Row[] | null>(null);
-  const [updatedAt, setUpdatedAt] = useState<number | null>(null);
 
-  // Instant paint from cache if available
+  // Load from cache
   useEffect(() => {
     try {
-      const cached = localStorage.getItem("market:top:cap4");
+      const cached = localStorage.getItem("market:top:all7");
       if (cached) {
-        const { items, updatedAt } = JSON.parse(cached);
-        if (Array.isArray(items)) {
-          setRows(items);
-          setUpdatedAt(updatedAt ?? null);
-        }
+        const { items } = JSON.parse(cached);
+        if (Array.isArray(items)) setRows(items);
       }
-    } catch { }
+    } catch {}
   }, []);
 
-  // Fetch top 4 by market cap
+  // Fetch latest
   useEffect(() => {
-    const ctrl = new AbortController();
+    const controller = new AbortController();
     async function load() {
       try {
-        const SYMBOLS_8 = ["TRX", "ETH", "XMR", "SOL", "BTC", "XRP", "DOGE", "USDT"] as const;
+        const SYMBOLS_7 = ["TRX", "ETH", "XMR", "SOL", "BTC", "XRP", "DOGE"] as const;
+
         const r = await fetch(
-          `/api/market/top?symbols=${encodeURIComponent(SYMBOLS_8.join(","))}`,
-          { signal: ctrl.signal, cache: "no-store" }
+          `/api/market/top?symbols=${encodeURIComponent(SYMBOLS_7.join(","))}`,
+          { signal: controller.signal, cache: "no-store" }
         );
-        const j = await r.json();
-        if (Array.isArray(j.items)) {
-          setRows(j.items);
-          setUpdatedAt(j.updatedAt ?? Date.now());
-          try { localStorage.setItem("market:top:cap4", JSON.stringify({ items: j.items, updatedAt: Date.now() })); } catch { }
+
+        const data = await r.json();
+
+        if (Array.isArray(data.items)) {
+          setRows(data.items);
+          localStorage.setItem(
+            "market:top:all7",
+            JSON.stringify({ items: data.items, updatedAt: Date.now() })
+          );
         }
-      } catch { }
+      } catch {}
     }
+
     load();
-    const t = setInterval(load, 6_000_000);
-    return () => { ctrl.abort(); clearInterval(t); };
+    const timer = setInterval(load, 60_000);
+    return () => {
+      controller.abort();
+      clearInterval(timer);
+    };
   }, []);
 
+  const displayRows = rows ?? Array.from({ length: 7 }, () => null);
+
   return (
-    <div className="rounded-2xl p-px bg-gradient-to-br from-brand-500/40 via-transparent to-cyan-500/40">
-      <div className="h-full rounded-2xl border border-gray-200/60 dark:border-white/10
-                      bg-white/70 dark:bg-[#0B1220]/80 backdrop-blur-sm p-6 shadow-sm
-                      transition-all duration-300 hover:shadow-md">
-        <div className="flex items-center justify-between mb-5">
-          <h3 className="text-lg font-semibold tracking-tight text-gray-900 dark:text-white">Today Top Market</h3>
-          {updatedAt && (
-            <span className="text-xs text-gray-500 dark:text-gray-400">
-              Updated {new Date(updatedAt).toLocaleTimeString()}
-            </span>
-          )}
-        </div>
+    <div className="
+      rounded-2xl p-px 
+      bg-gradient-to-br from-purple-500/30 via-transparent to-cyan-500/30
+      h-full
+    ">
+      <div className="
+        h-full rounded-2xl p-6 shadow-sm flex flex-col transition-all duration-300
+        bg-white border border-gray-200
+        dark:bg-[#1A1F36]/80 dark:border-white/5 dark:backdrop-blur-xl
+      ">
+        
+        {/* Header */}
+        <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-5">
+          Markets
+        </h3>
 
-        <div className="overflow-x-auto">
-          <table className="w-full text-[15px] tabular-nums">
-            <thead>
-              <tr className="text-gray-500 dark:text-gray-400 border-b border-gray-200/60 dark:border-gray-700/50 text-sm">
-                <th className="text-left py-3 px-4">Name</th>
-                <th className="text-left py-3 px-4">Price</th>
-                <th className="text-left py-3 px-4">24h</th>
-                <th className="text-left py-3 px-4">7d</th>
-                <th className="text-left py-3 px-4">Market Cap</th>
-              </tr>
-            </thead>
-            <tbody>
-              {(rows ?? Array.from({ length: 4 }, () => null)).map((row, i) => {
-                const skeleton = !row;
-                const symbol = row?.symbol ?? "";
-                const name = row?.name ?? "";
-                const price = row?.price ?? 0;
-                const c24 = row?.change24h ?? 0;
-                const c7 = row?.change7d ?? 0;
-                const mcap = row?.marketCap ?? 0;
+        {/* Centered table */}
+        <div className="flex-1 flex items-center justify-center">
+          <div className="w-full max-w-[340px] space-y-2 mx-auto">
 
-                return (
-                  <tr key={i} className="border-b border-gray-100/70 dark:border-gray-800/60 hover:bg-gray-50 dark:hover:bg-[#1A2235]/40 transition">
-                    <td className="py-4 px-4 flex items-center gap-2 font-medium text-gray-900 dark:text-white notranslate">
-                      {skeleton ? <span className="w-5 h-5 rounded bg-gray-200 dark:bg-gray-700" /> : <Icon symbol={symbol} id={row!.id} />}
-                      <span className={skeleton ? "w-40 h-4 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" : ""}>
-                        {!skeleton && `${symbol} (${name})`}
-                      </span>
-                    </td>
-                    <td className="py-4 px-4 text-gray-700 dark:text-gray-300">
-                      {skeleton ? <span className="inline-block w-24 h-4 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" /> : fmtPrice(price)}
-                    </td>
-                    <td className="py-4 px-4">
+            {displayRows.map((row, i) => {
+              const skeleton = !row;
+              const symbol = row?.symbol ?? "";
+              const price = row?.price ?? 0;
+              const c24 = row?.change24h ?? 0;
+
+              return (
+                <div
+                  key={i}
+                  className="
+                    flex items-center justify-between p-2.5 rounded-xl border transition-all
+                    bg-gray-50 border-gray-200 hover:bg-gray-100
+                    dark:bg-white/5 dark:border-white/5 dark:hover:bg-white/10
+                  "
+                >
+                  {/* LEFT: Icon + price */}
+                  <div className="flex items-center gap-3 min-w-[120px]">
+                    {skeleton ? (
+                      <span className="w-8 h-8 rounded-full bg-gray-300 dark:bg-gray-700 animate-pulse" />
+                    ) : (
+                      <div className="w-8 h-8 rounded-full bg-gray-200 dark:bg-white/10 flex items-center justify-center">
+                        <Icon symbol={symbol} />
+                      </div>
+                    )}
+
+                    <div>
                       {skeleton ? (
-                        <span className="inline-block w-16 h-5 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+                        <>
+                          <div className="w-10 h-3 rounded bg-gray-300 dark:bg-gray-700 animate-pulse mb-1" />
+                          <div className="w-16 h-2 rounded bg-gray-300 dark:bg-gray-700 animate-pulse" />
+                        </>
                       ) : (
-                        <span className={`px-2.5 py-1 rounded-full text-xs font-semibold ${badgeClass(c24)}`}>
-                          {c24 >= 0 ? `+${c24.toFixed(2)}%` : `${c24.toFixed(2)}%`}
-                        </span>
+                        <>
+                          <p className="text-sm font-semibold text-gray-900 dark:text-white">
+                            {symbol}
+                          </p>
+                          <p className="text-xs text-gray-500 dark:text-gray-400">
+                            {fmtPrice(price)}
+                          </p>
+                        </>
                       )}
-                    </td>
-                    <td className="py-4 px-4">
-                      {skeleton ? (
-                        <span className="inline-block w-16 h-5 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
-                      ) : (
-                        <span className={`px-2.5 py-1 rounded-full text-xs font-semibold ${badgeClass(c7)}`}>
-                          {c7 >= 0 ? `+${c7.toFixed(2)}%` : `${c7.toFixed(2)}%`}
-                        </span>
-                      )}
-                    </td>
-                    <td className="py-4 px-4 text-gray-600 dark:text-gray-400">
-                      {skeleton ? <span className="inline-block w-24 h-4 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" /> : fmtUSD(mcap)}
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
+                    </div>
+                  </div>
+
+                  {/* RIGHT: 24h change */}
+                  <div className="text-right">
+                    {skeleton ? (
+                      <div className="w-14 h-3 rounded bg-gray-300 dark:bg-gray-700 animate-pulse ml-auto" />
+                    ) : (
+                      <p className={`text-sm font-bold ${c24 >= 0 ? "text-green-500 dark:text-green-400" : "text-red-500 dark:text-red-400"}`}>
+                        {c24 >= 0 ? "+" : ""}{c24.toFixed(2)}%
+                      </p>
+                    )}
+                  </div>
+                </div>
+              );
+            })}
+
+          </div>
         </div>
       </div>
     </div>

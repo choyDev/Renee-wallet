@@ -9,7 +9,8 @@ export async function GET(req: Request) {
   try {
     const { searchParams } = new URL(req.url);
     const userId = Number(searchParams.get("userId"));
-    const chain = searchParams.get("chain"); // 👈 optional chain filter
+    const chain = searchParams.get("chain");
+    const limit = searchParams.get("limit") ? Number(searchParams.get("limit")) : undefined; 
 
     if (!userId) {
       return NextResponse.json({ error: "userId required" }, { status: 400 });
@@ -44,6 +45,7 @@ export async function GET(req: Request) {
       include: {
         wallet: { include: { network: true } },
       },
+      ...(limit && { take: limit }),
     });
 
     // 3️⃣ Format + direction logic
