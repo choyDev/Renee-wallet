@@ -6,7 +6,7 @@ import LanguageSwitcher from "@/components/i18n/LanguageSwitcher";
 import { useSidebar } from "@/context/SidebarContext";
 import Image from "next/image";
 import Link from "next/link";
-import React, { useState ,useEffect,useRef} from "react";
+import React, { useState, useEffect, useRef } from "react";
 
 const AppHeader: React.FC = () => {
   const [isApplicationMenuOpen, setApplicationMenuOpen] = useState(false);
@@ -85,20 +85,30 @@ const AppHeader: React.FC = () => {
           </button>
 
           <Link href="/" className="lg:hidden">
-            <Image
-              width={154}
-              height={32}
-              className="dark:hidden"
-              src="./images/logo/logo-light.svg"
-              alt="Logo"
-            />
-            <Image
-              width={154}
-              height={32}
-              className="hidden dark:block"
-              src="./images/logo/logo-dark.svg"
-              alt="Logo"
-            />
+            <div className="flex flex-row items-center gap-2">
+              <Image
+                width={44}
+                height={44}
+                className="dark:hidden"
+                src="./images/logo/logo-light.svg"
+                alt="Logo"
+              />
+              <Image
+                width={44}
+                height={44}
+                className="hidden dark:block"
+                src="./images/logo/logo-dark.svg"
+                alt="Logo"
+              />
+              <span
+                className="hidden dark:block text-2xl font-bold tracking-tight bg-clip-text text-transparent"
+                style={{
+                  backgroundImage: "linear-gradient(135deg, #6e3bff 0%, #a855f7 100%)",
+                }}
+              >
+                Renee Wallet
+              </span>
+            </div>
           </Link>
 
           <button
@@ -123,9 +133,8 @@ const AppHeader: React.FC = () => {
 
         </div>
         <div
-          className={`${
-            isApplicationMenuOpen ? "flex" : "hidden"
-          } items-center justify-between w-full gap-4 px-5 py-4 lg:flex shadow-theme-md lg:justify-end lg:px-0 lg:shadow-none`}
+          className={`${isApplicationMenuOpen ? "flex" : "hidden"
+            } items-center justify-between w-full gap-4 px-5 py-4 lg:flex shadow-theme-md lg:justify-end lg:px-0 lg:shadow-none`}
         >
           <div className="flex items-center gap-2 2xsm:gap-3">
             <LanguageSwitcher />
@@ -134,12 +143,12 @@ const AppHeader: React.FC = () => {
             <ThemeToggleButton />
             {/* <!-- Dark Mode Toggler --> */}
 
-           <NotificationDropdown /> 
+            <NotificationDropdown />
             {/* <!-- Notification Menu Area --> */}
           </div>
           {/* <!-- User Area --> */}
-          <UserDropdown /> 
-    
+          <UserDropdown />
+
         </div>
       </div>
     </header>
