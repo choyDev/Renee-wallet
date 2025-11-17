@@ -301,7 +301,7 @@ export default function WalletOverviewPage() {
         <section className="col-span-1 lg:col-span-8">
           <div className="group relative h-full rounded-2xl p-px bg-gradient-to-br from-[#FF6600]/40 via-transparent to-[#FF8C42]/30">
             <div className="h-full rounded-2xl border border-gray-200/60 dark:border-white/10 
-                            bg-white/70 dark:bg-[#110f20] bg-[radial-gradient(circle_at_30%_20%,#120a22_0%,#131124_70%)] backdrop-blur-sm 
+                            bg-white/70 dark:bg-[#110f20] dark:bg-[radial-gradient(circle_at_30%_20%,#120a22_0%,#131124_70%)] backdrop-blur-sm 
                             shadow-[0_1px_0_0_rgba(255,255,255,0.06)_inset,0_10px_30px_-10px_rgba(0,0,0,0.35)]
                             transition-all duration-300 group-hover:shadow-lg">
 
@@ -329,7 +329,7 @@ export default function WalletOverviewPage() {
             {/* Total Balance */}
             <div className="rounded-2xl p-px bg-gradient-to-r from-[#FF6600]/50 to-cyan-500/40">
               <div className="rounded-2xl border border-gray-200/60 dark:border-white/10 
-                              bg-white/70 dark:bg-[#110f20] bg-[radial-gradient(circle_at_30%_20%,#120a22_0%,#131124_70%)] backdrop-blur-sm 
+                              bg-white/70 dark:bg-[#110f20] dark:bg-[radial-gradient(circle_at_30%_20%,#120a22_0%,#131124_70%)] backdrop-blur-sm 
                               p-4 sm:p-5 shadow-sm transition-all duration-300 hover:shadow-md">
 
                 <div className="flex items-center justify-between">
@@ -350,7 +350,7 @@ export default function WalletOverviewPage() {
             <div className="grid grid-cols-1 gap-2 text-sm sm:text-[15px] md:text-base">
 
               <div className="group rounded-xl border border-gray-200/60 dark:border-white/10
-                              bg-white/70 dark:bg-[#110f20] bg-[radial-gradient(circle_at_30%_20%,#120a22_0%,#131124_70%)] backdrop-blur-sm 
+                              bg-white/70 dark:bg-[#110f20] dark:bg-[radial-gradient(circle_at_30%_20%,#120a22_0%,#131124_70%)] backdrop-blur-sm 
                               p-3 sm:p-4 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md">
 
                 <div className="flex items-center justify-between gap-3">
