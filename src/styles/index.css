@@ -58,6 +58,22 @@ layer(base);
   --shadow-btn-light: 0px 1px 2px rgba(0, 0, 0, 0.1);
 
   --drop-shadow-three: 0px 5px 15px rgba(6, 8, 15, 0.05);
+
+  --bg-body: #101010;
+  /* Brand gradient (main purple) */
+  --brand-600: #6e3bff;   /* darker purple */
+  --brand-500: #7c4aff;   /* mid purple */
+  --brand-400: #a855f7;   /* lighter purple */
+  --brand-300: #b966ff;   /* soft highlight */
+
+  /* Alpha variants (keep gradients hex-only compliant) */
+  --brand-500-50: #7c4aff80;  /* 50% */
+  --brand-500-65: #7c4affa6;  /* 65% */
+  --brand-500-30: #7c4aff4d;  /* 30% */
+  --brand-600-50: #6e3bff80; /* 50% */
+
+  --white-10: #ffffff1a;
+  --white-5:  #ffffff0d;
 }
 
 @utility container {

@@ -1,82 +1,118 @@
-import NewsLatterBox from "./NewsLatterBox";
-
 const Contact = () => {
   return (
     <section id="contact" className="overflow-hidden py-16 md:py-20 lg:py-28">
       <div className="container">
         <div className="-mx-4 flex flex-wrap justify-center">
           <div className="w-full px-4 lg:w-7/12 xl:w-8/12">
+
             <div
-              className="mb-12 rounded-xs bg-white px-8 py-11 shadow-three dark:bg-gray-dark sm:p-[55px] lg:mb-5 lg:px-8 xl:p-[55px]"
-              data-wow-delay=".15s
+              className="
+                group mb-12 rounded-2xl border border-white/10 bg-[rgba(255,255,255,0.05)]
+                p-8 backdrop-blur
+                shadow-[0_0_0_rgba(110,59,255,0)]
+                transition-all duration-300
+                hover:-translate-y-[6px]
+                hover:border-[var(--brand-600)]
+                hover:shadow-[0_20px_48px_rgba(110,59,255,0.18)]
+                lg:mb-5 lg:p-8
               "
+              data-wow-delay=".15s"
             >
-              <h2 className="mb-3 text-2xl font-bold text-black dark:text-white sm:text-3xl lg:text-2xl xl:text-3xl">
-                Need Help? Open a Ticket
+              {/* Glow ring */}
+              <div
+                className="
+                  pointer-events-none absolute inset-0 rounded-2xl opacity-0 blur-xl
+                  bg-gradient-to-br from-[var(--brand-600)]/15 via-transparent to-[var(--brand-400)]/10
+                  transition-opacity duration-300 group-hover:opacity-100
+                "
+              />
+
+              {/* Title */}
+              <h2 className="text-center mb-3 text-2xl font-bold text-white sm:text-3xl lg:text-2xl xl:text-3xl">
+                Need Help? Send a Message
               </h2>
-              <p className="mb-12 text-base font-medium text-body-color">
+
+              <p className="text-center mb-10 text-base text-slate-300">
                 Our support team will get back to you ASAP via email.
               </p>
-              <form>
-                <div className="-mx-4 flex flex-wrap">
-                  <div className="w-full px-4 md:w-1/2">
-                    <div className="mb-8">
-                      <label
-                        htmlFor="name"
-                        className="mb-3 block text-sm font-medium text-dark dark:text-white"
-                      >
-                        Your Name
-                      </label>
-                      <input
-                        type="text"
-                        placeholder="Enter your name"
-                        className="border-stroke w-full rounded-xs border bg-[#f8f8f8] px-6 py-3 text-base text-body-color outline-hidden focus:border-primary dark:border-transparent dark:bg-[#2C303B] dark:text-body-color-dark dark:shadow-two dark:focus:border-primary dark:focus:shadow-none"
-                      />
-                    </div>
-                  </div>
-                  <div className="w-full px-4 md:w-1/2">
-                    <div className="mb-8">
-                      <label
-                        htmlFor="email"
-                        className="mb-3 block text-sm font-medium text-dark dark:text-white"
-                      >
-                        Your Email
-                      </label>
-                      <input
-                        type="email"
-                        placeholder="Enter your email"
-                        className="border-stroke w-full rounded-xs border bg-[#f8f8f8] px-6 py-3 text-base text-body-color outline-hidden focus:border-primary dark:border-transparent dark:bg-[#2C303B] dark:text-body-color-dark dark:shadow-two dark:focus:border-primary dark:focus:shadow-none"
-                      />
-                    </div>
-                  </div>
-                  <div className="w-full px-4">
-                    <div className="mb-8">
-                      <label
-                        htmlFor="message"
-                        className="mb-3 block text-sm font-medium text-dark dark:text-white"
-                      >
-                        Your Message
-                      </label>
-                      <textarea
-                        name="message"
-                        rows={5}
-                        placeholder="Enter your Message"
-                        className="border-stroke w-full resize-none rounded-xs border bg-[#f8f8f8] px-6 py-3 text-base text-body-color outline-hidden focus:border-primary dark:border-transparent dark:bg-[#2C303B] dark:text-body-color-dark dark:shadow-two dark:focus:border-primary dark:focus:shadow-none"
-                      ></textarea>
-                    </div>
-                  </div>
-                  <div className="w-full px-4">
-                    <button className="rounded-xs bg-primary px-9 py-4 text-base font-medium text-white shadow-submit duration-300 hover:bg-primary/90 dark:shadow-submit-dark">
-                      Submit Ticket
-                    </button>
-                  </div>
+
+              {/* Form */}
+              <form className="grid grid-cols-1 gap-6 md:grid-cols-2">
+
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-slate-200">Your Name</label>
+                  <input
+                    type="text"
+                    placeholder="Enter your name"
+                    className="
+                      w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3
+                      text-slate-100 placeholder:text-slate-400
+                      outline-none ring-0 transition
+                      focus:border-[var(--brand-500)]
+                    "
+                  />
                 </div>
+
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-slate-200">Your Email</label>
+                  <input
+                    type="email"
+                    placeholder="Enter your email"
+                    className="
+                      w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3
+                      text-slate-100 placeholder:text-slate-400
+                      outline-none ring-0 transition
+                      focus:border-[var(--brand-500)]
+                    "
+                  />
+                </div>
+
+                <div className="md:col-span-2 space-y-2">
+                  <label className="text-sm font-medium text-slate-200">Your Message</label>
+                  <textarea
+                    rows={5}
+                    placeholder="Enter your message"
+                    className="
+                      w-full resize-none rounded-xl border border-white/10 bg-white/5 px-4 py-3
+                      text-slate-100 placeholder:text-slate-400
+                      outline-none ring-0 transition
+                      focus:border-[var(--brand-500)]
+                    "
+                  />
+                </div>
+
+                {/* Submit Button */}
+                <div className="md:col-span-2 flex justify-center items-center mt-3">
+                  <button
+                    type="submit"
+                    className="
+                      group relative inline-flex items-center justify-center w-1/2
+                      px-10 py-3.5 text-[15px] font-semibold text-white rounded-sm
+                      bg-[linear-gradient(135deg,var(--brand-600)_0%,var(--brand-400)_100%)]
+                      shadow-[0_6px_20px_rgba(110,59,255,0.45)]
+                      transition-all duration-300
+                      hover:-translate-y-[3px]
+                      hover:shadow-[0_6px_20px_var(--brand-500-65)]
+                      active:scale-[0.98]
+                    "
+                  >
+                    <span className="relative z-10">Send</span>
+
+                    {/* Glow overlay (working now because button has group) */}
+                    <span
+                      className="
+                        absolute inset-0 rounded-sm opacity-0 blur-[22px]
+                        bg-[linear-gradient(135deg,var(--brand-600)_0%,var(--brand-400)_100%)]
+                        transition-opacity duration-300
+                      "
+                    />
+                  </button>
+                </div>
+
               </form>
             </div>
+
           </div>
-          {/* <div className="w-full px-4 lg:w-5/12 xl:w-4/12">
-            <NewsLatterBox />
-          </div> */}
         </div>
       </div>
     </section>

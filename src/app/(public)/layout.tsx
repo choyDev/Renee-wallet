@@ -14,14 +14,20 @@ export default function PublicLayout({
   children: React.ReactNode;
 }) {
   return (
-      <div className={`bg-[#FCFCFC] dark:bg-black ${inter.className}`}>
-        <Providers>
-          <Header />
-          {children}
-          <Footer />
-          <ScrollToTop />
-        </Providers>
-      </div>
+    <div
+      className={`min-h-screen bg-[#101010] text-white ${inter.className}`}
+      style={{
+        backgroundColor: "#101010",
+        color: "#fff",
+      }}
+    >
+      <Providers>
+        <Header />
+        <main className="relative z-10">{children}</main>
+        <Footer />
+        <ScrollToTop />
+      </Providers>
+    </div>
   );
 }
 

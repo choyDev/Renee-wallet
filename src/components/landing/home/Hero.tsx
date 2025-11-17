@@ -2,62 +2,82 @@ import Link from "next/link";
 
 const Hero = () => {
   return (
-    <>
-      <section
-        id="home"
-        className="relative z-10 overflow-x-clip overflow-y-hidden bg-white pb-16 pt-[120px] dark:bg-black md:pb-[120px] md:pt-[150px] xl:pb-[160px] xl:pt-[180px] 2xl:pb-[200px] 2xl:pt-[210px]"
-      >
-        <div className="container">
-          <div className="-mx-4 flex flex-wrap">
-            <div className="w-full px-4">
-              <div className="mx-auto max-w-[900px] text-center">
-                <h1 className="mb-5 text-3xl font-bold leading-tight text-black dark:text-white sm:text-4xl sm:leading-tight md:text-5xl md:leading-tight">
-                  A custodial wallet <span className="text-primary">and</span> crypto payment
-                  system for your business.
-                </h1>
+    <section
+      id="home"
+      className="relative z-10 overflow-hidden bg-transparent pb-20 pt-[140px] md:pb-[140px] md:pt-[170px] xl:pb-[170px] xl:pt-[190px]"
+    >
+      <div className="container">
+        <div className="-mx-4 flex flex-wrap">
+          <div className="w-full px-4">
+            <div className="mx-auto max-w-[950px] text-center">
 
-                <p className="mb-6 text-base !leading-relaxed text-body-color dark:text-body-color-dark sm:text-lg md:text-xl">
-                  Accept and track on-chain payments from individuals or institutions.
-                  Works with <strong>TRX, ETH, XMR, SOL, BTC, XRP, DOGE</strong> and{" "}
-                  <strong>USDT</strong> on <strong>ERC-20 / TRC-20 / SPL</strong>. No fiat
-                  deposits or withdrawals. In-wallet ramp via swap/bridge only.
-                </p>
+              {/* === TITLE WITH BRAND GRADIENT === */}
+              <h1
+                className="mb-4 text-4xl font-extrabold leading-tight sm:text-5xl md:text-6xl bg-clip-text text-transparent"
+                style={{
+                  backgroundImage:
+                    "linear-gradient(135deg, var(--brand-600) 0%, var(--brand-400) 100%)",
+                }}
+              >
+                Wallet <span className="text-violet-300">+</span> Crypto Payment System
+              </h1>
 
-                {/* Supported assets line */}
-                {/* <div className="mb-10 flex flex-wrap items-center justify-center gap-2 text-xs">
-                  <span className="rounded-full border border-primary/30 bg-primary/10 px-3 py-1 text-primary">
-                    TRX • ETH • XMR • SOL • BTC • XRP • DOGE
-                  </span>
-                  <span className="rounded-full border border-emerald-400/30 bg-emerald-400/10 px-3 py-1 text-emerald-600 dark:text-emerald-300">
-                    USDT: ERC-20 • TRC-20 • SPL
-                  </span>
-                  <span className="rounded-full border border-slate-300/40 bg-slate-100/40 px-3 py-1 text-slate-700 dark:border-white/10 dark:bg-white/5 dark:text-slate-200">
-                    Crypto-only (no fiat)
-                  </span>
-                </div> */}
+              {/* === DESCRIPTION === */}
+              <p className="mx-auto mb-10 max-w-3xl text-base text-slate-300/90 sm:text-lg md:text-xl">
+                Accept and track on-chain payments. Works with{" "}
+                <strong className="text-white">
+                  TRX, ETH, XMR, SOL, BTC, XRP, DOGE
+                </strong>{" "}
+                and <strong className="text-white">USDT</strong> on{" "}
+                <strong className="text-white">ERC-20 / TRC-20 / SPL</strong>. No fiat rails;
+                optional in-wallet swap/bridge.
+              </p>
 
-                <div className="flex flex-col items-center justify-center space-y-4 sm:flex-row sm:space-x-4 sm:space-y-0">
-                  <Link
-                    href="/signup"
-                    className="rounded-xl bg-primary px-8 py-4 text-base font-semibold text-white duration-300 ease-in-out hover:bg-primary/80"
-                  >
-                    Get started
-                  </Link>
-                  <Link
-                    href="#features"
-                    className="inline-block rounded-xl bg-black px-8 py-4 text-base font-semibold text-white duration-300 ease-in-out hover:bg-black/90 dark:bg-white/10 dark:text-white dark:hover:bg-white/5"
-                  >
-                    See features
-                  </Link>
-                </div>
+              {/* === BUTTONS === */}
+              <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row sm:gap-6">
+
+
+                {/* === PRIMARY (GAVINWOOD) BUTTON === */}
+                <Link
+                  href="/signup"
+                  className="w-45 relative inline-flex items-center justify-center px-10 py-3.5 text-[15px] font-semibold text-white rounded-sm
+                    bg-[linear-gradient(135deg,var(--brand-500)_0%,var(--brand-300)_100%)]
+                    shadow-[0_6px_20px_var(--brand-500-50)]
+                    transition-all duration-300 hover:-translate-y-[3px]
+                    hover:shadow-[0_6px_20px_var(--brand-500-65)]
+                    active:scale-[0.98]"
+                >
+                  <span className="relative z-10">Get started</span>
+
+                  {/* glow on hover */}
+                  <span
+                    className="absolute inset-0 rounded-sm opacity-0 group-hover:opacity-100 blur-[20px]
+                    bg-[linear-gradient(135deg,var(--brand-500)_0%,var(--brand-300)_100%)]
+                    transition-opacity duration-300"
+                  />
+                </Link>
+
+
+                {/* === SECONDARY BUTTON === */}
+                <Link
+                  href="#features"
+                  className="w-45 inline-flex items-center justify-center px-10 py-3.5 text-[15px] font-semibold text-white/85
+                    rounded-sm border border-[var(--white-10)] bg-[var(--white-5)] backdrop-blur-sm 
+                    shadow-[0_6px_20px_var(--brand-500-30)]
+                    transition-all duration-300 hover:-translate-y-[3px]
+                    hover:border-[var(--brand-300)]
+                    hover:bg-[var(--brand-500-30)] hover:text-white
+                    hover:shadow-[0_6px_20px_var(--brand-500-50)]"
+                >
+                  See features
+                </Link>
+
               </div>
             </div>
           </div>
         </div>
-
-        {/* keep your decorative SVGs below as-is */}
-      </section>
-    </>
+      </div>
+    </section>
   );
 };
 

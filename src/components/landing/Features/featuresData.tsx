@@ -10,17 +10,19 @@ const featuresData: Feature[] = [
       </svg>
     ),
     title: "Custodial multi-chain wallet",
-    paragraph: "TRX, ETH, XMR, SOL, BTC, XRP, DOGE balances in one place. USDT on ERC-20 / TRC-20 / SPL.",
+    paragraph:
+      "TRX, ETH, XMR, SOL, BTC, XRP, DOGE balances in one place. USDT on ERC-20 / TRC-20 / SPL.",
   },
   {
     id: 2,
     icon: (
       <svg width="40" height="40" viewBox="0 0 40 40" className="fill-current">
-        <path opacity="0.5" d="M4 8h32v6H4zM4 19h22v6H4zM4 30h28v6H4z"/>
+        <path opacity="0.5" d="M4 8h32v6H4zM4 19h22v6H4zM4 30h28v6H4z" />
       </svg>
     ),
     title: "Crypto payments",
-    paragraph: "Create payment requests and invoices; accept from individuals or institutions directly on-chain.",
+    paragraph:
+      "Create payment requests & invoices; accept directly on-chain from individuals or institutions.",
   },
   {
     id: 3,
@@ -30,7 +32,8 @@ const featuresData: Feature[] = [
       </svg>
     ),
     title: "Merchant tools",
-    paragraph: "Checkout links, QR codes, status webhooks, and settlement logs for accounting.",
+    paragraph:
+      "Checkout links, QR codes, status webhooks, and settlement logs for accounting.",
   },
   {
     id: 4,
@@ -40,19 +43,21 @@ const featuresData: Feature[] = [
         <circle cx="32" cy="32" r="6" opacity="0.5" />
       </svg>
     ),
-    title: "Swap / Bridge (in-wallet)",
-    paragraph: "Optional crypto ramp inside the wallet for supported chains. No fiat rails.",
+    title: "Swap / Bridge (optional)",
+    paragraph:
+      "In-wallet crypto ramp for supported chains. No fiat deposits or withdrawals.",
   },
   {
     id: 5,
     icon: (
       <svg width="40" height="40" viewBox="0 0 40 40" className="fill-current">
         <path opacity="0.5" d="M20 30c2.75 0 5 2.25 5 5s-2.25 5-5 5s-5-2.25-5-5s2.25-5 5-5Z" />
-        <path d="M33 7H7a3 3 0 0 0-3 3v11h32V10a3 3 0 0 0-3-3Z"/>
+        <path d="M33 7H7a3 3 0 0 0-3 3v11h32V10a3 3 0 0 0-3-3Z" />
       </svg>
     ),
     title: "Status & confirmations",
-    paragraph: "On-chain detection and confirmations per network with clear payment statuses.",
+    paragraph:
+      "On-chain detection with per-network confirmations and clear payment states.",
   },
   {
     id: 6,
@@ -62,7 +67,8 @@ const featuresData: Feature[] = [
       </svg>
     ),
     title: "Security first",
-    paragraph: "Encrypted custody, HTTPS, audit logs, and signed webhooks. Crypto-only compliance posture.",
+    paragraph:
+      "Encrypted custody, HTTPS, audit logs, and signed webhooks for merchant callbacks.",
   },
 ];
 

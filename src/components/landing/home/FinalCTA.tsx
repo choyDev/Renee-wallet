@@ -2,23 +2,76 @@ import Link from "next/link";
 
 export default function FinalCTA() {
   return (
-    <section className="relative overflow-x-clip">
-      <div className="container max-w-7xl px-6 py-16">
-        <div className="relative rounded-2xl border border-primary/20 bg-primary/10 p-8 text-center dark:border-primary/25 dark:bg-primary/15">
-          <div className="pointer-events-none absolute -top-24 left-1/2 -translate-x-1/2 h-72 w-[36rem] rounded-full bg-primary/25 blur-[100px]" />
-          <h3 className="text-2xl font-semibold text-slate-900 dark:text-white">
+    <section className="relative overflow-x-clip py-20">
+      <div className="container max-w-7xl px-6">
+        <div
+          className="
+            relative rounded-2xl border border-white/10 bg-[rgba(255,255,255,0.05)] p-10 text-center
+            shadow-[0_0_0_rgba(124,74,255,0)]
+            transition-all duration-300
+            hover:-translate-y-[6px]
+            hover:border-[var(--brand-600)]
+            hover:shadow-[0_20px_48px_rgba(110,59,255,0.18)]
+          "
+        >
+          {/* Glow ring */}
+          <div
+            className="
+              pointer-events-none absolute inset-0 rounded-2xl opacity-0 blur-xl
+              bg-gradient-to-br from-[var(--brand-600)]/15 via-transparent to-[var(--brand-400)]/10
+              transition-opacity duration-300 group-hover:opacity-100
+            "
+          />
+
+          {/* TITLE */}
+          <h3 className="text-3xl font-semibold text-white mb-3">
             Start accepting crypto payments
           </h3>
-          <p className="mt-2 text-slate-600 dark:text-slate-300">
-            TRX, ETH, XMR, SOL, BTC, XRP, DOGE — plus USDT on ERC-20 / TRC-20 / SPL. No fiat rails.
+
+          {/* TEXT */}
+          <p className="text-slate-400 mb-8">
+            TRX, ETH, XMR, SOL, BTC, XRP, DOGE — plus USDT on ERC-20 / TRC-20 / SPL.
+            No fiat rails.
           </p>
-          <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
-            <Link href="/signup" className="rounded-xl bg-primary px-6 py-3 text-white font-medium hover:opacity-90">
-              Get started
+
+          {/* BUTTONS */}
+          <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row sm:gap-6">
+
+            {/* Primary button */}
+            <Link
+              href="/signup"
+              className="w-45 relative inline-flex items-center justify-center px-10 py-3.5 text-[15px] font-semibold text-white rounded-sm
+                    bg-[linear-gradient(135deg,var(--brand-500)_0%,var(--brand-300)_100%)]
+                    shadow-[0_6px_20px_var(--brand-500-50)]
+                    transition-all duration-300 hover:-translate-y-[3px]
+                    hover:shadow-[0_6px_20px_var(--brand-500-65)]
+                    active:scale-[0.98]"
+            >
+              <span className="relative z-10">Get started</span>
+
+              {/* glow on hover */}
+              <span
+                className="absolute inset-0 rounded-sm opacity-0 group-hover:opacity-100 blur-[20px]
+                    bg-[linear-gradient(135deg,var(--brand-500)_0%,var(--brand-300)_100%)]
+                    transition-opacity duration-300"
+              />
             </Link>
-            <Link href="#features" className="rounded-xl border border-primary/40 px-6 py-3 text-primary hover:bg-primary/10">
+
+
+            {/* === SECONDARY BUTTON === */}
+            <Link
+              href="#features"
+              className="w-45 inline-flex items-center justify-center px-10 py-3.5 text-[15px] font-semibold text-white/85
+                    rounded-sm border border-[var(--white-10)] bg-[var(--white-5)] backdrop-blur-sm 
+                    shadow-[0_6px_20px_var(--brand-500-30)]
+                    transition-all duration-300 hover:-translate-y-[3px]
+                    hover:border-[var(--brand-300)]
+                    hover:bg-[var(--brand-500-30)] hover:text-white
+                    hover:shadow-[0_6px_20px_var(--brand-500-50)]"
+            >
               See features
             </Link>
+
           </div>
         </div>
       </div>
