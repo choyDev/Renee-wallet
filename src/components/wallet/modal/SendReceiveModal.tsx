@@ -200,8 +200,12 @@ export default function SendReceiveModal({
         exit={{ opacity: 0 }}
       >
         <motion.div
-          className="relative w-full max-w-md rounded-2xl overflow-hidden border border-white/10 shadow-[0_0_40px_rgba(0,0,0,0.5)]
-                     bg-gradient-to-br from-[#0f172a] via-[#1e293b] to-[#0f172a] p-6"
+           className="
+            relative w-full max-w-md rounded-2xl shadow-2xl p-6 space-y-6 
+            border border-slate-200 bg-white 
+            dark:border-white/10 
+            dark:bg-[#110f20] dark:bg-[radial-gradient(circle_at_30%_20%,#120a22_0%,#131124_70%)]
+          "
           initial={{ y: 60, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           exit={{ y: 40, opacity: 0 }}

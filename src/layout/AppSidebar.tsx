@@ -303,43 +303,12 @@ const AppSidebar: React.FC = () => {
       onMouseLeave={() => setIsHovered(false)}
     >
       {/* Logo */}
-      {/* <div className={`py-4 flex ${!isExpanded && !isHovered ? "lg:justify-center" : "justify-start"}`}>
-        <Link href="/">
-          {isExpanded || isHovered ? (
-            <div className="flex flex-row items-center gap-2">
-              <Image
-                className="dark:hidden"
-                src="/images/logo/logo-light.svg"
-                alt="Logo"
-                width={44}
-                height={44}
-              />
-              <Image
-                className="hidden dark:block"
-                src="/images/logo/logo-dark.svg"
-                alt="Logo"
-                width={44}
-                height={44}
-              />
-              <span
-                className="hidden dark:block text-2xl font-bold tracking-tight bg-clip-text text-transparent"
-                style={{
-                  backgroundImage: "linear-gradient(135deg, #6e3bff 0%, #a855f7 100%)",
-                }}
-              >
-                Renee Wallet
-              </span>
-              </div>
-          ) : (
-            <Image src="/images/logo/logo-dark.svg" alt="Logo" width={50} height={50} />
-          )}
-        </Link>
-      </div> */}
+     
       <div
         className={`
           py-4 
-          hidden               /* ⛔ Hide on mobile */
-          lg:flex             /* ✅ Show only on large devices */
+          hidden               
+          lg:flex    
           ${!isExpanded && !isHovered ? "lg:justify-center" : "justify-start"}
         `}
       >
