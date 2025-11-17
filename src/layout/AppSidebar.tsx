@@ -305,7 +305,7 @@ const AppSidebar: React.FC = () => {
       {/* Logo */}
       <div className={`py-4 flex ${!isExpanded && !isHovered ? "lg:justify-center" : "justify-start"}`}>
         <Link href="/">
-          {isExpanded || isHovered || isMobileOpen ? (
+          {isExpanded || isHovered ? (
             <div className="flex flex-row items-center gap-2">
               <Image
                 className="dark:hidden"
