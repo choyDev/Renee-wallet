@@ -8,7 +8,7 @@ import * as bitcoin from "bitcoinjs-lib";
 import * as ecc from "tiny-secp256k1";
 import { ECPairFactory } from "ecpair";
 import { Wallet as XrpWallet } from "xrpl";
-import { callXmrOnce } from "@/lib/xmrRpcPool";
+import { createXmrWallet } from "@/lib/xmrRpcPool";
 
 bitcoin.initEccLib(ecc);
 const ECPair = ECPairFactory(ecc);
@@ -105,6 +105,9 @@ const XMR_NET = {
       ? "https://stagenet.xmrchain.net"
       : "https://xmrchain.net",
 };
+
+
+
 
 // ----------------------
 // Encrypt private key
@@ -360,16 +363,22 @@ export async function ensureWalletsForUser(userId: number) {
 
         console.log(`🪙 Creating Monero wallet for user ${userId} (${networkType})...`);
 
-        // 1️⃣ Create wallet via xmrRpcPool
-        await callXmrOnce(walletName, walletPassword, "create_wallet", {
-          filename: walletName,
-          password: walletPassword,
-          language: "English",
-        });
+        // // 1️⃣ Create wallet via xmrRpcPool
+        // await callXmrOnce(walletName, walletPassword, "create_wallet", {
+        //   filename: walletName,
+        //   password: walletPassword,
+        //   language: "English",
+        // });
 
-        // 2️⃣ Fetch address from same one-shot process
-        const addrRes = await callXmrOnce(walletName, walletPassword, "get_address");
-        const address = addrRes.address;
+        // // 2️⃣ Fetch address from same one-shot process
+        // const addrRes = await callXmrOnce(walletName, walletPassword, "get_address");
+        // const address = addrRes.address;
+
+        const { address } = await createXmrWallet(
+          walletName,
+          walletPassword,
+          "English"
+        );
 
         const metaData = {
           rpcUrl: "http://127.0.0.1:38083/json_rpc", // optional reference, not used here
