@@ -23,7 +23,7 @@ export function WalletCardSkeleton() {
   return (
     <div className="rounded-2xl p-px bg-gradient-to-r from-brand-500/35 to-brand-500/10">
       <div className="h-full rounded-2xl border border-gray-200/60 dark:border-white/10
-                      bg-white/70 dark:bg-[#0B1220]/80 backdrop-blur-sm min-h-[223px]
+                      bg-white/70 dark:bg-[#110f20] bg-[radial-gradient(circle_at_30%_20%,#120a22_0%,#131124_70%)] backdrop-blur-sm min-h-[223px]
                       p-5 shadow-sm">
         {/* Header */}
         <div className="flex items-start justify-between mb-4">
@@ -77,7 +77,7 @@ export function BalanceCardSkeleton() {
   return (
     <div className="rounded-2xl p-px bg-gradient-to-r from-brand-500/50 to-cyan-500/40">
       <div className="rounded-2xl border border-gray-200/60 dark:border-white/10 
-                      bg-white/70 dark:bg-[#0B1220]/80 backdrop-blur-sm p-4 sm:p-5 
+                      bg-white/70 dark:bg-[#110f20] bg-[radial-gradient(circle_at_30%_20%,#120a22_0%,#131124_70%)] backdrop-blur-sm p-4 sm:p-5 
                       shadow-sm">
         <div className="flex items-center justify-between mb-2">
           <Skeleton className="h-4 w-24" />
@@ -95,7 +95,7 @@ export function BalanceCardSkeleton() {
 export function AssetCardSkeleton() {
   return (
     <div className="rounded-xl border border-gray-200/60 dark:border-white/10
-                    bg-white/70 dark:bg-[#0B1220]/80 backdrop-blur-sm p-4 sm:p-5
+                    bg-white/70 dark:bg-[#110f20] bg-[radial-gradient(circle_at_30%_20%,#120a22_0%,#131124_70%)] backdrop-blur-sm p-4 sm:p-5
                     shadow-sm">
       <div className="flex items-center justify-between">
         {/* Left: Icon + Name */}
@@ -123,12 +123,12 @@ export function AssetCardSkeleton() {
 export function ActionButtonsSkeleton() {
   return (
     <div className="rounded-2xl border border-gray-200/60 dark:border-white/10
-                    bg-white/70 dark:bg-[#0B1220]/80 backdrop-blur-sm shadow-sm p-3 sm:p-4">
+                    bg-white/70 dark:bg-[#110f20] bg-[radial-gradient(circle_at_30%_20%,#120a22_0%,#131124_70%)] backdrop-blur-sm shadow-sm p-3 sm:p-4">
       <div className="grid grid-cols-2 gap-3 sm:gap-4">
         {Array.from({ length: 4 }).map((_, i) => (
           <div key={i} className="rounded-2xl p-px bg-gradient-to-br from-brand-400/25 via-transparent to-brand-400/10">
             <div className="aspect-[2/1] rounded-2xl border border-gray-200/60 dark:border-white/10
-                            bg-white/70 dark:bg-[#0B1220]/80 backdrop-blur-sm
+                            bg-white/70 dark:bg-[#110f20] bg-[radial-gradient(circle_at_30%_20%,#120a22_0%,#131124_70%)] backdrop-blur-sm
                             flex flex-col items-center justify-center gap-2">
               <Skeleton className="h-8 w-8 rounded-full" />
               <Skeleton className="h-4 w-16" />
@@ -147,7 +147,7 @@ export function ChartSkeleton() {
   return (
     <div className="group relative h-full rounded-2xl p-px bg-gradient-to-br from-brand-400/40 via-transparent to-[#8B5CF6]/30">
       <div className="h-full rounded-2xl border border-gray-200/60 dark:border-white/10 
-                      bg-white/70 dark:bg-[#0B1220]/80 backdrop-blur-sm shadow-sm p-5 sm:p-6">
+                      bg-white/70 dark:bg-[#110f20] bg-[radial-gradient(circle_at_30%_20%,#120a22_0%,#131124_70%)] backdrop-blur-sm shadow-sm p-5 sm:p-6">
         {/* Header */}
         <div className="mb-4 flex items-center justify-between">
           <Skeleton className="h-6 w-32" />
@@ -189,7 +189,7 @@ export function ChartSkeleton() {
 export function TransactionTableSkeleton() {
   return (
     <div className="rounded-2xl border border-gray-200/60 dark:border-white/10 
-                    bg-white/70 dark:bg-[#0B1220]/80 backdrop-blur-sm 
+                    bg-white/70 dark:bg-[#110f20] bg-[radial-gradient(circle_at_30%_20%,#120a22_0%,#131124_70%)] backdrop-blur-sm 
                     shadow-sm p-6">
       {/* Header */}
       <div className="flex items-center gap-2 mb-5">

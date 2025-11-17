@@ -112,7 +112,7 @@ export default function TotalBalanceCard() {
       
       <div className="
         h-full rounded-2xl border border-white/10 
-        bg-white/80 dark:bg-[#121726]/80 backdrop-blur-xl 
+        bg-white/80 dark:bg-[#1A1F36]/80 backdrop-blur-xl 
         p-6 sm:p-8 lg:p-10 shadow-md flex flex-col justify-between
         transition-all duration-300
       ">

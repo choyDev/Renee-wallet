@@ -69,7 +69,7 @@ export default function KycVerification() {
       </div>
 
       {/* 🟦 KYC Card */}
-      <div className="relative z-10 w-full max-w-5xl rounded-2xl bg-white/10 p-12 backdrop-blur-xl shadow-2xl dark:bg-[#1A1D24]/80">
+      <div className="relative z-10 w-full max-w-5xl rounded-2xl bg-white/10 p-12 backdrop-blur-xl shadow-2xl dark:bg-[linear-gradient(145deg,#1C1A2F_0%,#12111F_40%,#080A12_100%)]">
         {/* Header Row: Back + Title */}
         <div className="flex items-center justify-between mb-8">
           {/* <Link

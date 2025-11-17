@@ -55,63 +55,70 @@ export default function DashboardStats() {
   return (
     <div
       className="
-        rounded-2xl p-6 h-full min-h-[200px] flex flex-col justify-between
-        shadow-sm transition-all duration-300
-
-        /* Light mode */
-        bg-white border border-gray-200
-
-        /* Dark mode */
-        dark:bg-[#1A1F36]/80 dark:border-white/10 dark:backdrop-blur-xl
-        dark:hover:border-purple-500/30
+        rounded-2xl p-px 
+        dark:bg-gradient-to-br dark:from-purple-500/30 dark:via-transparent dark:to-cyan-500/30
+        h-full
       "
     >
-      {/* TOP SECTION */}
-      <div className="flex items-start justify-between gap-6 mb-6">
-        {/* Wallets */}
+      <div
+        className="
+          rounded-2xl p-6 h-full min-h-[200px] flex flex-col justify-between
+          shadow-sm transition-all duration-300
+
+          /* Light mode */
+          bg-white border border-gray-200
+
+          /* Dark mode (same as second component) */
+          dark:bg-[#1A1F36]/80 dark:border-white/5 dark:backdrop-blur-xl
+        "
+      >
+        {/* TOP SECTION */}
+        <div className="flex items-start justify-between gap-6 mb-6">
+          {/* Wallets */}
+          <div>
+            {loading ? (
+              <div className="w-14 h-10 rounded-md bg-gray-200 dark:bg-white/10 animate-pulse mb-2" />
+            ) : (
+              <div className="text-4xl font-extrabold text-gray-900 dark:text-white notranslate leading-tight">
+                {stats.totalWallets}
+              </div>
+            )}
+
+            <div className="text-sm font-semibold text-gray-500 dark:text-gray-300 tracking-wide">
+              Wallets
+            </div>
+          </div>
+
+          {/* Transactions */}
+          <div className="text-right">
+            {loading ? (
+              <div className="w-16 h-10 rounded-md bg-gray-200 dark:bg-white/10 animate-pulse ml-auto mb-2" />
+            ) : (
+              <div className="text-4xl font-extrabold text-gray-900 dark:text-white notranslate leading-tight">
+                {stats.totalTransactions}
+              </div>
+            )}
+
+            <div className="text-sm font-semibold text-gray-500 dark:text-gray-300 tracking-wide">
+              Transactions
+            </div>
+          </div>
+        </div>
+
+        {/* BALANCE */}
         <div>
+          <div className="text-sm font-semibold text-gray-500 dark:text-gray-300 mb-1 tracking-wide">
+            Current balance
+          </div>
+
           {loading ? (
-            <div className="w-14 h-10 rounded-md bg-gray-200 dark:bg-white/10 animate-pulse mb-2" />
+            <div className="w-32 h-6 rounded-md bg-gray-200 dark:bg-white/10 animate-pulse" />
           ) : (
-            <div className="text-4xl font-extrabold text-gray-900 dark:text-white notranslate leading-tight">
-              {stats.totalWallets}
+            <div className="text-2xl font-bold text-gray-900 dark:text-white notranslate leading-tight">
+              ${stats.currentBalance.toFixed(1)}
             </div>
           )}
-
-          <div className="text-sm font-semibold text-gray-500 dark:text-gray-300 tracking-wide">
-            Wallets
-          </div>
         </div>
-
-        {/* Transactions */}
-        <div className="text-right">
-          {loading ? (
-            <div className="w-16 h-10 rounded-md bg-gray-200 dark:bg-white/10 animate-pulse ml-auto mb-2" />
-          ) : (
-            <div className="text-4xl font-extrabold text-gray-900 dark:text-white notranslate leading-tight">
-              {stats.totalTransactions}
-            </div>
-          )}
-
-          <div className="text-sm font-semibold text-gray-500 dark:text-gray-300 tracking-wide">
-            Transactions
-          </div>
-        </div>
-      </div>
-
-      {/* BALANCE */}
-      <div>
-        <div className="text-sm font-semibold text-gray-500 dark:text-gray-300 mb-1 tracking-wide">
-          Current balance
-        </div>
-
-        {loading ? (
-          <div className="w-32 h-6 rounded-md bg-gray-200 dark:bg-white/10 animate-pulse" />
-        ) : (
-          <div className="text-2xl font-bold text-gray-900 dark:text-white notranslate leading-tight">
-            ${stats.currentBalance.toFixed(1)}
-          </div>
-        )}
       </div>
     </div>
   );

@@ -45,8 +45,7 @@ export default function Dashboard() {
                   rounded-2xl p-4 h-full flex flex-col
 
                   /* Light mode card */
-                  bg-white border border-transparent
-
+                  bg-white border
                   /* Dark mode card */
                   dark:bg-[#1A1F36]/80
                   dark:border-gray-700

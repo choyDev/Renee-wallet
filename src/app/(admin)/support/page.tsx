@@ -174,7 +174,7 @@ export default function SupportPage() {
 
 function Card({ children }: { children: React.ReactNode }) {
   return (
-    <div className="rounded-2xl border border-slate-200 bg-white shadow-[0_10px_40px_-20px_rgba(0,0,0,0.06)] dark:border-slate-800 dark:bg-[#0C1428]">
+    <div className="rounded-2xl border border-slate-200 bg-white shadow-[0_10px_40px_-20px_rgba(0,0,0,0.06)] dark:border-slate-800 dark:bg-[linear-gradient(145deg,#24203A_0%,#171624_40%,#0D0F18_100%)]">
       <div className="p-6">{children}</div>
     </div>
   );
@@ -209,7 +209,7 @@ function Input(props: React.InputHTMLAttributes<HTMLInputElement>) {
       className={[
         "w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 placeholder-slate-400",
         "outline-none ring-0 focus:border-slate-400 focus:ring-2 focus:ring-indigo-500/50",
-        "dark:border-slate-800 dark:bg-[#0A1122] dark:text-slate-100 dark:placeholder-slate-500 dark:focus:border-slate-600",
+        "dark:border-slate-800 dark:bg-[linear-gradient(145deg,#24203A_0%,#171624_40%,#0D0F18_100%)] dark:text-slate-100 dark:placeholder-slate-500 dark:focus:border-slate-600",
         props.className || "",
       ].join(" ")}
     />
@@ -222,7 +222,7 @@ function Textarea(props: React.TextareaHTMLAttributes<HTMLTextAreaElement>) {
       className={[
         "w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 placeholder-slate-400",
         "outline-none ring-0 focus:border-slate-400 focus:ring-2 focus:ring-indigo-500/50",
-        "dark:border-slate-800 dark:bg-[#0A1122] dark:text-slate-100 dark:placeholder-slate-500 dark:focus:border-slate-600",
+        "dark:border-slate-800 dark:bg-[linear-gradient(145deg,#24203A_0%,#171624_40%,#0D0F18_100%)] dark:text-slate-100 dark:placeholder-slate-500 dark:focus:border-slate-600",
         props.className || "",
       ].join(" ")}
     />
@@ -235,7 +235,7 @@ function Select(props: React.SelectHTMLAttributes<HTMLSelectElement>) {
       className={[
         "w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900",
         "outline-none focus:border-slate-400 focus:ring-2 focus:ring-indigo-500/50",
-        "dark:border-slate-800 dark:bg-[#0A1122] dark:text-slate-100 dark:focus:border-slate-600",
+        "dark:border-slate-800 dark:bg-[linear-gradient(145deg,#24203A_0%,#171624_40%,#0D0F18_100%)] dark:text-slate-100 dark:focus:border-slate-600",
         props.className || "",
       ].join(" ")}
     />

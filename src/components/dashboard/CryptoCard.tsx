@@ -34,14 +34,14 @@ const shimmer =
 function CryptoCardSkeleton() {
   return (
     <div
-      className="group rounded-2xl p-px"
+      className="group rounded-2xl p-px bg-gradient-to-br from-purple-500/30 via-transparent to-cyan-500/30"
       style={{
         background:
           "linear-gradient(135deg, rgba(255,255,255,0.1), transparent)",
       }}
     >
       <div className="h-full rounded-2xl border border-gray-200/60 dark:border-white/10
-                      bg-white/70 dark:bg-[#0B1220]/80 backdrop-blur-sm
+                      bg-white/70 dark:bg-[#1A1F36]/80 backdrop-blur-sm
                       shadow-sm p-5 sm:p-6 flex flex-col">
 
         {/* TOP: icon + title */}
@@ -115,16 +115,21 @@ export default function CryptoCard({
 
   const accent = accentColor ?? "#3B82F6";
 
-  const hairline = `linear-gradient(135deg, ${normalizeToAlpha(accent, 0.35)}, transparent)`;
 
   return (
     <div
-      className="group rounded-2xl p-px transition-all duration-300"
-      style={{ background: hairline }}
-    >
-      <div className="h-full rounded-2xl border border-gray-200/60 dark:border-white/10
-                      bg-white/80 dark:bg-[#0B1220]/80 backdrop-blur-xl
-                      shadow-sm transition-all duration-300 hover:shadow-md">
+    className="
+      group rounded-2xl p-px transition-all duration-300 
+      dark:bg-gradient-to-br 
+      dark:from-purple-500/30 dark:via-transparent dark:to-cyan-500/30
+    "
+  >
+    <div className="
+      h-full rounded-2xl border border-gray-200/60 dark:border-white/10
+      bg-white/80 dark:bg-[#1A1F36]/80 backdrop-blur-xl
+      shadow-sm transition-all duration-300 hover:shadow-md
+    ">
+  
 
         <div className="p-4 sm:p-5 md:p-6 flex flex-col h-full">
 
