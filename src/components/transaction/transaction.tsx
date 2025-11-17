@@ -267,7 +267,7 @@ export default function TransactionTable({ chain }: TransactionTableProps) {
 
   return (
     <div className="rounded-2xl border border-gray-200/60 dark:border-white/10 
-                    bg-white/70 dark:bg-[#110f20] bg-[radial-gradient(circle_at_30%_20%,#120a22_0%,#131124_70%)] backdrop-blur-sm 
+                    bg-white/70 dark:bg-[#110f20] dark:bg-[radial-gradient(circle_at_30%_20%,#120a22_0%,#131124_70%)] backdrop-blur-sm 
                     shadow-sm hover:shadow-md transition-all duration-300 p-4 sm:p-5 md:p-6">
       
       {/* Header - Responsive */}
