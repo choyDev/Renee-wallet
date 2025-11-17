@@ -89,7 +89,7 @@
 //                 <section className="col-span-12 lg:col-span-8">
 //                     <div className="group relative h-full rounded-2xl p-px bg-gradient-to-br from-brand-400/40 via-transparent to-[#F59E0B]/30">
 //                         <div className="h-full rounded-2xl border border-gray-200/60 dark:border-white/10 
-//                           bg-white/70 dark:bg-[#0B1220]/80 backdrop-blur-sm 
+//                           bg-white/70 dark:bg-[#110f20] bg-[radial-gradient(circle_at_30%_20%,#120a22_0%,#131124_70%)] backdrop-blur-sm 
 //                           shadow-[0_1px_0_0_rgba(255,255,255,0.06)_inset,0_10px_30px_-10px_rgba(0,0,0,0.35)]
 //                           transition-all duration-300 group-hover:shadow-lg">
 //                             <div className="p-5 sm:p-6">
@@ -115,7 +115,7 @@
 //                         {/* Total Balance */}
 //                         <div className="h-full rounded-2xl p-px bg-gradient-to-r from-brand-500/50 to-cyan-500/40">
 //                             <div className="h-full flex flex-col rounded-2xl border border-gray-200/60 dark:border-white/10 
-//                             bg-white/70 dark:bg-[#0B1220]/80 backdrop-blur-sm p-4 sm:p-5 
+//                             bg-white/70 dark:bg-[#110f20] bg-[radial-gradient(circle_at_30%_20%,#120a22_0%,#131124_70%)] backdrop-blur-sm p-4 sm:p-5 
 //                             shadow-sm transition-all duration-300 hover:shadow-md">
 //                                 <div className="flex items-center justify-between">
 //                                     <span className="text-sm text-gray-500 dark:text-gray-400">Total Balance</span>
@@ -133,7 +133,7 @@
 //                         <div className="mt-auto grid grid-cols-1 gap-2 text-[15px] sm:text-base">  {/* base size for the section */}
 //                             {/* BTC */}
 //                             <div className="group rounded-xl border border-gray-200/60 dark:border-white/10
-//                   bg-white/70 dark:bg-[#0B1220]/80 backdrop-blur-sm p-4
+//                   bg-white/70 dark:bg-[#110f20] bg-[radial-gradient(circle_at_30%_20%,#120a22_0%,#131124_70%)] backdrop-blur-sm p-4
 //                   shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md">
 //                                 <div className="flex items-center justify-between">
 //                                     <div className="flex items-center gap-4">
@@ -292,7 +292,7 @@ export default function WalletOverviewPage() {
         <section className="col-span-1 lg:col-span-8">
           <div className="group relative h-full rounded-2xl p-px bg-gradient-to-br from-brand-400/40 via-transparent to-[#F59E0B]/30">
             <div className="h-full rounded-2xl border border-gray-200/60 dark:border-white/10 
-                            bg-white/70 dark:bg-[#0B1220]/80 backdrop-blur-sm 
+                            bg-white/70 dark:bg-[#110f20] bg-[radial-gradient(circle_at_30%_20%,#120a22_0%,#131124_70%)] backdrop-blur-sm 
                             shadow-[0_1px_0_0_rgba(255,255,255,0.06)_inset,0_10px_30px_-10px_rgba(0,0,0,0.35)]
                             transition-all duration-300 group-hover:shadow-lg">
               <div className="p-4 sm:p-5 md:p-6">
@@ -321,7 +321,7 @@ export default function WalletOverviewPage() {
             {/* Total Balance - Responsive */}
             <div className="rounded-2xl p-px bg-gradient-to-r from-brand-500/50 to-cyan-500/40">
               <div className="rounded-2xl border border-gray-200/60 dark:border-white/10 
-                              bg-white/70 dark:bg-[#0B1220]/80 backdrop-blur-sm 
+                              bg-white/70 dark:bg-[#110f20] bg-[radial-gradient(circle_at_30%_20%,#120a22_0%,#131124_70%)] backdrop-blur-sm 
                               p-4 sm:p-5 shadow-sm transition-all duration-300 hover:shadow-md">
                 
                 {/* Header */}
@@ -346,7 +346,7 @@ export default function WalletOverviewPage() {
               
               {/* BTC Card */}
               <div className="group rounded-xl border border-gray-200/60 dark:border-white/10
-                              bg-white/70 dark:bg-[#0B1220]/80 backdrop-blur-sm p-3 sm:p-4
+                              bg-white/70 dark:bg-[#110f20] bg-[radial-gradient(circle_at_30%_20%,#120a22_0%,#131124_70%)] backdrop-blur-sm p-3 sm:p-4
                               shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md">
                 <div className="flex items-center justify-between gap-3">
                   

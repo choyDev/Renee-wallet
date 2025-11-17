@@ -230,7 +230,7 @@ export default function WalletBalanceCard({
     <>
       {/* Container - Fully Responsive */}
       <div className="flex h-full flex-col rounded-2xl border border-gray-200/60 dark:border-white/10
-                      bg-white/70 dark:bg-[#0B1220]/80 backdrop-blur-sm shadow-sm">
+                      bg-white/70 dark:bg-[#110f20] bg-[radial-gradient(circle_at_30%_20%,#120a22_0%,#131124_70%)] backdrop-blur-sm shadow-sm">
         
         {/* Action Buttons Grid - Responsive padding and gap */}
         <div className="p-3 sm:p-4">
@@ -309,7 +309,7 @@ function ActionButton({
         aria-label={label}
         className="group relative flex aspect-[2/1] w-full flex-col items-center justify-center overflow-hidden
                    rounded-xl sm:rounded-2xl border border-gray-200/60 dark:border-white/10
-                   bg-white/70 dark:bg-[#0B1220]/80 backdrop-blur-sm shadow-sm
+                   bg-white/70 dark:bg-[#110f20] bg-[radial-gradient(circle_at_30%_20%,#120a22_0%,#131124_70%)] backdrop-blur-sm shadow-sm
                    text-gray-700 dark:text-[#C7C9D1]
                    transition-all duration-200 ease-out
                    hover:-translate-y-0.5 hover:shadow-md
