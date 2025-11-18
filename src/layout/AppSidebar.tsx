@@ -295,7 +295,7 @@ const AppSidebar: React.FC = () => {
   // ----------------------------
   return (
     <aside
-      className={`fixed mt-16 flex flex-col lg:mt-0 top-0 px-5 left-0 bg-white dark:bg-[linear-gradient(145deg,#1C1A2F_0%,#12111F_40%,#080A12_100%)] dark:border-gray-800 text-gray-900 h-screen transition-all duration-300 ease-in-out z-50 border-r border-gray-200 
+      className={`fixed mt-16 flex flex-col lg:mt-0 top-0 px-5 left-0 bg-white dark:bg-[#110f20] dark:border-gray-800 text-gray-900 h-screen transition-all duration-300 ease-in-out z-50 border-r border-gray-200 
         ${isExpanded || isMobileOpen ? "w-[290px]" : isHovered ? "w-[290px]" : "w-[90px]"}
         ${isMobileOpen ? "translate-x-0" : "-translate-x-full"}
         lg:translate-x-0`}
@@ -317,7 +317,7 @@ const AppSidebar: React.FC = () => {
             <div className="flex flex-row items-center gap-2">
               <Image
                 className="dark:hidden"
-                src="/images/logo/logo-light.svg"
+                src="/images/logo/logo-dark.svg"
                 alt="Logo"
                 width={44}
                 height={44}
@@ -330,7 +330,7 @@ const AppSidebar: React.FC = () => {
                 height={44}
               />
               <span
-                className="hidden dark:block text-2xl font-bold tracking-tight bg-clip-text text-transparent"
+                className="dark:block text-2xl font-bold tracking-tight bg-clip-text text-transparent"
                 style={{
                   backgroundImage: "linear-gradient(135deg, #6e3bff 0%, #a855f7 100%)",
                 }}

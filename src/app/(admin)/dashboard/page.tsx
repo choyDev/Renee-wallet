@@ -6,8 +6,7 @@ import TokensTable from "@/components/dashboard/TokensTable";
 import RecentActivityTable from "@/components/dashboard/RecentActivityTable";
 import DashboardStats from "@/components/dashboard/DashboardStats";
 import WalletIcons from "@/components/dashboard/WalletIcons";
-import BridgeCard from "@/components/dashboard/BridgeCard";
-import PortfolioBreakdown from "@/components/dashboard/PortofolioBreakdown";
+import DashboardChainChart from "@/components/dashboard/ChainChart";
 
 export default function Dashboard() {
 
@@ -30,12 +29,12 @@ export default function Dashboard() {
         <div className="grid grid-cols-1 xl:grid-cols-12 gap-6 items-stretch">
 
           {/* Dashboard Stats */}
-          <div className="xl:col-span-2 h-full">
+          <div className="xl:col-span-2 xl:row-span-2">
             <DashboardStats />
           </div>
 
           {/* Wallet Icons */}
-          <div className="xl:col-span-7 h-full">
+          <div className="xl:col-span-7">
             <div
               className="
                 rounded-2xl p-px
@@ -46,10 +45,10 @@ export default function Dashboard() {
                   rounded-2xl p-4 h-full flex flex-col
 
                   /* Light mode card */
-                  bg-white border
+                  bg-gray-50 border border-gray-300
                   /* Dark mode card */
-                  dark:bg-[#1A1F36]/80
-                  dark:border-gray-700
+                  dark:bg-[#1A1730]
+                  dark:border-gray-900
                   dark:backdrop-blur-xl
                 "
               >
@@ -68,20 +67,9 @@ export default function Dashboard() {
           </div>
 
           {/* TokensTable */}
-          <div className="xl:col-span-3">
-            <TokensTable />
+          <div className="xl:col-span-7">
+            <DashboardChainChart />
           </div>
-
-          {/* Portfolio Breakdown */}
-          <div className="xl:col-span-2">
-            <PortfolioBreakdown />
-          </div>
-
-          {/* Bridge Card */}
-          <div className="xl:col-span-4">
-            <BridgeCard />
-          </div>
-
         </div>
       </div>
     </div>

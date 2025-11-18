@@ -64,9 +64,9 @@ export default function WalletIcons() {
     { symbol: "BTC", name: "Bitcoin", icon: <SiBitcoin className="w-10 h-10" />, color: "#F7931A", path: "/wallet/btc" },
     { symbol: "SOL", name: "Solana", icon: <SiSolana className="w-10 h-10" />, color: "#14F195", path: "/wallet/sol" },
     { symbol: "TRX", name: "Tron", icon: <TronIcon className="w-10 h-10" />, color: "#FF060A", path: "/wallet/trx" },
-    { symbol: "XMR", name: "Monero", icon: <FaMonero className="w-10 h-10" />, color: "#FF6600", path: null },
-    { symbol: "XRP", name: "XRP", icon: <SiXrp className="w-10 h-10" />, color: "#0A74E6", path: null },
-    { symbol: "DOGE", name: "Dogecoin", icon: <SiDogecoin className="w-10 h-10" />, color: "#C2A633", path: null },
+    { symbol: "XMR", name: "Monero", icon: <FaMonero className="w-10 h-10" />, color: "#FF6600", path: "/wallet/xmr" },
+    { symbol: "XRP", name: "XRP", icon: <SiXrp className="w-10 h-10" />, color: "#0A74E6", path: "/wallet/xrp" },
+    { symbol: "DOGE", name: "Dogecoin", icon: <SiDogecoin className="w-10 h-10" />, color: "#C2A633", path: "/wallet/doge" },
   ];
 
   const getWalletBalance = (symbol: string) => {
@@ -105,13 +105,13 @@ export default function WalletIcons() {
                 h-full min-h-[200px]
 
                 /* LIGHT MODE */
-                bg-white border border-gray-200
+                bg-gray-30 border border-gray-300
 
                 /* DARK MODE */
                 dark:bg-white/5 dark:border-white/10
 
                 hover:border-purple-500/30
-                hover:bg-gray-50 dark:hover:bg-white/10
+                hover:bg-gray-100 dark:hover:bg-white/10
               "
             >
               {/* ICON */}

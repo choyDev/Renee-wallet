@@ -610,6 +610,12 @@ export default function CryptoPriceChart({
 
   const strokeColor = useResolvedCssColor(COLOR_CLASS[asset.key]);
 
+  React.useEffect(() => {
+    const newAsset = assetFromKey(initialAsset || "") || ASSETS[0];
+    setAsset(newAsset);
+  }, [initialAsset]);
+  
+
   // Detect mobile
   React.useEffect(() => {
     const checkMobile = () => setIsMobile(window.innerWidth < 640);
@@ -772,11 +778,11 @@ export default function CryptoPriceChart({
           
           {/* Price */}
           <div className="flex flex-col sm:flex-row sm:items-end gap-1 sm:gap-3">
-            <div className="text-2xl sm:text-3xl md:text-4xl font-semibold leading-none tracking-tight tabular-nums">
+            <div className="text-2xl sm:text-3xl md:text-4xl font-semibold leading-none tracking-tight tabular-nums dark:text-gray-100">
               {price ? usd.format(price) : "—"}
             </div>
             {asOf && (
-              <div className="text-[10px] sm:text-xs text-muted-foreground sm:pb-1">
+              <div className="text-[10px] sm:text-xs text-muted-foreground sm:pb-1 dark:text-gray-100">
                 {hoverTime ? "at " : "as of "}
                 {asOf.toLocaleString(undefined, {
                   month: 'short',
@@ -799,7 +805,7 @@ export default function CryptoPriceChart({
         </div>
 
         {/* Chart - Responsive Height */}
-        <div className="h-[240px] sm:h-[280px] md:h-[320px] lg:h-[360px] w-full">
+        <div className="h-[180px] sm:h-[280px] md:h-[260px] lg:h-[300px] w-full">
           {error && (
             <div className="flex h-full items-center justify-center text-xs sm:text-sm text-rose-600 dark:text-rose-400 px-4 text-center">
               {error}

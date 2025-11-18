@@ -26,6 +26,19 @@ export default function RecentActivityTable() {
   const [txs, setTxs] = useState<TxItem[]>([]);
   const [loading, setLoading] = useState(true);
 
+  const trimEndSlash = (url: string) => url.replace(/\/$/, "");
+
+  // Placeholder/Mock functions for network context
+  const isTestnet = (chainId: any) => chainId && String(chainId).toLowerCase().includes("test");
+  const normalizeChainId = (chainId: any) => String(chainId || "").toLowerCase();
+
+  interface ExplorerLinkParams {
+    symbol: string;
+    txHash: string | null;
+    chainId?: any; // You must define how to get chainId for a TxItem in your full application
+    explorerUrl?: string | null; // You must define how to get explorerUrl for a TxItem in your full application
+  }
+
   useEffect(() => {
     const loadRecent = async () => {
       try {
@@ -73,19 +86,108 @@ export default function RecentActivityTable() {
     return "Just now";
   };
 
+  const handleRowClick = (tx: TxItem) => {
+    // Attempt to generate the explorer URL
+    const explorerLink = getTransactionExplorerUrl({
+      symbol: tx.token,
+      txHash: tx.txHash,
+      // NOTE: You must pass actual chainId and explorerUrl here if your logic needs them
+      chainId: null, 
+      explorerUrl: null,
+    });
+
+    if (explorerLink) {
+      window.open(explorerLink, "_blank"); // Open the link in a new tab
+    } else {
+      console.warn(`Cannot open explorer for transaction: ${tx.id}. Missing txHash or configuration.`);
+      // Optionally, navigate to a local detail page if the explorer link isn't available
+      // router.push(`/transactions/${tx.id}`); 
+    }
+  };
+
+  function getTransactionExplorerUrl({
+    symbol,
+    txHash,
+    chainId,
+    explorerUrl,
+  }: ExplorerLinkParams): string | null {
+    if (!txHash) return null;
+  
+    // IMPORTANT: You will need to implement logic to retrieve the chainId and 
+    // potentially an existing explorerUrl based on the transaction's details.
+    // For the purpose of this example, we assume chainId/explorerUrl are available or null.
+  
+    switch (symbol) {
+        case "BTC": {
+          const base = explorerUrl && /blockstream\.info/.test(explorerUrl)
+            ? trimEndSlash(explorerUrl)
+            : isTestnet(chainId)
+              ? "https://blockstream.info/testnet"
+              : "https://blockstream.info";
+          return `${base}/tx/${txHash}`;
+        }
+        case "ETH": {
+          const base = explorerUrl && /etherscan\.io/.test(explorerUrl)
+            ? trimEndSlash(explorerUrl)
+            : isTestnet(chainId)
+              ? "https://sepolia.etherscan.io"
+              : "https://etherscan.io";
+          return `${base}/tx/${txHash}`;
+        }
+        case "TRX": {
+          const id = normalizeChainId(chainId);
+          const base = /nile/i.test(id)
+            ? "https://nile.tronscan.org/#/transaction"
+            : isTestnet(id)
+              ? "https://nile.tronscan.org/#/transaction"
+              : "https://tronscan.org/#/transaction";
+          return `${base}/${txHash}`;
+        }
+        case "SOL": {
+          const id = normalizeChainId(chainId);
+          const cluster = /devnet/i.test(id)
+            ? "devnet"
+            : /testnet/i.test(id)
+              ? "testnet"
+              : isTestnet(id)
+                ? "devnet"
+                : "";
+          const base = "https://solscan.io/tx";
+          return `${base}/${txHash}${cluster ? `?cluster=${cluster}` : ""}`;
+        }
+        case "DOGE": {
+          const base = isTestnet(chainId)
+            ? "https://doge-testnet-explorer.qed.me/tx"
+            : "https://dogechain.info/tx";
+          return `${base}/${txHash}`;
+        }
+        case "XRP": {
+          const base = isTestnet(chainId)
+            ? "https://testnet.xrpl.org/transactions"
+            : "https://xrpscan.com/transactions";
+          return `${base}/${txHash}`;
+        }
+        case "XMR": {
+          return `https://testnet.xmrchain.net/search?value=${txHash}`;
+        }
+        default:
+          return null;
+    }
+  }
+
   const skeletonItems = Array.from({ length: 7 });
 
   return (
-    <div className="
-      rounded-2xl p-px
-      dark:bg-gradient-to-br dark:from-purple-500/30 dark:via-transparent dark:to-cyan-500/30
-      h-full
-    ">
+    <div
+    className="
+      rounded-2xl p-px h-full
+    "
+    > 
       <div
         className="
           h-full rounded-2xl p-6 shadow-sm flex flex-col transition-all duration-300
-          bg-white border border-gray-200
-          dark:bg-[#1A1F36]/80 dark:border-white/5 dark:backdrop-blur-xl
+          bg-gray-50 border border-gray-300
+          dark:bg-[#1A1730] dark:border-gray-900 dark:backdrop-blur-xl
         "
       >
         <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
@@ -127,9 +229,10 @@ export default function RecentActivityTable() {
             {txs.map((t) => (
               <div
                 key={t.id}
+                onClick={() => handleRowClick(t)}
                 className="
                   flex flex-col p-3 rounded-lg border transition-all
-                  bg-gray-50 border-gray-200 hover:bg-gray-100
+                  bg-gray-100 border-gray-300 hover:bg-gray-200
                   dark:bg-white/5 dark:border-white/5 dark:hover:bg-white/10
                 "
               >

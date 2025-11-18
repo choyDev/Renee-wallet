@@ -373,8 +373,8 @@ export default function PortfolioAssets() {
             },
             value: {
               show: true,
-              fontSize: "14px",
-              fontWeight: 600,
+              fontSize: "20px",
+              fontWeight: 800,
               color: "#FFF",
               formatter: () => ""
             },
@@ -408,8 +408,11 @@ export default function PortfolioAssets() {
      RENDER
   =============================================== */
   return (
-    <div className="rounded-2xl p-px bg-gradient-to-br from-purple-500/30 via-transparent to-cyan-500/30 h-full">
-      <div className="h-full rounded-2xl border border-gray-200/50 dark:border-white/10 bg-white/80 dark:bg-[#1A1F36]/80 backdrop-blur-xl p-4 sm:p-5 md:p-6 shadow-sm transition-all duration-300 hover:border-purple-500/30 flex flex-col">
+    <div
+      className="
+        group rounded-2xl p-px transition-all duration-300"
+    >
+      <div className="h-full rounded-2xl border border-gray-300 dark:border-gray-900 bg-gray-50 dark:bg-[#1A1730] backdrop-blur-xl p-4 sm:p-5 md:p-6 transition-all duration-300 flex flex-col">
 
         {/* HEADER */}
         <h3 className="text-sm sm:text-base font-semibold text-gray-900 dark:text-white mb-3 sm:mb-4">

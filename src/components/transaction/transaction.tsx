@@ -182,6 +182,8 @@ interface TxItem {
   type: string;
   status: string;
   createdAt: string;
+ 
+
 }
 
 interface TransactionTableProps {
@@ -191,6 +193,19 @@ interface TransactionTableProps {
 export default function TransactionTable({ chain }: TransactionTableProps) {
   const [txs, setTxs] = useState<TxItem[]>([]);
   const [loading, setLoading] = useState(true);
+
+  const trimEndSlash = (url: string) => url.replace(/\/$/, "");
+
+  // Placeholder/Mock functions for network context
+  const isTestnet = (chainId: any) => chainId && String(chainId).toLowerCase().includes("test");
+  const normalizeChainId = (chainId: any) => String(chainId || "").toLowerCase();
+
+  interface ExplorerLinkParams {
+    symbol: string;
+    txHash: string | null;
+    chainId?: any; // You must define how to get chainId for a TxItem in your full application
+    explorerUrl?: string | null; // You must define how to get explorerUrl for a TxItem in your full application
+  }
 
   useEffect(() => {
     const loadTransactions = async () => {
@@ -220,6 +235,75 @@ export default function TransactionTable({ chain }: TransactionTableProps) {
 
     loadTransactions();
   }, [chain]);
+
+  const handleRowClick = (tx: TxItem) => {
+    // Attempt to generate the explorer URL
+    const explorerLink = getTransactionExplorerUrl({
+      symbol: tx.token,
+      txHash: tx.txHash,
+      // NOTE: You must pass actual chainId and explorerUrl here if your logic needs them
+      chainId: null, 
+      explorerUrl: null,
+    });
+
+    if (explorerLink) {
+      window.open(explorerLink, "_blank"); // Open the link in a new tab
+    } else {
+      console.warn(`Cannot open explorer for transaction: ${tx.id}. Missing txHash or configuration.`);
+      // Optionally, navigate to a local detail page if the explorer link isn't available
+      // router.push(`/transactions/${tx.id}`); 
+    }
+  };
+
+
+  function getTransactionExplorerUrl({
+    symbol,
+    txHash,
+    chainId,
+    explorerUrl,
+  }: ExplorerLinkParams): string | null {
+    if (!txHash) return null;
+  
+    // IMPORTANT: You will need to implement logic to retrieve the chainId and 
+    // potentially an existing explorerUrl based on the transaction's details.
+    // For the purpose of this example, we assume chainId/explorerUrl are available or null.
+  
+    switch (symbol) {
+        case "BTC": {
+          const base = "https://blockstream.info/testnet"
+              
+          return `${base}/tx/${txHash}`;
+        }
+        case "ETH": {
+          const base = "https://sepolia.etherscan.io"
+          return `${base}/tx/${txHash}`;
+        }
+        case "TRX": {
+          const id = normalizeChainId(chainId);
+          const base = "https://nile.tronscan.org/#/transaction"
+            
+          return `${base}/${txHash}`;
+        }
+        case "SOL": {
+      
+          const base = "https://solscan.io/tx";
+          return `${base}/${txHash}`;
+        }
+        case "DOGE": {
+          const base = "https://doge-testnet-explorer.qed.me/tx"
+          return `${base}/${txHash}`;
+        }
+        case "XRP": {
+          const base = "https://testnet.xrpl.org/transactions"
+          return `${base}/${txHash}`;
+        }
+        case "XMR": {
+          return `https://testnet.xmrchain.net/search?value=${txHash}`;
+        }
+        default:
+          return null;
+    }
+  }
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -306,8 +390,9 @@ export default function TransactionTable({ chain }: TransactionTableProps) {
                   {txs.map((t) => (
                     <tr
                       key={t.id}
+                      onClick={() => handleRowClick(t)}
                       className="border-b border-gray-100/60 dark:border-gray-800/60 
-                                 hover:bg-gray-50 dark:hover:bg-[#1A2235]/50 transition-colors"
+                                 hover:bg-gray-100 dark:hover:bg-[#1A2235]/50 transition-colors"
                     >
                       {/* MOBILE: Card Layout */}
                       <td className="sm:hidden py-4 px-4" colSpan={7}>

@@ -21,7 +21,7 @@ export function Skeleton({ className = "" }: { className?: string }) {
 =============================================== */
 export function WalletCardSkeleton() {
   return (
-    <div className="rounded-2xl p-px bg-gradient-to-r from-brand-500/35 to-brand-500/10">
+    <div className="rounded-2xl p-px">
       <div className="h-full rounded-2xl border border-gray-200/60 dark:border-white/10
                       bg-white/70 dark:bg-[#110f20] dark:bg-[radial-gradient(circle_at_30%_20%,#120a22_0%,#131124_70%)] backdrop-blur-sm min-h-[223px]
                       p-5 shadow-sm">
@@ -75,7 +75,7 @@ export function WalletCardSkeleton() {
 =============================================== */
 export function BalanceCardSkeleton() {
   return (
-    <div className="rounded-2xl p-px bg-gradient-to-r from-brand-500/50 to-cyan-500/40">
+    <div className="rounded-2xl p-px">
       <div className="rounded-2xl border border-gray-200/60 dark:border-white/10 
                       bg-white/70 dark:bg-[#110f20] dark:bg-[radial-gradient(circle_at_30%_20%,#120a22_0%,#131124_70%)] backdrop-blur-sm p-4 sm:p-5 
                       shadow-sm">
@@ -145,7 +145,7 @@ export function ActionButtonsSkeleton() {
 =============================================== */
 export function ChartSkeleton() {
   return (
-    <div className="group relative h-full rounded-2xl p-px bg-gradient-to-br from-brand-400/40 via-transparent to-[#8B5CF6]/30">
+    <div className="group relative h-full rounded-2xl p-px">
       <div className="h-full rounded-2xl border border-gray-200/60 dark:border-white/10 
                       bg-white/70 dark:bg-[#110f20] dark:bg-[radial-gradient(circle_at_30%_20%,#120a22_0%,#131124_70%)] backdrop-blur-sm shadow-sm p-5 sm:p-6">
         {/* Header */}

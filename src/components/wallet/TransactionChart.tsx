@@ -8,7 +8,7 @@ import type { ApexOptions } from "apexcharts";
 const ReactApexChart = dynamic(() => import("react-apexcharts"), { ssr: false });
 
 /* -------------------------------------------------------
-   ⭐ Modern Beautiful Shimmer Skeleton
+   Modern Beautiful Shimmer Skeleton
 ------------------------------------------------------- */
 const shimmerCSS = `
 @keyframes shimmer { 
@@ -259,12 +259,15 @@ export default function TransactionHistoryChart() {
   =========================================================== */
 
   return (
-    <div className="rounded-2xl p-px bg-gradient-to-br 
-      from-purple-500/30 via-transparent to-cyan-500/30 h-full">
+    <div
+    className="
+      group rounded-2xl p-px transition-all duration-300 
+    "
+    >
 
       <div className="
-        h-full rounded-2xl border border-gray-200/50 dark:border-white/10 
-        bg-white/70 dark:bg-[#1A1F36]/80 backdrop-blur-xl 
+        h-full rounded-2xl border border-gray-300 dark:border-gray-900
+        bg-gray-50 dark:bg-[#1A1730] backdrop-blur-xl 
         p-5 sm:p-6 lg:p-8 flex flex-col
       ">
 
@@ -301,7 +304,6 @@ export default function TransactionHistoryChart() {
                 bg-white/50 dark:bg-[#1A1F36] 
                 border border-gray-300 dark:border-white/20 
                 text-gray-900 dark:text-white 
-                focus:ring-2 focus:ring-purple-500 
                 outline-none cursor-pointer
               "
             >
