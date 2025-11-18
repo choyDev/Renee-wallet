@@ -120,13 +120,11 @@ export default function CryptoCard({
     <div
     className="
       group rounded-2xl p-px transition-all duration-300 
-      dark:bg-gradient-to-br 
-      dark:from-purple-500/30 dark:via-transparent dark:to-cyan-500/30
     "
-  >
+    >
     <div className="
-      h-full rounded-2xl border border-gray-200/60 dark:border-white/10
-      bg-white/80 dark:bg-[#1A1F36]/80 backdrop-blur-xl
+      h-full rounded-2xl border border-gray-300 dark:border-gray-900
+      bg-gray-50 dark:bg-[#1A1730] backdrop-blur-xl
       shadow-sm transition-all duration-300 hover:shadow-md
     ">
   

@@ -651,7 +651,7 @@ export function AddressSection({
   className,
   addressTextClassName,
 }: AddressSectionProps) {
-  const [showQR, setShowQR] = useState(false);
+  
   const [showAddress, setShowAddress] = useState(false);
   const [alertVisible, setAlertVisible] = useState(false);
   const [alertTitle, setAlertTitle] = useState('');
@@ -728,14 +728,6 @@ export function AddressSection({
           {/* Icon buttons */}
           <div className="flex items-center gap-2 sm:gap-3">
             <button
-              onClick={() => setShowQR(true)}
-              className="hover:text-blue-500 dark:hover:text-blue-400 transition-colors p-1"
-              title="Show QR"
-              disabled={!address}
-            >
-              <FaQrcode className="w-3 h-3 sm:w-4 sm:h-4" />
-            </button>
-            <button
               onClick={copyAddress}
               className="hover:text-blue-500 dark:hover:text-blue-400 transition-colors p-1"
               title="Copy Address"
@@ -768,32 +760,6 @@ export function AddressSection({
         </div>
       </div>
 
-      {/* QR Modal - Responsive */}
-      {showQR && address && (
-        <div className="absolute inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm rounded-2xl p-4">
-          <div className="flex flex-col items-center justify-center 
-                          bg-white dark:bg-[#121B2E] 
-                          px-6 sm:px-8 py-5 sm:py-6 
-                          rounded-2xl shadow-2xl 
-                          w-full max-w-[280px] sm:max-w-[300px]">
-            <div className="flex items-center justify-center mb-4">
-              <QRCode value={resolvedAddress} size={window.innerWidth < 640 ? 130 : 150} />
-            </div>
-
-            <p className="text-xs sm:text-sm text-gray-700 dark:text-gray-200 text-center break-all mb-4">
-              {resolvedAddress}
-            </p>
-
-            <button
-              onClick={() => setShowQR(false)}
-              className="px-4 sm:px-5 py-1.5 rounded-md text-xs sm:text-sm font-medium 
-                         bg-blue-600 hover:bg-blue-700 text-white transition-colors w-full"
-            >
-              Close
-            </button>
-          </div>
-        </div>
-      )}
     </div>
   );
 }

@@ -36,7 +36,7 @@ export default function RootLayout({
         />
       </head>
 
-      <body className="font-inter bg-white dark:bg-[linear-gradient(145deg,#1C1A2F_0%,#12111F_40%,#080A12_100%)]">
+      <body className="font-inter bg-white dark:bg-[#110f20]">
         <RootClientWrapper>{children}</RootClientWrapper>
         <Toaster
           position="top-right"

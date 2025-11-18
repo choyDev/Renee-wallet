@@ -13,8 +13,7 @@ function Skeleton({ className = "" }: { className?: string }) {
     <div
       className={`relative overflow-hidden bg-gray-300/30 dark:bg-white/10 rounded-md ${className}`}
     >
-      <div className="absolute inset-0 animate-shimmer bg-gradient-to-r 
-        from-transparent via-white/40 dark:via-white/5 to-transparent" />
+      <div className="absolute inset-0 animate-shimmer" />
     </div>
   );
 }
@@ -107,13 +106,16 @@ export default function TotalBalanceCard() {
      RENDER
   ------------------------------------------------------------------- */
   return (
-    <div className="rounded-2xl p-px bg-gradient-to-br from-purple-500/40 
-        via-transparent to-cyan-500/40 h-full">
+    <div
+    className="
+      group rounded-2xl p-px transition-all duration-300 
+    "
+    >
       
       <div className="
-        h-full rounded-2xl border border-white/10 
-        bg-white/80 dark:bg-[#1A1F36]/80 backdrop-blur-xl 
-        p-6 sm:p-8 lg:p-10 shadow-md flex flex-col justify-between
+        h-full rounded-2xl border border-gray-300 dark:border-gray-900 
+        bg-gray-50 dark:bg-[#1A1730] backdrop-blur-xl 
+        p-6 sm:p-8 lg:p-10  flex flex-col justify-between
         transition-all duration-300
       ">
 
@@ -125,8 +127,7 @@ export default function TotalBalanceCard() {
 
         {/* ------------------ TOTAL BALANCE ------------------ */}
         <div className="mt-6 mb-8 sm:mb-12 lg:mb-16">
-          <span className="text-gray-500 dark:text-gray-400 
-              text-sm sm:text-base">
+          <span className="text-gray-800 dark:text-gray-300 text-base sm:text-lg">
             Total Balance
           </span>
 
@@ -134,9 +135,9 @@ export default function TotalBalanceCard() {
             <Skeleton className="mt-4 w-56 h-12 sm:w-72 sm:h-14" />
           ) : (
             <div className="
-              text-5xl sm:text-6xl lg:text-7xl 
-              font-extrabold bg-gradient-to-r from-purple-300 to-cyan-300 
-              bg-clip-text text-transparent mt-3 sm:mt-4 leading-tight notranslate
+              text-4xl sm:text-5xl lg:text-6xl 
+              font-semibold  text-gray-800 dark:text-gray-300
+              bg-clip-text  mt-3 sm:mt-4 leading-tight notranslate
             ">
               <CountUp
                 start={0}

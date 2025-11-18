@@ -9,6 +9,8 @@ import {
   } from "@solana/web3.js";
   import TronWeb from "tronweb";
   import bs58 from "bs58";
+
+  import BigNumber from "bignumber.js";
   
   /* ===========================================================
      🔹 1️⃣ Lock native SOL (User → Bridge Vault)
@@ -85,8 +87,16 @@ import {
     const contract = await tronWeb.contract().at(process.env.TRON_TESTNET_USDT_CONTRACT!);
   
     console.log(`🚀 Sending ${amountTrc20} USDT (TRC-20) from ${fromAddr} → ${toAddress}`);
+
+    const decimals = 6;
+
+    // Convert human amount → integer amount
+    const rawAmount = new BigNumber(amountTrc20)
+      .multipliedBy(new BigNumber(10).pow(decimals))
+      .integerValue() // remove decimals
+      .toString(10);
   
-    const tx = await contract.transfer(toAddress, tronWeb.toSun(amountTrc20)).send();
+    const tx = await contract.transfer(toAddress, rawAmount).send();
     console.log("✅ Sent TRC-20 USDT TX:", tx);
     return { txHash: tx };
   }

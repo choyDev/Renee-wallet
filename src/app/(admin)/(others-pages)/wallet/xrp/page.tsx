@@ -297,7 +297,7 @@ export default function WalletOverviewPage() {
 
         {/* LEFT: CHART */}
         <section className="col-span-1 lg:col-span-8">
-          <div className="group relative h-full rounded-2xl p-px bg-gradient-to-br from-[#25A768]/40 via-transparent to-[#1bcf7e]/30">
+          <div className="group relative h-full rounded-2xl p-px">
             <div className="h-full rounded-2xl border border-gray-200/60 dark:border-white/10 
                             bg-white/70 dark:bg-[#110f20] dark:bg-[radial-gradient(circle_at_30%_20%,#120a22_0%,#131124_70%)] backdrop-blur-sm 
                             shadow-[0_1px_0_0_rgba(255,255,255,0.06)_inset,0_10px_30px_-10px_rgba(0,0,0,0.35)]
@@ -325,17 +325,13 @@ export default function WalletOverviewPage() {
           <div className="flex h-full flex-col gap-3 sm:gap-4">
 
             {/* TOTAL BALANCE */}
-            <div className="rounded-2xl p-px bg-gradient-to-r from-[#25A768]/50 to-cyan-500/40">
+            <div className="rounded-2xl p-px">
               <div className="rounded-2xl border border-gray-200/60 dark:border-white/10 
                               bg-white/70 dark:bg-[#110f20] dark:bg-[radial-gradient(circle_at_30%_20%,#120a22_0%,#131124_70%)] backdrop-blur-sm 
                               p-4 sm:p-5 shadow-sm transition-all duration-300 hover:shadow-md">
 
                 <div className="flex items-center justify-between">
                   <span className="text-xs sm:text-sm text-gray-500 dark:text-gray-400">Total Balance</span>
-                  <span className="text-[10px] px-2 py-0.5 rounded-full bg-gray-100 dark:bg-white/10 
-                                    text-gray-600 dark:text-gray-300">
-                    USD
-                  </span>
                 </div>
 
                 <div className="mt-2 text-xl sm:text-2xl md:text-3xl font-semibold tabular-nums tracking-tight text-gray-900 dark:text-white">
