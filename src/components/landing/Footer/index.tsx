@@ -4,7 +4,7 @@ import Link from "next/link";
 
 const Footer = () => {
   return (
-    <footer className="relative z-10 bg-[#14121c] pt-20 pb-10 border-t border-white/10">
+    <footer className="relative z-10 bg-gray-300 dark:bg-[#14121c] pt-20 pb-10 border-t border-white/10">
       <div className="container mx-auto px-6 text-center">
         {/* LOGO + DESCRIPTION */}
         <div className="flex flex-col items-center justify-center mb-10">
@@ -20,7 +20,7 @@ const Footer = () => {
               Renee Wallet
             </span>
           </Link>
-          <p className="max-w-xl text-sm leading-relaxed text-slate-400">
+          <p className="max-w-xl text-sm leading-relaxed text-dark dark:text-slate-400">
             Simple, compliant crypto wallet for businesses and individuals.<br/>  
             Supports TRX, ETH, XMR, SOL, BTC, XRP, DOGE and USDT on ERC-20 / TRC-20 / SPL.
           </p>
@@ -57,7 +57,7 @@ const Footer = () => {
 
         {/* COPYRIGHT */}
         <div className="h-px w-full bg-gradient-to-r from-transparent via-[#6e3bff40] to-transparent mb-6" />
-        <p className="text-xs text-slate-500">© 2025 Renee. All rights reserved.</p>
+        <p className="text-xs text-dark dark:text-slate-500">© 2025 Renee. All rights reserved.</p>
 
         {/* GLOW DECORATION */}
         <div className="absolute inset-x-0 bottom-0 h-64 bg-gradient-to-t from-[#6e3bff20] via-transparent to-transparent blur-3xl pointer-events-none" />
@@ -78,7 +78,7 @@ function FooterLink({
   return (
     <Link
       href={href}
-      className="text-slate-400 hover:text-[#a855f7] transition duration-300 font-medium"
+      className="text-dark dark:text-slate-400 hover:text-[#a855f7] transition duration-300 font-medium"
     >
       {children}
     </Link>

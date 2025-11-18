@@ -45,7 +45,7 @@ const Header = () => {
 
   return (
     <header
-      className={`fixed top-0 left-0 z-[9999] w-full transition-all duration-500 ${sticky ? "bg-[var(--bg-body)]/55 backdrop-blur-md" : "bg-transparent"
+      className={`fixed top-0 left-0 z-[9999] w-full transition-all duration-500 ${sticky ? "bg-[var(--bg-body)]/85 backdrop-blur-md" : "bg-transparent"
         }`}
     >
       {/* <div className="container mx-auto flex items-center justify-between px-4 py-4 md:py-5"> */}
