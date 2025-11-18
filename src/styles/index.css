@@ -5,6 +5,66 @@ layer(base);
 
 @custom-variant dark (&:is(.dark *));
 
+
+/* =========================================================
+   GLOBAL THEME VARIABLES (LIGHT MODE DEFAULT)
+   ========================================================= */
+:root {
+  --bg-body: #ffffff;
+
+  /* Brand purples */
+  --brand-600: #6e3bff;
+  --brand-500: #7c4aff;
+  --brand-400: #a855f7;
+  --brand-300: #b966ff;
+
+  --brand-500-50: #7c4aff80;
+  --brand-600-50: #6e3bff80;
+
+  /* Text */
+  --text-main: #0f172a;
+  --text-sub: #475569;
+
+  --white-10: #ffffff1a;
+  --white-5:  #ffffff0d;
+
+  --streak-1: radial-gradient(60% 220% at 50% 0%, #6e3bff80 0%, transparent 62%);
+  --streak-2: radial-gradient(60% 240% at 50% 0%, #6e3bff80 0%, transparent 64%);
+  --streak-3: radial-gradient(60% 180% at 50% 0%, #6e3bff80 0%, transparent 66%);
+
+  --streak-w-1: 14rem;
+  --streak-w-2: 16rem;
+  --streak-w-3: 12rem;
+  --streak-blur: 120px;
+
+  --streak-pos-1: -50%;
+  --streak-pos-2: -50%;
+  --streak-pos-3: 50%;
+}
+
+/* =========================================================
+   DARK MODE OVERRIDES
+   ========================================================= */
+.dark {
+  --bg-body: #101010;
+
+  --text-main: #ffffff;
+  --text-sub: #cbd5e1;
+
+  --streak-1: radial-gradient(60% 220% at 50% 0%, #6e3bffcc 0%, transparent 62%);
+  --streak-2: radial-gradient(60% 240% at 50% 0%, #6e3bffcc 0%, transparent 64%);
+  --streak-3: radial-gradient(60% 180% at 50% 0%, #6e3bffcc 0%, transparent 66%);
+
+  --streak-w-1: 12rem;
+  --streak-w-2: 14rem;
+  --streak-w-3: 10rem;
+  --streak-blur: 120px;
+
+  --streak-pos-1: 0%;
+  --streak-pos-2: -50%;
+  --streak-pos-3: 0%;
+}
+
 @theme {
   --breakpoint-*: initial;
   --breakpoint-xs: 450px;

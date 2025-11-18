@@ -71,8 +71,14 @@ const navItems: NavItem[] = [
 ];
 
 // compact USD badge formatter
-const fmtUsdShort = (n: number) =>
-  n >= 1000 ? `$${Math.round(n).toLocaleString()}` : `$${n.toFixed(2)}`;
+export const fmtUsdShort = (n: number) => {
+  const num = n >= 1000 ? Math.round(n).toLocaleString("en-US") : n.toFixed(2);
+  return (
+    <span className="notranslate" translate="no">
+      ${num}
+    </span>
+  );
+};
 
 // ----------------------------
 // Component

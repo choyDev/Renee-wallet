@@ -3,6 +3,7 @@ import Link from "next/link";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Alert from "@/components/ui/alert/Alert";
+import BackHomeButton from "@/components/landing/ui/BackHomeButton";
 
 const SignupPage = () => {
 
@@ -87,11 +88,32 @@ const SignupPage = () => {
         <div className="container">
           <div className="-mx-4 flex flex-wrap">
             <div className="w-full px-4">
-              <div className="shadow-three dark:bg-dark mx-auto max-w-[500px] rounded-sm bg-white px-6 py-10 sm:p-[60px]">
-                <h3 className="mb-3 text-center text-2xl font-bold text-black sm:text-3xl dark:text-white">
+              <div
+                className="
+                mx-auto max-w-[500px] px-6 py-10 sm:p-[60px] sm:pb-7
+                group rounded-2xl border border-[var(--brand-600)]/50 dark:border-white/10 bg-[rgba(255,255,255,0.05)]
+                backdrop-blur
+                shadow-[0_0_0_rgba(110,59,255,0)]
+                transition-all duration-300
+                hover:border-[var(--brand-600)]
+              "
+              >
+                {/* Glow ring */}
+                <div
+                  className="
+                  pointer-events-none absolute inset-0 rounded-2xl opacity-0 blur-xl
+                  bg-gradient-to-br from-[var(--brand-600)]/15 via-transparent to-[var(--brand-400)]/10
+                  transition-opacity duration-300 group-hover:opacity-100
+                "
+                />
+
+                {/* Back Home Button */}
+                <BackHomeButton />
+
+                <h3 className="mt-3 mb-3 text-center text-2xl font-bold text-black sm:text-3xl dark:text-white">
                   Create your account
                 </h3>
-                <p className="text-body-color mb-11 text-center text-base font-medium">
+                <p className="text-body-color mb-6 text-center text-base font-medium">
                   It’s totally free and super easy
                 </p>
                 {/* <button className="border-stroke dark:text-body-color-dark dark:shadow-two text-body-color hover:border-primary hover:bg-primary/5 hover:text-primary dark:hover:border-primary dark:hover:bg-primary/5 dark:hover:text-primary mb-6 flex w-full items-center justify-center rounded-xs border bg-[#f8f8f8] px-6 py-3 text-base outline-hidden transition-all duration-300 dark:border-transparent dark:bg-[#2C303B] dark:hover:shadow-none">
@@ -169,7 +191,7 @@ const SignupPage = () => {
                       onChange={handleChange}
                       required
                       placeholder="Enter your full name"
-                      className="border-stroke dark:text-body-color-dark dark:shadow-two text-body-color focus:border-[var(--brand-500)] dark:focus:border-[var(--brand-500)] w-full rounded-xs border bg-[#f8f8f8] px-6 py-3 text-base outline-hidden transition-all duration-300 dark:border-transparent dark:bg-[#2E224D] dark:focus:shadow-none"
+                      className="border-stroke dark:text-body-color-dark dark:shadow-two text-body-color focus:border-[var(--brand-500)]/60 dark:focus:border-[var(--brand-500)]/70 w-full rounded-xs border bg-white/5 px-6 py-3 text-base outline-hidden transition-all duration-300 dark:border-transparent dark:focus:shadow-none"
                     />
                   </div>
                   <div className="mb-8">
@@ -188,7 +210,7 @@ const SignupPage = () => {
                       onChange={handleChange}
                       required
                       placeholder="Enter your Email"
-                      className="border-stroke dark:text-body-color-dark dark:shadow-two text-body-color focus:border-primary dark:focus:border-[var(--brand-500)] w-full rounded-xs border bg-[#f8f8f8] px-6 py-3 text-base outline-hidden transition-all duration-300 dark:border-transparent dark:bg-[#2E224D] dark:focus:shadow-none"
+                      className="border-stroke dark:text-body-color-dark dark:shadow-two text-body-color focus:border-[var(--brand-500)]/60 dark:focus:border-[var(--brand-500)]/70 w-full rounded-xs border bg-white/5 px-6 py-3 text-base outline-hidden transition-all duration-300 dark:border-transparent dark:focus:shadow-none"
                     />
                   </div>
                   <div className="mb-8">
@@ -207,7 +229,7 @@ const SignupPage = () => {
                       required
                       name="password"
                       placeholder="Enter your Password"
-                      className="border-stroke dark:text-body-color-dark dark:shadow-two text-body-color focus:border-primary dark:focus:border-[var(--brand-500)] w-full rounded-xs border bg-[#f8f8f8] px-6 py-3 text-base outline-hidden transition-all duration-300 dark:border-transparent dark:bg-[#2E224D] dark:focus:shadow-none"
+                      className="border-stroke dark:text-body-color-dark dark:shadow-two text-body-color focus:border-[var(--brand-500)]/60 dark:focus:border-[var(--brand-500)]/70 w-full rounded-xs border bg-white/5 px-6 py-3 text-base outline-hidden transition-all duration-300 dark:border-transparent dark:focus:shadow-none"
                     />
                   </div>
                   <div className="mb-8 flex">

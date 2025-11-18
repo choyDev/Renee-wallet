@@ -45,10 +45,11 @@ const Header = () => {
 
   return (
     <header
-      className={`fixed top-0 left-0 z-[9999] w-full transition-all duration-500 ${sticky ? "bg-[var(--bg-body)]/85 backdrop-blur-md" : "bg-transparent"
+      className={`fixed top-0 left-0 z-[9999] w-full transition-all duration-500 ${sticky ? "bg-[var(--bg-body)]/55 backdrop-blur-md" : "bg-transparent"
         }`}
     >
-      <div className="container mx-auto flex items-center justify-between px-4 py-4 md:py-5">
+      {/* <div className="container mx-auto flex items-center justify-between px-4 py-4 md:py-5"> */}
+      <div className="w-full max-w-[1600px] mx-auto flex items-center justify-between px-2 sm:px-4 py-4 md:py-5">
         {/* ---------------- LOGO ---------------- */}
         <Link href="/" className="flex items-center gap-2">
           <Image
@@ -82,34 +83,6 @@ const Header = () => {
         >
           <ul className="flex flex-col space-y-3 md:flex-row md:items-center md:space-x-8 md:space-y-0">
 
-            {/* ---------------- NON-HOMEPAGE HEADER ---------------- */}
-            {!isHomePage && (
-              <li>
-                <Link
-                  href="/"
-                  className="inline-flex items-center gap-2 rounded-md px-4 py-2 text-base font-medium
-                   text-white transition-all duration-300 
-                   bg-[linear-gradient(135deg,var(--brand-600),var(--brand-400))]
-                   shadow-[0_0_12px_#6e3bff70]
-                   hover:shadow-[0_0_18px_#a855f780]"
-                >
-                  <svg
-                    width="18"
-                    height="18"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="white"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  >
-                    <path d="M15 18L9 12L15 6" />
-                  </svg>
-                  Back to Home
-                </Link>
-              </li>
-            )}
-
             {/* ---------------- HOMEPAGE FULL MENU ---------------- */}
             {isHomePage &&
               menuData.map((m) => {
@@ -137,9 +110,9 @@ const Header = () => {
                         }
                         setNavbarOpen(false);
                       }}
-                      className={`relative block px-2 py-2 text-base font-medium transition md:px-0 md:py-0 ${isActive(m.path)
+                      className={`relative block px-2 py-2 text-base transition md:px-3 md:py-0 ${isActive(m.path)
                         ? "text-[var(--brand-600)]"
-                        : "text-slate-300 hover:text-[var(--brand-600)]"
+                        : "text-dark dark:text-slate-300 hover:text-[var(--brand-600)]"
                         }`}
                     >
                       {m.title}
@@ -164,13 +137,15 @@ const Header = () => {
           <div className="hidden md:flex items-center gap-3">
             <Link
               href="/signin"
-              className="rounded-md border border-[var(--brand-600)]/40 bg-[var(--brand-600)]/10 px-6 py-2 text-sm font-medium text-[var(--brand-600)] hover:bg-[var(--white-5)] transition-all duration-300"
+              // className="rounded-md border border-[var(--brand-600)]/40 bg-[var(--brand-600)]/10 px-6 py-2 text-sm font-medium text-[var(--brand-600)] hover:bg-[var(--white-5)] transition-all duration-300"
+              className="text-dark hidden px-7 py-3 text-base font-medium hover:opacity-70 md:block dark:text-white"
             >
               Login
             </Link>
             <Link
               href="/signup"
-              className="rounded-md bg-[var(--brand-600)] px-6 py-2 text-sm font-semibold text-white shadow-[0_0_15px_#6e3bff70] hover:bg-[var(--brand-500)] hover:shadow-[0_0_25px_#6e3bff90] transition-all duration-300"
+              // className="rounded-md bg-[var(--brand-600)] px-6 py-2 text-sm font-semibold text-white shadow-[0_0_15px_#6e3bff70] hover:bg-[var(--brand-500)] hover:shadow-[0_0_25px_#6e3bff90] transition-all duration-300"
+              className="ease-in-up shadow-btn hover:shadow-btn-hover bg-[var(--brand-600)] hover:bg-[var(--brand-600)]/90 hidden rounded-xs px-8 py-2.5 text-base font-medium text-white transition duration-300 md:block md:px-9 lg:px-6 xl:px-9"
             >
               Sign Up
             </Link>
