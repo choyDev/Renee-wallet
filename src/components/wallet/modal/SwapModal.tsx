@@ -177,7 +177,12 @@ export default function SwapModal({ onClose, currentChain, walletsBySymbol }: Pr
         exit={{ opacity: 0 }}
       >
         <motion.div
-          className="relative w-full max-w-md rounded-2xl shadow-2xl bg-gradient-to-br from-[#0f172a] via-[#1e293b] to-[#0f172a] border border-white/10 p-6 space-y-6"
+          className="
+            relative w-full max-w-md rounded-2xl shadow-2xl p-6 space-y-6 
+            border border-slate-200 bg-white 
+            dark:border-white/10 
+            dark:bg-[#110f20] dark:bg-[radial-gradient(circle_at_30%_20%,#120a22_0%,#131124_70%)]
+          "
           initial={{ scale: 0.9, opacity: 0, y: 20 }}
           animate={{ scale: 1, opacity: 1, y: 0 }}
           exit={{ scale: 0.9, opacity: 0, y: 20 }}

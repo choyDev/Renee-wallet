@@ -144,7 +144,7 @@ export default function LanguageSwitcher({
       <button
         onClick={() => setOpen(v => !v)}
         className="inline-flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-black font-medium
-                   hover:bg-slate-50 dark:border-white/10 dark:bg-white/5 dark:text-white"
+                   hover:bg-slate-50 dark:border-white/10 dark:text-gray-500 dark:bg-[linear-gradient(145deg,#1C1A2F_0%,#12111F_40%,#080A12_100%)]"
         aria-haspopup="listbox"
         aria-expanded={open}
         aria-label={`Language: ${label}`}
@@ -157,7 +157,7 @@ export default function LanguageSwitcher({
         <div
           role="listbox"
           className="absolute right-0 z-50 mt-2 w-44 rounded-lg border border-slate-200 bg-white p-1 shadow-lg
-                     dark:border-white/10 dark:bg-black/80 backdrop-blur notranslate"
+                     dark:border-white/10 dark:bg-[linear-gradient(145deg,#1C1A2F_0%,#12111F_40%,#080A12_100%)]"
         >
           {languages.map(l => (
             <button

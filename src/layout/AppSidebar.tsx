@@ -301,7 +301,7 @@ const AppSidebar: React.FC = () => {
   // ----------------------------
   return (
     <aside
-      className={`fixed mt-16 flex flex-col lg:mt-0 top-0 px-5 left-0 bg-white dark:bg-gray-900 dark:border-gray-800 text-gray-900 h-screen transition-all duration-300 ease-in-out z-50 border-r border-gray-200 
+      className={`fixed mt-16 flex flex-col lg:mt-0 top-0 px-5 left-0 bg-white dark:bg-[linear-gradient(145deg,#1C1A2F_0%,#12111F_40%,#080A12_100%)] dark:border-gray-800 text-gray-900 h-screen transition-all duration-300 ease-in-out z-50 border-r border-gray-200 
         ${isExpanded || isMobileOpen ? "w-[290px]" : isHovered ? "w-[290px]" : "w-[90px]"}
         ${isMobileOpen ? "translate-x-0" : "-translate-x-full"}
         lg:translate-x-0`}
@@ -309,7 +309,15 @@ const AppSidebar: React.FC = () => {
       onMouseLeave={() => setIsHovered(false)}
     >
       {/* Logo */}
-      <div className={`py-4 flex ${!isExpanded && !isHovered ? "lg:justify-center" : "justify-start"}`}>
+     
+      <div
+        className={`
+          py-4 
+          hidden               
+          lg:flex    
+          ${!isExpanded && !isHovered ? "lg:justify-center" : "justify-start"}
+        `}
+      >
         <Link href="/">
           {isExpanded || isHovered ? (
             <div className="flex flex-row items-center gap-2">
@@ -335,13 +343,19 @@ const AppSidebar: React.FC = () => {
               >
                 Renee Wallet
               </span>
-              </div>
+            </div>
           ) : (
-            <Image src="/images/logo/logo-dark.svg" alt="Logo" width={50} height={50} />
+            <Image
+              src="/images/logo/logo-dark.svg"
+              alt="Logo"
+              width={44}
+              height={44}
+            />
           )}
         </Link>
       </div>
 
+      
       {/* Navigation (Only navItems) */}
       <div className="flex flex-col overflow-y-auto duration-300 ease-linear no-scrollbar">
         <nav className="mb-6">
