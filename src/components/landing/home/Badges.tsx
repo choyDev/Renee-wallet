@@ -14,7 +14,8 @@ export default function Badges() {
             px-4 py-1.5 rounded-full text-sm
             border border-[var(--brand-600)]/30
             bg-[var(--brand-600)]/10
-            text-[#b68cff]
+            text-[var(--brand-600)]/90
+            dark:text-[#b68cff]
           "
         >
           {b}

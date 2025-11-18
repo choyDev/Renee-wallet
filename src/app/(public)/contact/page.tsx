@@ -12,12 +12,15 @@ export const metadata: Metadata = {
 const ContactPage = () => {
   return (
     <>
-      <Breadcrumb
+    
+      {/* <Breadcrumb
         pageName="Contact Page"
         description="Lorem ipsum dolor sit amet, consectetur adipiscing elit. In varius eros eget sapien consectetur ultrices. Ut quis dapibus libero."
-      />
-
-      <Contact />
+      /> */}
+      
+      <div className="pt-18 lg:pt-22 pb-10 lg:pb-20">
+        <Contact showBackButton={true}/>
+      </div>
     </>
   );
 };

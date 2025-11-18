@@ -56,22 +56,51 @@ export default function Home() {
   return (
     <>
       {/* Background FX (global) */}
-      <div aria-hidden className="pointer-events-none fixed inset-0 -z-10 bg-[var(--bg-body)]">
+      <div aria-hidden className="pointer-events-none fixed inset-0 -z-10 bg-[var(--bg-body)] transition-colors duration-500">
         {/* TOP STREAKS (narrow, tall, blurred, start at top) */}
         <div className="absolute inset-x-0 -top-24 h-[100vh]">
-          <div className="absolute left-[10%] w-[22rem] h-full rotate-[20deg] blur-[100px] opacity-80 mix-blend-screen
-      bg-[radial-gradient(60%_220%_at_50%_0%,var(--brand-600-50),transparent_62%)]" />
-          <div className="absolute left-1/2 -translate-x-1/2 w-[20rem] h-full rotate-[20deg] blur-[100px] opacity-90 mix-blend-screen
-      bg-[radial-gradient(60%_240%_at_50%_0%,var(--brand-600-50),transparent_64%)]" />
-          <div className="absolute right-[12%] w-[24rem] h-full rotate-[20deg] blur-[100px] opacity-75 mix-blend-screen
-      bg-[radial-gradient(60%_180%_at_50%_0%,var(--brand-600-50),transparent_66%)]" />
+          {/* LEFT */}
+          <div
+            className="absolute left-[10%] opacity-80"
+            style={{
+              width: "var(--streak-w-1)",
+              height: "100%",
+              filter: `blur(var(--streak-blur))`,
+              transform: `translateX(var(--streak-pos-1)) rotate(20deg)`,
+              background: "var(--streak-1)",
+            }}
+          />
+
+          {/* CENTER */}
+          <div
+            className="absolute left-1/2 opacity-90"
+            style={{
+              width: "var(--streak-w-2)",
+              height: "100%",
+              filter: `blur(var(--streak-blur))`,
+              transform: `translateX(var(--streak-pos-2)) rotate(20deg)`,
+              background: "var(--streak-2)",
+            }}
+          />
+
+          {/* RIGHT */}
+          <div
+            className="absolute right-[12%] opacity-75"
+            style={{
+              width: "var(--streak-w-3)",
+              height: "100%",
+              filter: `blur(var(--streak-blur))`,
+              transform: `translateX(var(--streak-pos-3)) rotate(20deg)`,
+              background: "var(--streak-3)",
+            }}
+          />
         </div>
 
         {/* SIDE VIGNETTES */}
-        <div className="absolute -left-28 top-0 bottom-0 w-[42vw] blur-[70px] opacity-35
+        {/* <div className="absolute -left-28 top-0 bottom-0 w-[42vw] blur-[70px] opacity-35
     bg-[radial-gradient(85%_65%_at_0%_15%,#020617e6,transparent_70%)]" />
         <div className="absolute -right-28 top-0 bottom-0 w-[45vw] blur-[70px] opacity-35
-    bg-[radial-gradient(85%_65%_at_100%_10%,#020617e6,transparent_70%)]" />
+    bg-[radial-gradient(85%_65%_at_100%_10%,#020617e6,transparent_70%)]" /> */}
 
         {/* BOTTOM FADE */}
         <div className="absolute inset-x-0 bottom-0 h-64 bg-gradient-to-b from-transparent to-[var(--bg-body)]" />

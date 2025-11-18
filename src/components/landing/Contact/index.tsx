@@ -1,4 +1,6 @@
-const Contact = () => {
+import BackHomeButton from "../ui/BackHomeButton";
+
+const Contact = ({ showBackButton = false }: { showBackButton?: boolean }) => {
   return (
     <section id="contact" className="overflow-hidden py-16 md:py-20 lg:py-28">
       <div className="container">
@@ -7,7 +9,7 @@ const Contact = () => {
 
             <div
               className="
-                group mb-12 rounded-2xl border border-white/10 bg-[rgba(255,255,255,0.05)]
+                group mb-12 rounded-2xl border border-[var(--brand-600)]/50 dark:border-white/10 bg-[rgba(255,255,255,0.05)]
                 p-8 backdrop-blur
                 shadow-[0_0_0_rgba(110,59,255,0)]
                 transition-all duration-300
@@ -26,13 +28,14 @@ const Contact = () => {
                   transition-opacity duration-300 group-hover:opacity-100
                 "
               />
+              {showBackButton && <BackHomeButton />}   {/* <===== ONLY HERE IF ENABLED */}
 
               {/* Title */}
-              <h2 className="text-center mb-3 text-2xl font-bold text-white sm:text-3xl lg:text-2xl xl:text-3xl">
+              <h2 className="text-center mt-6 mb-3 text-2xl font-bold text-balck dark:text-white sm:text-3xl lg:text-2xl xl:text-3xl">
                 Need Help? Send a Message
               </h2>
 
-              <p className="text-center mb-10 text-base text-slate-300">
+              <p className="text-center mb-10 text-base text-body-color dark:text-slate-300">
                 Our support team will get back to you ASAP via email.
               </p>
 
@@ -40,12 +43,12 @@ const Contact = () => {
               <form className="grid grid-cols-1 gap-6 md:grid-cols-2">
 
                 <div className="space-y-2">
-                  <label className="text-sm font-medium text-slate-200">Your Name</label>
+                  <label className="text-sm font-medium text-black/80 dark:text-slate-200">Your Name</label>
                   <input
                     type="text"
                     placeholder="Enter your name"
                     className="
-                      w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3
+                      w-full rounded-xl border border-[var(--brand-500)]/50 dark:border-white/10 bg-white/5 px-4 py-3
                       text-slate-100 placeholder:text-slate-400
                       outline-none ring-0 transition
                       focus:border-[var(--brand-500)]
@@ -54,12 +57,12 @@ const Contact = () => {
                 </div>
 
                 <div className="space-y-2">
-                  <label className="text-sm font-medium text-slate-200">Your Email</label>
+                  <label className="text-sm font-medium text-black/80 dark:text-slate-200">Your Email</label>
                   <input
                     type="email"
                     placeholder="Enter your email"
                     className="
-                      w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3
+                      w-full rounded-xl border border-[var(--brand-500)]/50 dark:border-white/10 bg-white/5 px-4 py-3
                       text-slate-100 placeholder:text-slate-400
                       outline-none ring-0 transition
                       focus:border-[var(--brand-500)]
@@ -68,12 +71,12 @@ const Contact = () => {
                 </div>
 
                 <div className="md:col-span-2 space-y-2">
-                  <label className="text-sm font-medium text-slate-200">Your Message</label>
+                  <label className="text-sm font-medium text-black/80 dark:text-slate-200">Your Message</label>
                   <textarea
                     rows={5}
                     placeholder="Enter your message"
                     className="
-                      w-full resize-none rounded-xl border border-white/10 bg-white/5 px-4 py-3
+                      w-full resize-none rounded-xl border border-[var(--brand-500)]/50 dark:border-white/10 bg-white/5 px-4 py-3
                       text-slate-100 placeholder:text-slate-400
                       outline-none ring-0 transition
                       focus:border-[var(--brand-500)]
@@ -87,7 +90,7 @@ const Contact = () => {
                     type="submit"
                     className="
                       group relative inline-flex items-center justify-center w-1/2
-                      px-10 py-3.5 text-[15px] font-semibold text-white rounded-sm
+                      px-8 py-3 text-[15px] font-semibold text-white rounded-sm
                       bg-[linear-gradient(135deg,var(--brand-600)_0%,var(--brand-400)_100%)]
                       shadow-[0_6px_20px_rgba(110,59,255,0.45)]
                       transition-all duration-300
@@ -96,7 +99,7 @@ const Contact = () => {
                       active:scale-[0.98]
                     "
                   >
-                    <span className="relative z-10">Send</span>
+                    <span className="text-[18px] relative z-10">Send</span>
 
                     {/* Glow overlay (working now because button has group) */}
                     <span

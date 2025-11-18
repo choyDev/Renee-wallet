@@ -15,11 +15,7 @@ export default function PublicLayout({
 }) {
   return (
     <div
-      className={`min-h-screen bg-[#101010] text-white ${inter.className}`}
-      style={{
-        backgroundColor: "#1A132B",
-        color: "#fff",
-      }}
+      className={`min-h-screen bg-[var(--bg-body)] text-[var(--text-main)] transition-colors duration-300 ${inter.className}`}
     >
       <Providers>
         <Header />

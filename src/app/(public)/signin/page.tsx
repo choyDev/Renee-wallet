@@ -3,6 +3,7 @@ import Link from "next/link";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Alert from "@/components/ui/alert/Alert";
+import BackHomeButton from "@/components/landing/ui/BackHomeButton";
 
 const SigninPage = () => {
   const router = useRouter();
@@ -90,11 +91,32 @@ const SigninPage = () => {
         <div className="container">
           <div className="-mx-4 flex flex-wrap">
             <div className="w-full px-4">
-              <div className="shadow-three dark:bg-dark mx-auto max-w-[500px] rounded-sm bg-white px-6 py-10 sm:p-[60px]">
-                <h3 className="mb-3 text-center text-2xl font-bold text-black sm:text-3xl dark:text-white">
+              {/* <div className="shadow-three dark:bg-dark mx-auto max-w-[500px] rounded-sm bg-white px-6 py-10 sm:p-[60px]"> */}
+              <div
+                className="
+                mx-auto max-w-[500px] px-6 py-10 sm:p-[60px]
+                group rounded-2xl border border-[var(--brand-600)]/50 dark:border-white/10 bg-[rgba(255,255,255,0.05)]
+                backdrop-blur
+                shadow-[0_0_0_rgba(110,59,255,0)]
+                transition-all duration-300
+                hover:border-[var(--brand-600)]
+              "
+              >
+                {/* Glow ring */}
+                <div
+                  className="
+                  pointer-events-none absolute inset-0 rounded-2xl opacity-0 blur-xl
+                  bg-gradient-to-br from-[var(--brand-600)]/15 via-transparent to-[var(--brand-400)]/10
+                  transition-opacity duration-300 group-hover:opacity-100
+                "
+                />
+                {/* Back Home Button */}
+                <BackHomeButton />
+
+                <h3 className="mt-3 mb-3 text-center text-2xl font-bold text-black sm:text-3xl dark:text-white">
                   Sign in to your account
                 </h3>
-                <p className="text-body-color mb-11 text-center text-base font-medium">
+                <p className="text-body-color mb-6 text-center text-base font-medium">
                   Login to your account for a faster checkout.
                 </p>
                 {/* <button className="border-stroke dark:text-body-color-dark dark:shadow-two text-body-color hover:border-primary hover:bg-primary/5 hover:text-primary dark:hover:border-primary dark:hover:bg-primary/5 dark:hover:text-primary mb-6 flex w-full items-center justify-center rounded-xs border bg-[#f8f8f8] px-6 py-3 text-base outline-hidden transition-all duration-300 dark:border-transparent dark:bg-[#2C303B] dark:hover:shadow-none">
@@ -170,7 +192,7 @@ const SigninPage = () => {
                       onChange={handleChange}
                       required
                       placeholder="Enter your Email"
-                      className="border-stroke dark:text-body-color-dark dark:shadow-two text-body-color focus:border-primary dark:focus:border-[var(--brand-500)] w-full rounded-xs border bg-[#f8f8f8] px-6 py-3 text-base outline-hidden transition-all duration-300 dark:border-transparent dark:bg-[#2E224D] dark:focus:shadow-none"
+                      className="border-stroke dark:text-body-color-dark dark:shadow-two text-body-color focus:border-[var(--brand-500)]/60 dark:focus:border-[var(--brand-500)]/70 w-full rounded-xs border bg-white/5 px-6 py-3 text-base outline-hidden transition-all duration-300 dark:border-transparent dark:focus:shadow-none"
                     />
                   </div>
                   <div className="mb-8">
@@ -187,7 +209,7 @@ const SigninPage = () => {
                       onChange={handleChange}
                       required
                       placeholder="Enter your Password"
-                      className="border-stroke dark:text-body-color-dark dark:shadow-two text-body-color focus:border-primary dark:focus:border-[var(--brand-500)] w-full rounded-xs border bg-[#f8f8f8] px-6 py-3 text-base outline-hidden transition-all duration-300 dark:border-transparent dark:bg-[#2E224D] dark:focus:shadow-none"
+                      className="border-stroke dark:text-body-color-dark dark:shadow-two text-body-color focus:border-[var(--brand-500)]/60 dark:focus:border-[var(--brand-500)]/70 w-full rounded-xs border bg-white/5 px-6 py-3 text-base outline-hidden transition-all duration-300 dark:border-transparent dark:focus:shadow-none"
                     />
                   </div>
                   <div className="mb-8 flex flex-col justify-between sm:flex-row sm:items-center">
@@ -213,8 +235,8 @@ const SigninPage = () => {
                               >
                                 <path
                                   d="M10.0915 0.951972L10.0867 0.946075L10.0813 0.940568C9.90076 0.753564 9.61034 0.753146 9.42927 0.939309L4.16201 6.22962L1.58507 3.63469C1.40401 3.44841 1.11351 3.44879 0.932892 3.63584C0.755703 3.81933 0.755703 4.10875 0.932892 4.29224L0.932878 4.29225L0.934851 4.29424L3.58046 6.95832C3.73676 7.11955 3.94983 7.2 4.1473 7.2C4.36196 7.2 4.55963 7.11773 4.71406 6.9584L10.0468 1.60234C10.2436 1.4199 10.2421 1.1339 10.0915 0.951972ZM4.2327 6.30081L4.2317 6.2998C4.23206 6.30015 4.23237 6.30049 4.23269 6.30082L4.2327 6.30081Z"
-                                  fill="#3056D3"
-                                  stroke="#3056D3"
+                                  fill="var(--brand-500)"
+                                  stroke="var(--brand-500)"
                                   strokeWidth="0.4"
                                 />
                               </svg>
@@ -239,15 +261,14 @@ const SigninPage = () => {
                     bg-[linear-gradient(135deg,var(--brand-500)_0%,var(--brand-300)_100%)]
                     shadow-[0_6px_20px_var(--brand-500-50)]
                     transition-all duration-300 hover:-translate-y-[3px]
-                    hover:shadow-[0_6px_20px_var(--brand-500-65)]
                     active:scale-[0.98]">
                       <span className="relative z-10">Sign in</span>
                       {/* glow on hover */}
-                      <span
+                      {/* <span
                         className="absolute inset-0 rounded-sm opacity-0 group-hover:opacity-100 blur-[20px]
                     bg-[linear-gradient(135deg,var(--brand-500)_0%,var(--brand-300)_100%)]
                     transition-opacity duration-300"
-                      />
+                      /> */}
                     </button>
                   </div>
                 </form>

@@ -6,7 +6,7 @@ export default function FinalCTA() {
       <div className="container max-w-7xl px-6">
         <div
           className="
-            relative rounded-2xl border border-white/10 bg-[rgba(255,255,255,0.05)] p-10 text-center
+            relative rounded-2xl border border-[var(--brand-600)]/50 dark:border-white/10 bg-[rgba(255,255,255,0.05)] p-10 text-center
             shadow-[0_0_0_rgba(124,74,255,0)]
             transition-all duration-300
             hover:-translate-y-[6px]
@@ -24,12 +24,12 @@ export default function FinalCTA() {
           />
 
           {/* TITLE */}
-          <h3 className="text-3xl font-semibold text-white mb-3">
+          <h3 className="text-3xl font-semibold text-black dark:text-white mb-3">
             Start accepting crypto payments
           </h3>
 
           {/* TEXT */}
-          <p className="text-slate-400 mb-8">
+          <p className="text-body-color dark:text-slate-400 mb-8">
             TRX, ETH, XMR, SOL, BTC, XRP, DOGE — plus USDT on ERC-20 / TRC-20 / SPL.
             No fiat rails.
           </p>
@@ -37,10 +37,10 @@ export default function FinalCTA() {
           {/* BUTTONS */}
           <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row sm:gap-6">
 
-            {/* Primary button */}
+            {/* === PRIMARY BUTTON === */}
             <Link
               href="/signup"
-              className="w-45 relative inline-flex items-center justify-center px-10 py-3.5 text-[15px] font-semibold text-white rounded-sm
+              className="min-w-44 relative inline-flex items-center justify-center px-8 py-3 text-[18px] font-semibold text-white rounded-sm
                     bg-[linear-gradient(135deg,var(--brand-500)_0%,var(--brand-300)_100%)]
                     shadow-[0_6px_20px_var(--brand-500-50)]
                     transition-all duration-300 hover:-translate-y-[3px]
@@ -61,12 +61,11 @@ export default function FinalCTA() {
             {/* === SECONDARY BUTTON === */}
             <Link
               href="#features"
-              className="w-45 inline-flex items-center justify-center px-10 py-3.5 text-[15px] font-semibold text-white/85
-                    rounded-sm border border-[var(--white-10)] bg-[var(--white-5)] backdrop-blur-sm 
+              className="min-w-44 inline-flex items-center justify-center px-8 py-3 text-[18px] font-semibold text-white
+                    rounded-sm border border-[var(--white-10)] bg-[var(--brand-600)]/80 dark:bg-[var(--brand-500-50)] backdrop-blur-sm 
                     shadow-[0_6px_20px_var(--brand-500-30)]
                     transition-all duration-300 hover:-translate-y-[3px]
-                    hover:border-[var(--brand-300)]
-                    hover:bg-[var(--brand-500-30)] hover:text-white
+                    hover:text-white
                     hover:shadow-[0_6px_20px_var(--brand-500-50)]"
             >
               See features

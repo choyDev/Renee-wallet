@@ -9,8 +9,8 @@ export default function Fees() {
           
           {/* FEES */}
           <div className="text-center md:text-left">
-            <h2 className="text-3xl font-bold text-white mb-4">Fees</h2>
-            <p className="text-slate-400 text-base max-w-md mx-auto md:mx-0">
+            <h2 className="text-3xl font-bold text-black dark:text-white mb-4">Fees</h2>
+            <p className="text-body-color dark:text-slate-400 text-base max-w-md mx-auto md:mx-0">
               Crypto-only. All costs are transparent before the payer sends.
             </p>
 
@@ -23,7 +23,7 @@ export default function Fees() {
 
           {/* SECURITY */}
           <div className="text-center md:text-left">
-            <h2 className="text-3xl font-bold text-white mb-4">Security & Reliability</h2>
+            <h2 className="text-3xl font-bold text-black dark:text-white mb-4">Security & Reliability</h2>
             <Security />
           </div>
 
@@ -38,7 +38,7 @@ function FeeItem({ label, value }: { label: string; value: string }) {
     <div
       className="
         group relative flex flex-col items-center text-center
-        rounded-2xl border border-white/10 bg-[rgba(255,255,255,0.05)]
+        rounded-2xl border border-[var(--brand-600)]/50 dark:border-white/10 bg-[rgba(255,255,255,0.05)]
         p-6 transition-all duration-300
         hover:-translate-y-[6px]
         hover:border-[var(--brand-600)]
@@ -60,8 +60,8 @@ function FeeItem({ label, value }: { label: string; value: string }) {
       />
 
       <div className="relative z-10">
-        <div className="text-slate-300 font-medium">{label}</div>
-        <div className="mt-1 text-lg font-semibold text-white">{value}</div>
+        <div className="text-dark dark:text-slate-300 font-medium">{label}</div>
+        <div className="mt-1 text-lg font-semibold text-body-color dark:text-white">{value}</div>
       </div>
     </div>
   );

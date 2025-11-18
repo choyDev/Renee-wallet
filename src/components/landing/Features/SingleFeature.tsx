@@ -8,7 +8,7 @@ const SingleFeature = ({ feature }: { feature: Feature }) => {
       <div
         className="
           relative flex flex-col items-center text-center group
-          rounded-2xl border border-white/10 bg-[rgba(255,255,255,0.05)]
+          rounded-2xl border border-[var(--brand-600)]/50 dark:border-white/10 bg-[rgba(255,255,255,0.05)]
           p-8 shadow-[0_0_0_rgba(124,74,255,0)]
           transition-all duration-300
           hover:-translate-y-[6px]
@@ -48,12 +48,12 @@ const SingleFeature = ({ feature }: { feature: Feature }) => {
           </div>
 
           {/* Title */}
-          <h3 className="mb-3 text-xl font-semibold text-white">
+          <h3 className="mb-3 text-xl font-semibold text-dark dark:text-white">
             {title}
           </h3>
 
           {/* Description */}
-          <p className="text-[15px] leading-relaxed text-slate-400">
+          <p className="text-[15px] leading-relaxed text-body-color dark:text-slate-400">
             {paragraph}
           </p>
         </div>

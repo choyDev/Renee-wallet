@@ -11,11 +11,13 @@ export const metadata: Metadata = {
 const PrivacyPage = () => {
   return (
     <>
+    <div className="pt-25 pb-20">
       <Breadcrumb
         pageName="Privacy Policy"
         description="Your privacy is important to us. This policy explains how we collect, use, and protect your information when you use our services."
       />
       {/* <Contact /> */}
+      </div>
     </>
   );
 };
