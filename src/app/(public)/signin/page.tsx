@@ -37,23 +37,37 @@ const SigninPage = () => {
         setAlertMessage('Could not get response from server');
         setAlertVariant('error');
         setAlertVisible(true);
-      } else {
-        localStorage.setItem("user", JSON.stringify(data.user));
-        setAlertTitle('Login Successful');
-        setAlertMessage("Redirecting to dashboard...");
-        setAlertVariant('success');
-        setAlertVisible(true);
-        if (data.user.kycVerified) {
-          setTimeout(() => {
-            router.push("/dashboard");
-          }, 1000); // delay 1 second
-        } else {
-          setTimeout(() => {
-            router.push("/kyc-verification");
-          }, 1000); // delay 1 second
-        }
-
+        return;
       }
+      localStorage.setItem("user", JSON.stringify(data.user));
+      setAlertTitle('Login Successful');
+      setAlertMessage("Redirecting to dashboard...");
+      setAlertVariant('success');
+      setAlertVisible(true);
+
+      // decide redirect based on role + KYC
+      let redirectTo = "/dashboard";
+
+      if (data.user.role) {
+        localStorage.setItem("role", data.user.role);
+      }
+
+      if (data.user.role === "admin") {
+        redirectTo = "/admin";
+      } else {
+        // normal user
+        if (!data.user.kycVerified) {
+          redirectTo = "/kyc-verification";
+        } else {
+          // your new requirement: user area is /user (instead of /dashboard)
+          redirectTo = "/dashboard";
+        }
+      }
+
+      setTimeout(() => {
+        router.push(redirectTo);
+      }, 1000);
+
     } catch (err) {
       setAlertTitle('Server Error');
       setAlertMessage('Something went wrong.');

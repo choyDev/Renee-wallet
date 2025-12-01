@@ -22,7 +22,7 @@ export async function POST(req: Request) {
 
     const kyc = await prisma.kycverification.findFirst({ where: { userId: user.id } });
 
-    const token = jwt.sign({ id: user.id, email: user.email }, JWT_SECRET, { expiresIn: "1d" });
+    const token = jwt.sign({ id: user.id, email: user.email, role: user.role }, JWT_SECRET, { expiresIn: "1d" });
 
     const res = NextResponse.json({
       message: "Login successful",
@@ -30,11 +30,19 @@ export async function POST(req: Request) {
         id: user.id,
         email: user.email,
         name: user.full_name,
+        role: user.role,
         kycVerified: kyc?.verified || false,
       },
     });
 
-    res.cookies.set("token", token, { httpOnly: true, sameSite: "lax", path: "/" });
+    res.cookies.set("token", token, {
+      httpOnly: true,
+      sameSite: "lax",
+      path: "/",
+      secure: false,
+    });
+    console.log("Setting cookie:", token);
+    res.headers.append("X-Debug-Cookie", "attempted");
 
     return res;
   } catch (err) {

@@ -7,7 +7,12 @@ import { SidebarProvider } from "@/context/SidebarContext";
 import { ThemeProvider } from "@/context/ThemeContext";
 
 import AppHeader from "@/layout/AppHeader";
-import AppSidebar from "@/layout/AppSidebar";
+import dynamic from "next/dynamic";
+
+const AppSidebar = dynamic(() => import("@/layout/AppSidebar"), {
+  ssr: false,
+});
+
 import Backdrop from "@/layout/Backdrop";
 
 import "swiper/css";
@@ -49,7 +54,7 @@ function WalletBadgesHydrator({ refreshMs = 60_000 }: { refreshMs?: number }) {
     }
 
     load();
-    
+
   }, [setWalletBadgesBulk, refreshMs]);
 
   return null;
@@ -72,8 +77,8 @@ function AdminLayoutInner({ children }: { children: React.ReactNode }) {
   const mainContentMargin = isMobileOpen
     ? "ml-0"
     : isExpanded || isHovered
-    ? "lg:ml-[290px]"
-    : "lg:ml-[90px]";
+      ? "lg:ml-[290px]"
+      : "lg:ml-[90px]";
 
   return (
     <div className="min-h-screen xl:flex">
