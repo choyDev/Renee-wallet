@@ -85,30 +85,33 @@ const SigninPage = () => {
         setAlertVisible(true);
         return;
       }
-
-      // 🟦 1. If backend tells us to redirect to DIDIT
-      if (data.redirectTo) {
-        setAlertTitle('KYC Required');
-        setAlertMessage("Redirecting to verification...");
-        setAlertVariant('warning');
-        setAlertVisible(true);
-
-        setTimeout(() => {
-          window.location.href = data.redirectTo; // 🔥 Go to DIDIT KYC UI
-        }, 1000);
-        return;
-      }
-
-      // 🟩 2. User is verified — normal login
       localStorage.setItem("user", JSON.stringify(data.user));
-
       setAlertTitle('Login Successful');
-      setAlertMessage("Redirecting to your dashboard...");
+      setAlertMessage("Redirecting to dashboard...");
       setAlertVariant('success');
       setAlertVisible(true);
 
+      // decide redirect based on role + KYC
+      let redirectTo = "/dashboard";
+
+      if (data.user.role ) {
+        localStorage.setItem("role", data.user.role);
+      }
+
+      if (data.user.role === "admin") {
+        redirectTo = "/admin";
+      } else {
+        // normal user
+        if (!data.user.kycVerified && data.redirectTo) {
+          redirectTo = data.redirectTo;
+        } else {
+          // your new requirement: user area is /user (instead of /dashboard)
+          redirectTo = "/dashboard";
+        }
+      }
+
       setTimeout(() => {
-        router.push("/dashboard");
+        router.push(redirectTo);
       }, 1000);
 
     } catch (err) {

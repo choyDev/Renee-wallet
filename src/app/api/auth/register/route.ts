@@ -25,6 +25,7 @@ export async function POST(req: Request) {
         full_name,
         email,
         password_hash,
+        role: "user",
       },
     });
 

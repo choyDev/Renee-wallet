@@ -101,15 +101,8 @@ export async function POST(req: Request) {
       });
     }
 
-    // ---------------------------------------------------
-    // 🟩 STEP 2 — If VERIFIED → Normal login flow
-    // ---------------------------------------------------
+    const token = jwt.sign({ id: user.id, email: user.email, role: user.role }, JWT_SECRET, { expiresIn: "1d" });
 
-    const token = jwt.sign(
-      { id: user.id, email: user.email },
-      JWT_SECRET,
-      { expiresIn: "1d" }
-    );
 
     const res = NextResponse.json({
       message: "Login successful",
@@ -117,7 +110,9 @@ export async function POST(req: Request) {
         id: user.id,
         email: user.email,
         name: user.full_name,
-        kycVerified: true,
+        role: user.role,
+        kycVerified: kyc?.verified || false,
+
       },
     });
 
@@ -125,7 +120,10 @@ export async function POST(req: Request) {
       httpOnly: true,
       sameSite: "lax",
       path: "/",
+      secure: false,
     });
+    console.log("Setting cookie:", token);
+    res.headers.append("X-Debug-Cookie", "attempted");
 
     return res;
 
