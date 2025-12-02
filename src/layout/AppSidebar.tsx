@@ -105,11 +105,11 @@ const userNavItems = [
 const adminNavItems = [
   { name: "Dashboard", href: "/admin", icon: LayoutDashboard },
   { name: "Users", href: "/admin/users", icon: Users },
-  { name: "KYC", href: "/admin/kyc", icon: ShieldCheck },
+  // { name: "KYC", href: "/admin/kyc", icon: ShieldCheck },
   { name: "Transactions", href: "/admin/transactions", icon: Receipt },
-  { name: "Swap Monitor", href: "/admin/swap", icon: Repeat },
-  { name: "Assets", href: "/admin/assets", icon: Wallet },
-  { name: "Fee Settings", href: "/admin/settings/fees", icon: Settings },
+  // { name: "Swap Monitor", href: "/admin/swap", icon: Repeat },
+  // { name: "Assets", href: "/admin/assets", icon: Wallet },
+  { name: "Fee Settings", href: "/admin/fees", icon: Settings },
 ];
 
 // =============================

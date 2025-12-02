@@ -98,6 +98,14 @@ export async function POST(req: Request) {
       return NextResponse.json({
         message: "KYC verification required",
         redirectTo: diditResponse.data.url, // 🔥 DIDIT KYC Interface
+        user: {
+          id: user.id,
+          email: user.email,
+          name: user.full_name,
+          role: user.role,
+          kycVerified: kyc?.verified || false,
+  
+        },
       });
     }
 
