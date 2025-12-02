@@ -18,6 +18,52 @@ const SigninPage = () => {
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) =>
     setFormData({ ...formData, [e.target.name]: e.target.value });
 
+  // const handleSubmit = async (e: React.FormEvent) => {
+  //   e.preventDefault();
+  //   setLoading(true);
+  //   setMessage("");
+
+  //   try {
+  //     const res = await fetch("/api/auth/login", {
+  //       method: "POST",
+  //       headers: { "Content-Type": "application/json" },
+  //       body: JSON.stringify(formData),
+  //     });
+
+  //     const data = await res.json();
+
+  //     if (!res.ok) {
+  //       setAlertTitle('Server Error');
+  //       setAlertMessage('Could not get response from server');
+  //       setAlertVariant('error');
+  //       setAlertVisible(true);
+  //     } else {
+  //       localStorage.setItem("user", JSON.stringify(data.user));
+  //       setAlertTitle('Login Successful');
+  //       setAlertMessage("Redirecting to dashboard...");
+  //       setAlertVariant('success');
+  //       setAlertVisible(true);
+  //       if (data.user.kycVerified) {
+  //         setTimeout(() => {
+  //           router.push("/dashboard");
+  //         }, 1000); // delay 1 second
+  //       } else {
+  //         setTimeout(() => {
+  //           router.push("/kyc-verification");
+  //         }, 1000); // delay 1 second
+  //       }
+
+  //     }
+  //   } catch (err) {
+  //     setAlertTitle('Server Error');
+  //     setAlertMessage('Something went wrong.');
+  //     setAlertVariant('error');
+  //     setAlertVisible(true);
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
@@ -34,26 +80,37 @@ const SigninPage = () => {
 
       if (!res.ok) {
         setAlertTitle('Server Error');
-        setAlertMessage('Could not get response from server');
+        setAlertMessage(data.error || 'Could not get response from server');
         setAlertVariant('error');
         setAlertVisible(true);
-      } else {
-        localStorage.setItem("user", JSON.stringify(data.user));
-        setAlertTitle('Login Successful');
-        setAlertMessage("Redirecting to dashboard...");
-        setAlertVariant('success');
-        setAlertVisible(true);
-        if (data.user.kycVerified) {
-          setTimeout(() => {
-            router.push("/dashboard");
-          }, 1000); // delay 1 second
-        } else {
-          setTimeout(() => {
-            router.push("/kyc-verification");
-          }, 1000); // delay 1 second
-        }
-
+        return;
       }
+
+      // 🟦 1. If backend tells us to redirect to DIDIT
+      if (data.redirectTo) {
+        setAlertTitle('KYC Required');
+        setAlertMessage("Redirecting to verification...");
+        setAlertVariant('warning');
+        setAlertVisible(true);
+
+        setTimeout(() => {
+          window.location.href = data.redirectTo; // 🔥 Go to DIDIT KYC UI
+        }, 1000);
+        return;
+      }
+
+      // 🟩 2. User is verified — normal login
+      localStorage.setItem("user", JSON.stringify(data.user));
+
+      setAlertTitle('Login Successful');
+      setAlertMessage("Redirecting to your dashboard...");
+      setAlertVariant('success');
+      setAlertVisible(true);
+
+      setTimeout(() => {
+        router.push("/dashboard");
+      }, 1000);
+
     } catch (err) {
       setAlertTitle('Server Error');
       setAlertMessage('Something went wrong.');
@@ -63,6 +120,7 @@ const SigninPage = () => {
       setLoading(false);
     }
   };
+
 
   useEffect(() => {
     if (alertVisible) {
