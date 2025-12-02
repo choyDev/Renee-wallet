@@ -111,7 +111,7 @@ model user {
   id                Int                 @id @default(autoincrement())
   email             String              @unique(map: "User_email_key")
   password_hash     String
-  role              UserRole            @default(user)
+  role              UserRole?           @default(user)
   createdAt         DateTime            @default(now())
   updatedAt         DateTime?           @default(now())
   full_name         String
